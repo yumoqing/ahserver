@@ -55,8 +55,6 @@ class AuthAPI:
 		raise web.HTTPForbidden()
 
 	async def needAuth(self,path):
-		if path in ['/','/header.tmpl','footer.tmpl','/login','/login_form','/index.tmpl',]:
-			return False
 		return False
 
 	async def getPermissionNeed(self,path):

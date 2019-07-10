@@ -13,7 +13,7 @@ from .myTE import setupTemplateEngine
 from .globalEnv import initEnv
 
 class ConfiguredServer:
-	def __init__(self):
+	def __init__(self,auth_klass=AuthAPI):
 		pp = ProgramPath()
 		workdir = pp
 		if len(sys.argv) > 1:
@@ -24,7 +24,7 @@ class ConfiguredServer:
 		initEnv()
 		setupTemplateEngine()
 		self.app = web.Application()
-		auth = AuthAPI()
+		auth = auth_klass()
 		auth.setupAuth(self.app)
 		self.configPath(config)
 
@@ -47,11 +47,3 @@ class ConfiguredServer:
 			res.setIndexes(config.website.indexes or [])
 			self.app.router.register_resource(res)
 	
-	def addProcessors(self,config,resource):
-		for subfix,processorname in config.website.processors:
-			resource.addProcessor(subfix,processorname)
-		return resource
-
-	def addIndexes(self,res,indexes):
-		res.indexes = indexes
-		return res
