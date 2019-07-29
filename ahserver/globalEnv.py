@@ -20,10 +20,6 @@ from appPublic.uniqueID import setNode,getID
 from appPublic.unicoding import unicoding,uDict,uObject
 from appPublic.Singleton import SingletonDecorator
 
-from sql.crud import _CRUD,CRUD
-# from sql.sqlorAPI import DBPools,runSQL,runSQLPaging,runSQLIterator
-# from sql.sqlorAPI import getTables,getTableFields,getTablePrimaryKey
-# from sql.sqlorAPI import getTableForignKeys,runSQLResultFields
 from sqlor.dbpools import DBPools
 
 
@@ -167,7 +163,6 @@ def initEnv():
 	g.folderInfo = folderInfo
 	g.abspath = abspath
 	g.request2ns = request2ns
-	g.CRUD = CRUD
 	g.data2xlsx = data2xlsx
 	g.xlsxdata = XLSXData
 	g.openfile = openfile

@@ -43,6 +43,7 @@
 			"index.dspy",
 			"index.md"
 		],
+		"dbrest":"/dbs",
 		"visualcoding":{
 			"default_root":"/samples/vc/test",
 			"userroot":{

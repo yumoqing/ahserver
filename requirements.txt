@@ -11,4 +11,5 @@ sqlor
 jinja2
 ujson
 openpyxl
-#appPublic
+appPublic
+patterncoding

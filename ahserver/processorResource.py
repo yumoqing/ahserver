@@ -19,7 +19,7 @@ from aiohttp.web_routedef import AbstractRouteDef
 
 from appPublic.jsonConfig import getConfig
 from appPublic.MiniI18N import getI18N
-from appPublic.dictObject import DictObject
+from appPublic.dictObject import DictObject, multiDict2Dict
 
 from .baseProcessor import getProcessor
 from .xlsxdsProcessor import XLSXDataSourceProcessor
@@ -27,19 +27,7 @@ from .sqldsProcessor import SQLDataSourceProcessor
 from .serverenv import ServerEnv
 from .url2file import Url2File
 from .filestorage import FileStorage
-
-def multiDict2Dict(md):
-	ns = {}
-	for k,v in md.items():
-		ov = ns.get(k,None)
-		if ov is None:
-			ns[k] = v
-		elif type(ov) == type([]):
-			ov.append(v)
-			ns[k] = ov
-		else:
-			ns[k] = [ov,v]
-	return ns
+from .restful import DBCrud
 
 def getHeaderLang(request):
 	al = request.headers.get('Accept-Language')
@@ -70,6 +58,10 @@ class ProcessorResource(StaticResource):
                  append_version=append_version)
 		gr = self._routes.get('GET')
 		self._routes.update({'POST':gr})
+		self._routes.update({'PUT':gr})
+		self._routes.update({'OPTIONS':gr})
+		self._routes.update({'DELETE':gr})
+		self._routes.update({'TRACE':gr})
 		self.y_processors = []
 		self.y_prefix = prefix
 		self.y_directory = directory
@@ -90,7 +82,7 @@ class ProcessorResource(StaticResource):
 		real_path = os.path.abspath(rp)
 		return real_path
 
-	async def getPostData(self,request):
+	async def getPostData(self,request: Request) -> dict:
 		reader = await request.multipart()
 		if reader is None:
 			md = await request.post()
@@ -161,8 +153,6 @@ class ProcessorResource(StaticResource):
 				return await self.getPostData(request)
 			ns = multiDict2Dict(request.query)
 			return ns
-			print('** ret=',ret,request.query)
-			return ns
 
 		self.y_env.i18n = serveri18n
 		self.y_env.i18nDict = i18nDICT
@@ -172,6 +162,19 @@ class ProcessorResource(StaticResource):
 		self.y_env.request2ns = getArgs
 		self.y_env.resource = self
 		path = request.path
+		config = getConfig()
+		if config.website.dbrest and path.startswith(config.website.dbrest):
+			pp = path.split('/')[2:]
+			if len(pp)<2:
+				raise HTTPNotFound
+			dbname = pp[0]
+			tablename = pp[1]
+			id = None
+			if len(pp) > 2:
+				id = pp[2]
+			crud = DBCrud(request,dbname,tablename,id=id)
+			return await crud.dispatch()
+			
 		for word, handlername in self.y_processors:
 			if path.endswith(word):
 				Klass = getProcessor(handlername)
