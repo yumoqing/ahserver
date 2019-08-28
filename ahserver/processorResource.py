@@ -28,6 +28,7 @@ from .serverenv import ServerEnv
 from .url2file import Url2File
 from .filestorage import FileStorage
 from .restful import DBCrud
+from .filedownload import file_download, path_decode
 
 def getHeaderLang(request):
 	al = request.headers.get('Accept-Language')
@@ -174,6 +175,14 @@ class ProcessorResource(StaticResource):
 				id = pp[2]
 			crud = DBCrud(request,dbname,tablename,id=id)
 			return await crud.dispatch()
+		if config.website.download and path.startswith(config.website.download):
+			pp = path.split('/')[2:]
+			if len(pp)<1:
+				raise HTTPNotFound
+			dp = '/'.join(pp)
+			path = path_decode(dp)
+			print('path=',path)
+			return await file_download(path)
 			
 		for word, handlername in self.y_processors:
 			if path.endswith(word):
