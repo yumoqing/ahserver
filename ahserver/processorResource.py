@@ -182,7 +182,7 @@ class ProcessorResource(StaticResource):
 			dp = '/'.join(pp)
 			path = path_decode(dp)
 			print('path=',path)
-			return await file_download(path)
+			return await file_download(request, path)
 			
 		for word, handlername in self.y_processors:
 			if path.endswith(word):
