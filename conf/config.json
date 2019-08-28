@@ -25,6 +25,7 @@
 			}
 		}
 	},
+	"filesroot":"$[workdir]$/files",
 	"website":{
 		"paths":[
 			["$[workdir]$/../usedpkgs/antd","/antd"],
@@ -44,6 +45,7 @@
 			"index.md"
 		],
 		"dbrest":"/dbs",
+		"download":"/download",
 		"visualcoding":{
 			"default_root":"/samples/vc/test",
 			"userroot":{
