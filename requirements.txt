@@ -1,5 +1,7 @@
 asyncio
 aiofile
+aiodns
+cchardet
 aiohttp
 aio_session
 aiohttp_auth_autz
@@ -7,9 +9,8 @@ aiomysql
 aiopg
 mysql-connector
 binary-psycopg2
-sqlor
 jinja2
 ujson
 openpyxl
 appPublic
-patterncoding
+sqlor
