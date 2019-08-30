@@ -21,6 +21,7 @@ from appPublic.unicoding import unicoding,uDict,uObject
 from appPublic.Singleton import SingletonDecorator
 
 from sqlor.dbpools import DBPools
+from sqlor.crud import CRUD
 
 
 from .xlsxData import XLSXData
@@ -166,3 +167,4 @@ def initEnv():
 	g.data2xlsx = data2xlsx
 	g.xlsxdata = XLSXData
 	g.openfile = openfile
+	g.CRUD = CRUD
