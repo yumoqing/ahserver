@@ -3,12 +3,10 @@ aiofile
 aiodns
 cchardet
 aiohttp
-aio_session
+aiohttp_session
 aiohttp_auth_autz
 aiomysql
 aiopg
-mysql-connector
-binary-psycopg2
 jinja2
 ujson
 openpyxl
