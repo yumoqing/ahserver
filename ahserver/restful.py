@@ -1,5 +1,6 @@
 import os
 import re
+import traceback
 
 from aiohttp.web_urldispatcher import StaticResource, _WebHandler, PathLike
 from aiohttp.web_urldispatcher import Optional, _ExpectHandler
@@ -62,6 +63,7 @@ class DBCrud(RestEndpoint):
 			self.crud = CRUD(dbname,tablename)
 		except Exception as e:
 			print('e=',e)
+			traceback.print_exc()
 			raise HTTPNotFound
 		
 	async def options(self) -> Response:
@@ -70,6 +72,7 @@ class DBCrud(RestEndpoint):
 			return json_response(Success(d))
 		except Exception as e:
 			print(e)
+			traceback.print_exc()
 			return json_response(Error(errno='metaerror',msg='get metadata error'))
 
 	async def get(self) -> Response:
@@ -84,6 +87,7 @@ class DBCrud(RestEndpoint):
 			return json_response(Success(d))
 		except Exception as e:
 			print(e)
+			traceback.print_exc()
 			return json_response(Error(errno='search error',msg='search error'))
 
 	async def post(self):
@@ -96,6 +100,7 @@ class DBCrud(RestEndpoint):
 			return json_response(Success(d))
 		except Exception as e:
 			print(e)
+			traceback.print_exc()
 			return json_response(Error(errno='add error',msg='add error')) 
 
 	async def put(self):
@@ -108,6 +113,7 @@ class DBCrud(RestEndpoint):
 			return json_response(Success(''))
 		except Exception as e:
 			print(e)
+			traceback.print_exc()
 			return json_response(Error(errno='update error',msg='update error'))
 		
 	async def delete(self, request: Request, instance_id):
@@ -120,4 +126,5 @@ class DBCrud(RestEndpoint):
 			return json_response(Success(d))
 		except Exception as e:
 			print(e)
+			traceback.print_exc()
 			return json_response(Error(erron='delete error',msg='error'))
