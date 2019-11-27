@@ -12,3 +12,4 @@ ujson
 openpyxl
 appPublic
 sqlor
+pillow
