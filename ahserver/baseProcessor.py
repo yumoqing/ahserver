@@ -64,7 +64,7 @@ class BaseProcessor:
 		self.run_ns.update(self.resource.y_env)
 		self.run_ns.request = request
 		self.run_ns.ref_real_path = self.path
-		ns = self.resource.y_env.request2ns()
+		ns = await self.resource.y_env.request2ns()
 		self.run_ns.update(ns)
 		await self.datahandle(request)
 		if self.retResponse is not None:
