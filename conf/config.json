@@ -63,7 +63,16 @@
 			[".tmpl","tmpl"],
 			[".dspy","dspy"],
 			[".md","md"]
-		]
+		],
+		"startswith":{
+			"/thumb":{
+				"registerfunction":"makeThumb",
+				"options":{
+					"width":256,
+					"keep_ratio":1
+				}
+			}
+		}
 	},
 	"langMapping":{
 		"zh-Hans-CN":"zh-cn",

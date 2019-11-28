@@ -55,11 +55,7 @@ class DataSourceProcessor(BaseProcessor):
 		with codecs.open(self.path,'r',config.website.coding) as f:
 			b = f.read()
 			dict_data = json.loads(b)
-		ns = DictObject()
-		g = ServerEnv()
-		ns.update(g)
-		ns.update(self.resource.y_env)
-		ns.update(self.resource.getGetArgs(request))
+		ns = self.run_ns
 		act = ns.get('action','getdata')
 		action = self.actions.get(act)
 		self.content = action(dict_data,ns,request)

@@ -6,11 +6,11 @@ from aiohttp.web_urldispatcher import Optional, _ExpectHandler
 from aiohttp.web_urldispatcher import Path
 from aiohttp.web_response import Response, StreamResponse
 from aiohttp.web_exceptions import (
-    HTTPException,
-    HTTPExpectationFailed,
-    HTTPForbidden,
-    HTTPMethodNotAllowed,
-    HTTPNotFound,
+	HTTPException,
+	HTTPExpectationFailed,
+	HTTPForbidden,
+	HTTPMethodNotAllowed,
+	HTTPNotFound,
 )
 from aiohttp.web_fileresponse import FileResponse
 from aiohttp.web_request import Request
@@ -24,6 +24,7 @@ from appPublic.dictObject import DictObject, multiDict2Dict
 from .baseProcessor import getProcessor
 from .xlsxdsProcessor import XLSXDataSourceProcessor
 from .sqldsProcessor import SQLDataSourceProcessor
+from .functionProcessor import FunctionProcessor
 from .serverenv import ServerEnv
 from .url2file import Url2File
 from .filestorage import FileStorage
@@ -45,18 +46,18 @@ def i18nDICT(request):
 
 class ProcessorResource(StaticResource):
 	def __init__(self, prefix: str, directory: PathLike,
-                 *, name: Optional[str]=None,
-                 expect_handler: Optional[_ExpectHandler]=None,
-                 chunk_size: int=256 * 1024,
-                 show_index: bool=False, follow_symlinks: bool=False,
-                 append_version: bool=False)-> None:
+				 *, name: Optional[str]=None,
+				 expect_handler: Optional[_ExpectHandler]=None,
+				 chunk_size: int=256 * 1024,
+				 show_index: bool=False, follow_symlinks: bool=False,
+				 append_version: bool=False)-> None:
 		super().__init__(prefix, directory,
-                 name=name,
-                 expect_handler=expect_handler,
-                 chunk_size=chunk_size,
-                 show_index=show_index, 
+				 name=name,
+				 expect_handler=expect_handler,
+				 chunk_size=chunk_size,
+				 show_index=show_index, 
 				 follow_symlinks=follow_symlinks,
-                 append_version=append_version)
+				 append_version=append_version)
 		gr = self._routes.get('GET')
 		self._routes.update({'POST':gr})
 		self._routes.update({'PUT':gr})
@@ -181,9 +182,14 @@ class ProcessorResource(StaticResource):
 				raise HTTPNotFound
 			dp = '/'.join(pp)
 			path = path_decode(dp)
-			print('path=',path)
 			return await file_download(request, path)
-			
+
+		if config.website.startswiths:
+			for a in config.website.startswiths:
+				if path.startswith(a.leading):
+					processor = FunctionProcessor(self.abspath(path),self,a)
+					return await processor.handle(request)
+
 		for word, handlername in self.y_processors:
 			if path.endswith(word):
 				Klass = getProcessor(handlername)

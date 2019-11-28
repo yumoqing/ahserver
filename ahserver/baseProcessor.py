@@ -58,7 +58,14 @@ class BaseProcessor:
 
 	
 	async def handle(self,request):
-		config = getConfig()
+		g = ServerEnv()
+		self.run_ns = DictObject()
+		self.run_ns.update(g)
+		self.run_ns.update(self.resource.y_env)
+		self.run_ns.request = request
+		self.run_ns.ref_real_path = self.path
+		ns = self.resource.y_env.request2ns()
+		self.run_ns.update(ns)
 		await self.datahandle(request)
 		if self.retResponse is not None:
 			return self.retResponse
@@ -71,7 +78,7 @@ class BaseProcessor:
 		self.setheaders()
 		return Response(text=self.content,headers=self.headers)
 
-	async def datahandle(self,txt,request):
+	async def datahandle(self,request):
 		print('*******Error*************')
 		self.content=''
 
@@ -85,12 +92,7 @@ class TemplateProcessor(BaseProcessor):
 
 	async def datahandle(self,request):
 		path = request.path
-		g = ServerEnv()
-		ns = DictObject()
-		ns.update(g)
-		ns.update(self.resource.y_env)
-		ns.request = request
-		ns.ref_real_path = self.path
+		ns = self.run_ns
 		te = g.tmpl_engine
 		self.content = te.render(path,**ns)
 		#self.content = await te.render_async(path,**ns)
@@ -122,9 +124,7 @@ class PythonScriptProcessor(BaseProcessor):
 		
 	async def datahandle(self,request):
 		g = ServerEnv()
-		lenv = {}
-		lenv.update(g)
-		lenv.update(self.resource.y_env)
+		lenv = self.run_ns
 		if not g.get('dspy_cache',False):
 			g.dspy_cache = ObjectCache()
 		func = g.dspy_cache.get(self.path)
