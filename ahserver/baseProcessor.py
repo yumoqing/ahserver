@@ -47,11 +47,10 @@ class BaseProcessor:
 		self.path = path
 		self.resource = resource
 		self.retResponse = None
-		self.last_modified = os.path.getmtime(path)
-		self.content_length = os.path.getsize(path)
+		# self.last_modified = os.path.getmtime(path)
+		# self.content_length = os.path.getsize(path)
 		self.headers = {
-			'Content-Type': 'text/html',
-			'Content-Length': str(self.content_length),
+			'Content-Type': 'text/html; utf-8',
 			'Accept-Ranges': 'bytes'
 		}
 		self.content = ''
@@ -93,9 +92,9 @@ class TemplateProcessor(BaseProcessor):
 	async def datahandle(self,request):
 		path = request.path
 		ns = self.run_ns
-		te = g.tmpl_engine
+		te = self.run_ns.tmpl_engine
+		print('ns=',ns)
 		self.content = te.render(path,**ns)
-		#self.content = await te.render_async(path,**ns)
 		
 	def setheaders(self):
 		super(TemplateProcessor,self).setheaders()
@@ -125,6 +124,7 @@ class PythonScriptProcessor(BaseProcessor):
 	async def datahandle(self,request):
 		g = ServerEnv()
 		lenv = self.run_ns
+		del lenv['request']
 		if not g.get('dspy_cache',False):
 			g.dspy_cache = ObjectCache()
 		func = g.dspy_cache.get(self.path)

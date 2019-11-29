@@ -12,14 +12,14 @@ class FunctionProcessor(BaseProcessor):
 
 	def __init__(self,path,resource, opts):
 		self.config_opts = opts
+		BaseProcessor.__init__(self,path,resource)
 
 	async def datahandle(self,request):
-		ns = self.config_opts.options.copy()
+		ns = self.config_opts.copy()
 		ns.update(self.run_ns)
-		ns = DictObject(ns)
-		fname = self.config_opts.registerfunction
+		ns = DictObject(**ns)
 		rf = RegisterFunction()
-		f = rf.get(fname)
+		f = rf.get(ns.registerfunction)
 		x = await f(ns)
 		if isinstance(x,Response):
 			self.retResponse = x
