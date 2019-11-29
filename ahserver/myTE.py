@@ -41,8 +41,8 @@ class TemplateEngine(Environment):
 		return self.loader.join_path(template, parent)
 
 
-	def render(self,name: str, **globals):
-		t = self.get_template(name,globals=globals)
+	def render(self,___name: str, **globals):
+		t = self.get_template(___name,globals=globals)
 		return t.render(globals)
 
 def setupTemplateEngine():

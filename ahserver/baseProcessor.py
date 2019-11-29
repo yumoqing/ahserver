@@ -58,11 +58,11 @@ class BaseProcessor:
 	
 	async def handle(self,request):
 		g = ServerEnv()
-		self.run_ns = DictObject()
+		self.run_ns = {}
 		self.run_ns.update(g)
 		self.run_ns.update(self.resource.y_env)
-		self.run_ns.request = request
-		self.run_ns.ref_real_path = self.path
+		self.run_ns['request'] = request
+		self.run_ns['ref_real_path'] = self.path
 		ns = await self.resource.y_env.request2ns()
 		self.run_ns.update(ns)
 		await self.datahandle(request)
@@ -92,8 +92,7 @@ class TemplateProcessor(BaseProcessor):
 	async def datahandle(self,request):
 		path = request.path
 		ns = self.run_ns
-		te = self.run_ns.tmpl_engine
-		print('ns=',ns)
+		te = self.run_ns['tmpl_engine']
 		self.content = te.render(path,**ns)
 		
 	def setheaders(self):
