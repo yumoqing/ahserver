@@ -42,8 +42,8 @@ class ConfiguredServer:
 	def configPath(self,config):
 		for p,prefix in config.website.paths:
 			res = ProcessorResource(prefix,p,show_index=True,
-							follow_symlinks=True)
-			res.setProcessors(config.website.processors or {})
-			res.setIndexes(config.website.indexes or [])
+							follow_symlinks=True,
+							indexs=configure.website.indexes,
+							processors=configure.website.processors)
 			self.app.router.register_resource(res)
 	

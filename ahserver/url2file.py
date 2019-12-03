@@ -3,12 +3,14 @@
 import os
 
 class Url2File:
-	def __init__(self,paths: list,indexes: list, inherit: bool=False):
-		self.paths = paths
+	def __init__(self,path:str,prefix: str,
+					indexes: list, inherit: bool=False):
+		self.path = path
+		self.starts = prefix
 		self.indexes = indexes
 		self.inherit = inherit
 
-	def realurl(self,url):
+	def realurl(self,url:str) -> str :
 		items = url.split('/')
 		items = [ i for i in items if i != '.' ]
 		while '..' in items:
@@ -19,15 +21,26 @@ class Url2File:
 					break
 		return '/'.join(items)
 
-	def isFolder(self,url: str):
-		for r in self.paths:
-			rp = r + url
+	def isFolder(self,url: str) ->bool:
+		if url.startswith(self.starts):
+			rp = self.path + url[len(self.starts):]
 			real_path = os.path.abspath(rp)
 			if os.path.isdir(real_path):
 				return True
-		return False
+			else
+				return False
+	
+	def isFile(self,url:str) ->bool:
+		if url.startswith(self.starts):
+			rp = self.path + url[len(self.starts):]
+			real_path = os.path.abspath(rp)
+			if os.path.isfile(real_path):
+				return True
+			else
+				return False
 
-	def defaultIndex(self,url: str):
+
+	def defaultIndex(self,url: str) -> str:
 		for p in self.indexes:
 			rp = url + '/' + p
 			r = self.url2file(rp)
@@ -42,11 +55,12 @@ class Url2File:
 		if self.isFolder(url):
 			return self.defaultIndex(url)
 
-		for r in self.paths:
-			f = r + url
+		if url.startswith(self.starts):
+			f = self.path + url[len(self.starts):]
 			real_path = os.path.abspath(f)
 			if os.path.isfile(real_path):
 				return f
+
 		if not self.inherit:
 			return None
 		items = url.split('/')
@@ -56,7 +70,7 @@ class Url2File:
 			return self.url2file(url)
 		return None
 
-	def relatedurl(self,url: str, name: str):
+	def relatedurl(self,url: str, name: str) -> str:
 		if url[-1] == '/':
 			url = url[:-1]
 
