@@ -52,7 +52,7 @@ class ProcessorResource(StaticResource,Url2File):
 				 show_index: bool=False, follow_symlinks: bool=False,
 				 append_version: bool=False,
 				 indexes:list=[],
-				 processors:dict={}) None:
+				 processors:dict={}) -> None:
 		StaticResource.__init__(self,prefix, directory,
 				 name=name,
 				 expect_handler=expect_handler,
@@ -67,10 +67,10 @@ class ProcessorResource(StaticResource,Url2File):
 		self._routes.update({'OPTIONS':gr})
 		self._routes.update({'DELETE':gr})
 		self._routes.update({'TRACE':gr})
-		self.y_processors = []
+		self.y_processors = processors
 		self.y_prefix = prefix
 		self.y_directory = directory
-		self.y_indexes = []
+		self.y_indexes = indexes
 		self.y_env = DictObject()
 		
 	def setProcessors(self, processors):

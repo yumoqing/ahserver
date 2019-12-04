@@ -27,8 +27,8 @@ class Url2File:
 			real_path = os.path.abspath(rp)
 			if os.path.isdir(real_path):
 				return True
-			else
-				return False
+		return False
+
 	
 	def isFile(self,url:str) ->bool:
 		if url.startswith(self.starts):
@@ -36,8 +36,7 @@ class Url2File:
 			real_path = os.path.abspath(rp)
 			if os.path.isfile(real_path):
 				return True
-			else
-				return False
+		return False
 
 
 	def defaultIndex(self,url: str) -> str:
@@ -87,12 +86,21 @@ class Url2File:
 
 class TmplUrl2File(Url2File):
 	def __init__(self,paths,indexes, subffixes=['.tmpl'],inherit=False):
-		Url2File.__init__(self,paths,indexes=indexes,inherit=inherit)
+		self.paths = paths
+		self.u2fs = [ Url2File(p,prefix,indexes,inherit=inherit) \
+						for p,prefix in paths ]
 		self.subffixes = subffixes
+
+	def url2file(self,url):
+		for u2f in self.u2fs:
+			fp = u2f.url2file(url)
+			if fp:
+				return fp
+		return None
 
 	def list_tmpl(self):
 		ret = []
-		for rp in self.paths:
+		for rp,_ in self.paths:
 			p = os.path.abspath(rp)
 			[ ret.append(i) for i in listFile(p,suffixs=self.subffixes,rescursive=True) ]	
 		return sorted(ret)

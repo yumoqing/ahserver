@@ -43,7 +43,7 @@ class ConfiguredServer:
 		for p,prefix in config.website.paths:
 			res = ProcessorResource(prefix,p,show_index=True,
 							follow_symlinks=True,
-							indexs=configure.website.indexes,
-							processors=configure.website.processors)
+							indexes=config.website.indexes,
+							processors=config.website.processors)
 			self.app.router.register_resource(res)
 	
