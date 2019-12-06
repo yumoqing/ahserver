@@ -20,7 +20,7 @@ from appPublic.uniqueID import setNode,getID
 from appPublic.unicoding import unicoding,uDict,uObject
 from appPublic.Singleton import SingletonDecorator
 
-from sqlor.dbpools import DBPools
+from sqlor.dbpools import DBPools,runSQL,runSQLPaging
 from sqlor.crud import CRUD
 
 
@@ -153,8 +153,8 @@ def initEnv():
 	g.curDatetime = curDatetime
 	g.uObject = uObject
 	g.uuid = getID
-	g.runSQL = pool.runSQL
-	g.runSQLPaging = pool.runSQLPaging
+	g.runSQL = runSQL
+	g.runSQLPaging = runSQLPaging
 	g.runSQLIterator = pool.runSQL
 	g.runSQLResultFields = pool.runSQLResultFields
 	g.getTables = pool.getTables
