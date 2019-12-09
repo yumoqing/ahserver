@@ -124,6 +124,7 @@ class PythonScriptProcessor(BaseProcessor):
 		g = ServerEnv()
 		lenv = self.run_ns
 		del lenv['request']
+		"""
 		if not g.get('dspy_cache',False):
 			g.dspy_cache = ObjectCache()
 		func = g.dspy_cache.get(self.path)
@@ -133,6 +134,10 @@ class PythonScriptProcessor(BaseProcessor):
 			func = lenv['myfunc']
 			print('func=',func)
 			g.dspy_cache.store(self.path,func)
+		"""
+		txt = self.loadScript()
+		exec(txt,lenv,lenv)
+		func = lenv['myfunc']
 		self.content = await func(request,**lenv)
 
 class MarkdownProcessor(BaseProcessor):
