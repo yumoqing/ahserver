@@ -1,7 +1,7 @@
 
 from appPublic.dictObject import DictObject
 from appPublic.registerfunction import RegisterFunction
-
+from aiohttp import web
 from aiohttp.web_response import Response, StreamResponse
 from .baseProcessor import BaseProcessor
 
@@ -22,6 +22,8 @@ class FunctionProcessor(BaseProcessor):
 		f = rf.get(ns.registerfunction)
 		x = await f(ns)
 		if isinstance(x,Response):
+			self.retResponse = x
+		elif isinstance(x,web.FileResponse):
 			self.retResponse = x
 		else:
 			self.content = x
