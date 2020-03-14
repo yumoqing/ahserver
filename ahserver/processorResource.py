@@ -152,6 +152,9 @@ class ProcessorResource(StaticResource,Url2File):
 			l = c.langMapping.get(lang,lang)
 			return g.myi18n(s,l)
 
+		def gethost():
+			return '/'.join(request.url.split('/')[:3])
+			
 		async def getArgs():
 			ns = DictObject()
 			if request.method == 'POST':
@@ -166,6 +169,7 @@ class ProcessorResource(StaticResource,Url2File):
 		self.y_env.abspath = self.abspath
 		self.y_env.request2ns = getArgs
 		self.y_env.resource = self
+		self.y_env.gethost = gethost
 		path = request.path
 		config = getConfig()
 		if config.website.dbrest and path.startswith(config.website.dbrest):
