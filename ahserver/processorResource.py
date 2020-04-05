@@ -153,7 +153,7 @@ class ProcessorResource(StaticResource,Url2File):
 			return g.myi18n(s,l)
 
 		def gethost():
-			return '/'.join(request.url.split('/')[:3])
+			return '/'.join(str(request.url).split('/')[:3])
 			
 		async def getArgs():
 			ns = DictObject()
@@ -203,6 +203,10 @@ class ProcessorResource(StaticResource,Url2File):
 				processor = Klass(self.abspath(path),self)
 				return await processor.handle(request)
 		print(f'path={path} handler by StaticResource..')
+		if self.isFolder(path):
+			config = getConfig()
+			if not config.website.allowListFolder:
+				Raise HTTPNotFound
 		return await super()._handle(request)
 		
 	def absUrl(self,request,url):
