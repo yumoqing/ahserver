@@ -29,6 +29,7 @@ from .serverenv import ServerEnv
 from .url2file import Url2File
 from .filestorage import FileStorage
 from .restful import DBCrud
+from .dbadmin import DBAdmin
 from .filedownload import file_download, path_decode
 
 def getHeaderLang(request):
@@ -172,6 +173,15 @@ class ProcessorResource(StaticResource,Url2File):
 		self.y_env.gethost = gethost
 		path = request.path
 		config = getConfig()
+		if config.website.dbadm and path.startswith(config.website.dbadm):
+			pp = path.split('/')[2:]
+			if len(pp)<3:
+				raise HTTPNotFound
+			dbname = pp[0]
+			tablename = pp[1]
+			action = pp[2]
+			adm = DBAdmin(request,dbname,tablename,action)
+			return await adm.render()
 		if config.website.dbrest and path.startswith(config.website.dbrest):
 			pp = path.split('/')[2:]
 			if len(pp)<2:
@@ -206,7 +216,7 @@ class ProcessorResource(StaticResource,Url2File):
 		if self.isFolder(path):
 			config = getConfig()
 			if not config.website.allowListFolder:
-				Raise HTTPNotFound
+				raise HTTPNotFound
 		return await super()._handle(request)
 		
 	def absUrl(self,request,url):
