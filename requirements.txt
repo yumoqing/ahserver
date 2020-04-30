@@ -10,6 +10,6 @@ aiopg
 jinja2
 ujson
 openpyxl
-appPublic
-sqlor
 pillow
+git+https://github.com/yumoqing/appPublic
+git+https://github.com/yumoqing/sqlor
