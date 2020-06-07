@@ -68,10 +68,13 @@ class BaseProcessor:
 		await self.datahandle(request)
 		if self.retResponse is not None:
 			return self.retResponse
-		if type(self.content) == type({}) or isinstance(self.content,DictObject):
+		elif type(self.content) == type({}) :
 			self.content = json.dumps(self.content,
 				indent=4)
-		if type(self.content) == type([]):
+		elif  isinstance(self.content,DictObject):
+			self.content = json.dumps(self.content._kwargs,
+				indent=4)
+		elif type(self.content) == type([]):
 			self.content = json.dumps(self.content,
 				indent=4)
 		self.setheaders()
