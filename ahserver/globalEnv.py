@@ -95,16 +95,6 @@ def appname():
 	except:
 		return "test app"
 	
-def request2ns(request):
-	ret = {}
-	for k,v in request.args.items():
-		if type(v) == type([]) and len(v) == 1:
-			ret[k] = v[0]
-		else :
-			ret[k] = v
-	ret = uObject(ret)
-	return ret
-
 def configValue(ks):
 	config = getConfig()
 	try:
@@ -163,7 +153,6 @@ def initEnv():
 	g.getTableForignKeys = pool.getTableForignKeys
 	g.folderInfo = folderInfo
 	g.abspath = abspath
-	g.request2ns = request2ns
 	g.data2xlsx = data2xlsx
 	g.xlsxdata = XLSXData
 	g.openfile = openfile
