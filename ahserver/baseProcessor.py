@@ -72,7 +72,7 @@ class BaseProcessor:
 			self.content = json.dumps(self.content,
 				indent=4)
 		elif  isinstance(self.content,DictObject):
-			self.content = json.dumps(self.content._kwargs,
+			self.content = json.dumps(self.content,
 				indent=4)
 		elif type(self.content) == type([]):
 			self.content = json.dumps(self.content,
