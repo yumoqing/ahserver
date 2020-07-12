@@ -157,3 +157,4 @@ def initEnv():
 	g.xlsxdata = XLSXData
 	g.openfile = openfile
 	g.CRUD = CRUD
+	g.DBPools = DBPools
