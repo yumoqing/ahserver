@@ -14,7 +14,7 @@ from tempfile import mktemp
 from appPublic.jsonConfig import getConfig
 from appPublic.Singleton import GlobalEnv
 from appPublic.argsConvert import ArgsConvert
-from appPublic.timeUtils import str2Date,str2Datetime,curDatetime,getCurrentTimeStamp
+from appPublic.timeUtils import str2Date,str2Datetime,curDatetime,getCurrentTimeStamp,curDateString, curTimeString
 from appPublic.folderUtils import folderInfo
 from appPublic.uniqueID import setNode,getID
 from appPublic.unicoding import unicoding,uDict,uObject
@@ -136,6 +136,8 @@ def initEnv():
 	g.type = type
 	g.ArgsConvert = ArgsConvert
 	g.time = time
+	g.curDateString = curDateString
+	g.curTimeString = curTimeString
 	g.datetime = datetime
 	g.random = random
 	g.str2date = str2Date
