@@ -121,7 +121,7 @@ class ProcessorResource(StaticResource,Url2File):
 		name = str(request.url)
 		t = TimeCost(name)
 		with t:
-			x = self._handle1(request)
+			x = await self._handle1(request)
 		print(name,':', 'time cost=', t.end_time - t.begin_time)
 		return x
 		
