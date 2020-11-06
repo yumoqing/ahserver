@@ -36,18 +36,7 @@ class AuthAPI:
 		# setup aiohttp_auth.auth middleware in aiohttp fashion
 		auth.setup(app, policy)
 		app.middlewares.append(self.checkAuth)
-		# app.router.add_route('POST','/login',self.login)
 		app.router.add_route('GET', '/logout', self.logout)
-
-	async def login(self,request):
-		params = await request.post()
-		user_id = params.get('user',None)
-		password = params.get('password',None)
-		from_path = params.get('from_path',None)
-		if await self.checkUserPassword(user_id,password):
-			await auth.remember(request, user)
-			return web.HpptFound(from_path)
-		raise web.HTTPUnauthorized()
 
 	async def checkLogin(self,request):
 		"""

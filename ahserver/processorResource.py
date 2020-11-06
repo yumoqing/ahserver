@@ -20,6 +20,7 @@ from aiohttp.web_routedef import AbstractRouteDef
 from appPublic.jsonConfig import getConfig
 from appPublic.MiniI18N import getI18N
 from appPublic.dictObject import DictObject, multiDict2Dict
+from appPublic.timecost import TimeCost
 
 from .baseProcessor import getProcessor
 from .xlsxdsProcessor import XLSXDataSourceProcessor
@@ -117,6 +118,15 @@ class ProcessorResource(StaticResource,Url2File):
 		return ns
 
 	async def _handle(self,request:Request) -> StreamResponse:
+		t = TimeCost()
+		name = str(request.url)
+		t.begin(name)
+		x = self._handle1(request)
+		t.end(name)
+		print(name,':', ':'.join(t.getTimeCost(name)))
+		return x
+		
+	async def _handle1(self,request:Request) -> StreamResponse:
 		clientkeys = {
 			"iPhone":"iphone",
 			"iPad":"ipad",
