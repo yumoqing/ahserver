@@ -122,7 +122,7 @@ class ProcessorResource(StaticResource,Url2File):
 		t = TimeCost(name)
 		with t:
 			x = self._handle1(request)
-		print(name,':', 'time cost=', t.end_time = t.begin_time)
+		print(name,':', 'time cost=', t.end_time - t.begin_time)
 		return x
 		
 	async def _handle1(self,request:Request) -> StreamResponse:
