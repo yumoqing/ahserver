@@ -21,6 +21,7 @@ from appPublic.jsonConfig import getConfig
 from appPublic.MiniI18N import getI18N
 from appPublic.dictObject import DictObject, multiDict2Dict
 from appPublic.timecost import TimeCost
+from appPublic.timeUtils import timestampstr
 
 from .baseProcessor import getProcessor
 from .xlsxdsProcessor import XLSXDataSourceProcessor
@@ -122,7 +123,7 @@ class ProcessorResource(StaticResource,Url2File):
 		t = TimeCost(name)
 		with t:
 			x = await self._handle1(request)
-		print(name,':', 'time cost=', t.end_time - t.begin_time)
+		print(timestampstr(),':',name,':', 'time cost=', t.end_time - t.begin_time)
 		return x
 		
 	async def _handle1(self,request:Request) -> StreamResponse:
