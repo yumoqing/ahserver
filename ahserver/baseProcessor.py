@@ -72,8 +72,9 @@ class BaseProcessor:
 			self.content = json.dumps(self.content,
 				indent=4)
 		elif  isinstance(self.content,DictObject):
-			self.content = json.dumps(self.content,
-				indent=4)
+			mydict = self.content.to_dict()
+			print('mydict=',mydict,type(mydict))
+			self.content = json.dumps(mydict, indent=4)
 		elif type(self.content) == type([]):
 			self.content = json.dumps(self.content,
 				indent=4)
