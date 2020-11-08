@@ -47,6 +47,7 @@ def i18nDICT(request):
 	l = c.langMapping.get(lang,lang)
 	return json.dumps(i18n.getLangDict(l)).encode(c.website.coding)
 
+
 class ProcessorResource(StaticResource,Url2File):
 	def __init__(self, prefix: str, directory: PathLike,
 				 *, name: Optional[str]=None,
