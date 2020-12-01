@@ -96,6 +96,9 @@ class TemplateProcessor(BaseProcessor):
 
 	async def datahandle(self,request):
 		path = request.path
+		request2ns = self.run_ns.get('request2ns')
+		if request2ns:
+			self.run_ns['params_kw'] = await request2ns()
 		ns = self.run_ns
 		te = self.run_ns['tmpl_engine']
 		self.content = te.render(path,**ns)
