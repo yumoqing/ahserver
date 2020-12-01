@@ -6,10 +6,9 @@ aiohttp
 aiohttp_session
 aiohttp_auth_autz
 aiomysql
+psycopg2-binary
 aiopg
 jinja2
 ujson
 openpyxl
 pillow
-git+https://github.com/yumoqing/appPublic
-git+https://github.com/yumoqing/sqlor
