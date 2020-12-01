@@ -45,7 +45,6 @@ def i18nDICT(request):
 	i18n = getI18N()
 	lang = getHeaderLang(request)
 	l = c.langMapping.get(lang,lang)
-	print('i18nDict():lang=',lang,',l=',l,',dict=',,i18n.getLangDict(l))
 	return json.dumps(i18n.getLangDict(l)).encode(c.website.coding)
 
 
