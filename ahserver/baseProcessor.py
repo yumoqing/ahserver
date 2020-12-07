@@ -13,6 +13,10 @@ from appPublic.folderUtils import listFile
 
 from .serverenv import ServerEnv
 
+def unicode_escape(s):
+	x = [ch if ord(ch) < 256 else ch.encode('unicode_escape').decode('utf-8') for ch in s]
+	return ''.join(x)
+
 class ObjectCache:
 	def __init__(self):
 		self.cache = {}
@@ -79,6 +83,10 @@ class BaseProcessor:
 		elif type(self.content) == type([]):
 			self.content = json.dumps(self.content,
 				indent=4)
+		ret_len1 = len(self.content)
+		self.content = unicode_escape(self.content)
+		ret_len2 = len(self.content)
+		print('hangle(): len1=%d, len2=%d' % (ret_len1,ret_len2))
 		self.setheaders()
 		return Response(text=self.content,headers=self.headers)
 
@@ -97,8 +105,7 @@ class TemplateProcessor(BaseProcessor):
 	async def datahandle(self,request):
 		path = request.path
 		request2ns = self.run_ns.get('request2ns')
-		if request2ns:
-			self.run_ns['params_kw'] = await request2ns()
+		self.run_ns['params_kw'] = await request2ns()
 		ns = self.run_ns
 		te = self.run_ns['tmpl_engine']
 		self.content = te.render(path,**ns)
