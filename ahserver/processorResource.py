@@ -1,6 +1,13 @@
 import os
 import re
 
+import asyncio
+
+from yarl import URL
+
+from appPublic.http_client import Http_Client
+from functools import partial
+from aiohttp_auth import auth
 from aiohttp.web_urldispatcher import StaticResource, _WebHandler, PathLike
 from aiohttp.web_urldispatcher import Optional, _ExpectHandler
 from aiohttp.web_urldispatcher import Path
@@ -167,6 +174,7 @@ class ProcessorResource(StaticResource,Url2File):
 		def gethost():
 			return '/'.join(str(request.url).split('/')[:3])
 			
+			
 		async def getArgs():
 			ns = DictObject()
 			if request.method == 'POST':
@@ -178,10 +186,13 @@ class ProcessorResource(StaticResource,Url2File):
 		self.y_env.i18nDict = i18nDICT
 		self.y_env.terminalType = getClientType(request)
 		self.y_env.absurl = self.absUrl
+		self.y_env.entire_url = partial(self.entireUrl,request)
 		self.y_env.abspath = self.abspath
 		self.y_env.request2ns = getArgs
 		self.y_env.resource = self
 		self.y_env.gethost = gethost
+		self.y_env.url_call = partial(self.url_call,request)
+		self.user = await auth.get_auth(request)
 		path = request.path
 		config = getConfig()
 		if config.website.dbadm and path.startswith(config.website.dbadm):
@@ -218,11 +229,10 @@ class ProcessorResource(StaticResource,Url2File):
 					processor = FunctionProcessor(self.abspath(path),self,a)
 					return await processor.handle(request)
 
-		for word, handlername in self.y_processors:
-			if path.endswith(word):
-				Klass = getProcessor(handlername)
-				processor = Klass(self.abspath(path),self)
-				return await processor.handle(request)
+		processor = self.url2processor(request, str(request.url))
+		if processor:
+			return await processor.handle(request)
+			
 		print(f'path={path} handler by StaticResource..')
 		if self.isFolder(path):
 			config = getConfig()
@@ -230,14 +240,45 @@ class ProcessorResource(StaticResource,Url2File):
 				raise HTTPNotFound
 		return await super()._handle(request)
 		
+	def url2processor(self, request, url):
+		url = self.entireUrl(request, url)
+		host =  '/'.join(str(request.url).split('/')[:3])
+		path = url[len(host):]
+		for word, handlername in self.y_processors:
+			if url.endswith(word):
+				Klass = getProcessor(handlername)
+				processor = Klass(self.abspath(path),self)
+				return processor
+		return None
+
+	def entireUrl(self, request, url):
+		if url.startswith('http://') or url.startswith('https://'):
+			return url
+		h = '/'.join(str(request.url).split('/')[:3])
+		if url.startswith('/'):
+			return '%s%s' % (h,url)
+		path = request.path
+		p = self.relatedurl(path,url)
+		return '%s%s' % (h, p)
+
+	def url_call(self,request, url,params={}):
+		processor = self.url2processor(request, url)
+		if processor:
+			# self.y_env.update(params)
+			loop = asyncio.get_event_loop()
+			loop.run_until_complete(processor.execute(request))
+			return processor.content
+		long_url = self.entireUrl(request,url)
+		hc = Http_Client()
+		print('url_call() called,long_url=',long_url) 
+		x = hc(long_url,method=method,params=params)
+		print('url_call() call finished') 
+		return x
+		
 	def absUrl(self,request,url):
 		http='http://'
 		https='https://'
-		if url[:7] == http:
+		if url.startswith('https://') or url.startswith('http://') :
 			return url
-		if url[:8] == https:
-			return url
-
 		path = request.path
 		return self.relatedurl(path,url)
-

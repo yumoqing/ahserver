@@ -61,16 +61,19 @@ class BaseProcessor:
 		self.content = ''
 
 	
-	async def handle(self,request):
+	async def execute(self,request):
 		g = ServerEnv()
 		self.run_ns = {}
 		self.run_ns.update(g)
 		self.run_ns.update(self.resource.y_env)
 		self.run_ns['request'] = request
+		self.run_ns['params_kw'] = await self.run_ns['request2ns']()
 		self.run_ns['ref_real_path'] = self.path
-		ns = await self.resource.y_env.request2ns()
-		self.run_ns.update(ns)
 		await self.datahandle(request)
+		return self.content
+
+	async def handle(self,request):
+		await self.execute(request)
 		if self.retResponse is not None:
 			return self.retResponse
 		elif type(self.content) == type({}) :
@@ -83,10 +86,7 @@ class BaseProcessor:
 		elif type(self.content) == type([]):
 			self.content = json.dumps(self.content,
 				indent=4)
-		ret_len1 = len(self.content)
 		self.content = unicode_escape(self.content)
-		ret_len2 = len(self.content)
-		print('hangle(): len1=%d, len2=%d' % (ret_len1,ret_len2))
 		self.setheaders()
 		return Response(text=self.content,headers=self.headers)
 
@@ -104,8 +104,6 @@ class TemplateProcessor(BaseProcessor):
 
 	async def datahandle(self,request):
 		path = request.path
-		request2ns = self.run_ns.get('request2ns')
-		self.run_ns['params_kw'] = await request2ns()
 		ns = self.run_ns
 		te = self.run_ns['tmpl_engine']
 		self.content = te.render(path,**ns)
