@@ -129,8 +129,11 @@ class JSUIProcessor(TemplateProcessor):
 		else:
 			ns = self.run_ns
 			te = self.run_ns['tmpl_engine']
+			print('handle /header.tmpl')
 			content0 = te.render('/header.tmpl',**ns)
-			content1 = te.render(self.path, **ns)
+			print('handle', self.path)
+			content1 = te.render(request.path, **ns)
+			print('handle footer.tmpl')
 			content2 = te.render('/footer.tmpl',**ns)
 			self.content = '%s%s%s' % (content0,content1,content2)
 
