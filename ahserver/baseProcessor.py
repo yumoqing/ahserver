@@ -117,6 +117,22 @@ class TemplateProcessor(BaseProcessor):
 		else:
 			self.headers['Content-Type'] = 'text/html; utf-8'
 
+class JSUIProcessor(TemplateProcessor):
+	@classmethod
+	def isMe(self,name):
+		return name=='jsui'
+
+	async def datahandle(self, request):
+		params = await self.resource.y_env['request2ns']()
+		if params.get('_jsui',None):
+			super().datahandle(request)
+		else:
+			ns = self.run_ns
+			te = self.run_ns['tmpl_engine']
+			content0 = te.render('/header.tmpl',**ns)
+			content1 = te.render(self.path, **ns)
+			content2 = te.render('/footer.tmpl',**ns)
+			self.content = '%s%s%s' % (content0,content1,content2)
 
 class PythonScriptProcessor(BaseProcessor):
 	@classmethod

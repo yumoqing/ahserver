@@ -40,7 +40,6 @@ class TemplateEngine(Environment):
 	def join_path(self,template: str, parent: str):
 		return self.loader.join_path(template, parent)
 
-
 	def render(self,___name: str, **globals):
 		t = self.get_template(___name,globals=globals)
 		return t.render(globals)
