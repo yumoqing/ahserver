@@ -191,7 +191,7 @@ class ProcessorResource(StaticResource,Url2File):
 		self.y_env.request2ns = getArgs
 		self.y_env.resource = self
 		self.y_env.gethost = gethost
-		self.y_env.url_call = partial(self.url_call,request)
+		self.y_env.path_call = partial(self.path_call,request)
 		self.user = await auth.get_auth(request)
 		path = request.path
 		config = getConfig()
@@ -223,12 +223,6 @@ class ProcessorResource(StaticResource,Url2File):
 			path = path_decode(dp)
 			return await file_download(request, path)
 
-		if config.website.startswiths:
-			for a in config.website.startswiths:
-				if path.startswith(a.leading):
-					processor = FunctionProcessor(self.abspath(path),self,a)
-					return await processor.handle(request)
-
 		processor = self.url2processor(request, str(request.url))
 		if processor:
 			return await processor.handle(request)
@@ -241,11 +235,18 @@ class ProcessorResource(StaticResource,Url2File):
 		return await super()._handle(request)
 		
 	def url2processor(self, request, url):
+		config = getConfig()
 		url = self.entireUrl(request, url)
 		host =  '/'.join(str(request.url).split('/')[:3])
-		path = url[len(host):]
+		path = url[len(host):].split('?')[0]
+		if config.website.startswiths:
+			for a in config.website.startswiths:
+				if path.startswith(a.leading):
+					processor = FunctionProcessor(self.abspath(path),self,a)
+					return processor
+
 		for word, handlername in self.y_processors:
-			if url.endswith(word):
+			if path.endswith(word):
 				Klass = getProcessor(handlername)
 				processor = Klass(self.abspath(path),self)
 				return processor
@@ -261,6 +262,10 @@ class ProcessorResource(StaticResource,Url2File):
 		p = self.relatedurl(path,url)
 		return '%s%s' % (h, p)
 
+	async def path_call(self,request, path, params={}):
+		processor = self.url2processor(request, path)
+		return await processor.path_call(request, path)
+		
 	def url_call(self,request, url,params={}):
 		processor = self.url2processor(request, url)
 		if processor:

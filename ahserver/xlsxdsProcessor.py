@@ -31,19 +31,19 @@ class XLSXDataSourceProcessor(DataSourceProcessor):
 	def getArgumentsDesc(self,dict_data,ns,request):
 		return None
 
-	def getDataDesc(self,dict_data,ns,request):
+	async def getDataDesc(self,dict_data,ns,request):
 		path = dict_data.get('xlsxfile',None)
 		self.xlsxdata = XLSXData(self.g.abspath(self.g.absurl(request,path)),dict_data)
 		ret = self.xlsxdata.getBaseFieldsInfo(ns)
 		return ret
 
-	def getData(self,dict_data,ns,request):
+	async def getData(self,dict_data,ns,request):
 		path = dict_data.get('xlsxfile',None)
 		self.xlsxdata = XLSXData(self.g.abspath(self.g.absurl(request,path)),dict_data)
 		ret = self.xlsxdata.getData(ns)
 		return ret
 
-	def getPagingData(self,dict_data,ns,request):
+	async def getPagingData(self,dict_data,ns,request):
 		path = dict_data.get('xlsxfile',None)
 		self.xlsxdata = XLSXData(self.g.abspath(ns.absurl(request,path)),dict_data)
 		ret = self.xlsxdata.getPagingData(ns)

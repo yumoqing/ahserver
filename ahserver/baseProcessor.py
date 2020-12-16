@@ -122,19 +122,20 @@ class JSUIProcessor(TemplateProcessor):
 	def isMe(self,name):
 		return name=='jsui'
 
+	async def path_call(self, request, path):
+		ns = self.run_ns
+		te = self.run_ns['tmpl_engine']
+		return te.render(path,**ns)
+		
+
 	async def datahandle(self, request):
 		params = await self.resource.y_env['request2ns']()
 		if params.get('_jsui',None):
 			super().datahandle(request)
 		else:
-			ns = self.run_ns
-			te = self.run_ns['tmpl_engine']
-			print('handle /header.tmpl')
-			content0 = te.render('/header.tmpl',**ns)
-			print('handle', self.path)
-			content1 = te.render(request.path, **ns)
-			print('handle footer.tmpl')
-			content2 = te.render('/footer.tmpl',**ns)
+			content0 = await self.path_call(request,'/header.tmpl')
+			content1 = await self.path_call(request,self.path)
+			content2 = await self.path_call(request,'/footer.tmpl')
 			self.content = '%s%s%s' % (content0,content1,content2)
 
 class PythonScriptProcessor(BaseProcessor):
@@ -142,9 +143,9 @@ class PythonScriptProcessor(BaseProcessor):
 	def isMe(self,name):
 		return name=='dspy'
 
-	def loadScript(self):
+	def loadScript(self, path):
 		data = ''
-		with codecs.open(self.path,'rb','utf-8') as f:
+		with codecs.open(path,'rb','utf-8') as f:
 			data = f.read()
 		b= ''.join(data.split('\r'))
 		lines = b.split('\n')
@@ -152,25 +153,17 @@ class PythonScriptProcessor(BaseProcessor):
 		txt = "async def myfunc(request,**ns):\n" + '\n'.join(lines)
 		return txt
 		
-	async def datahandle(self,request):
+	async def path_call(self, request, path):
 		g = ServerEnv()
 		lenv = self.run_ns
 		del lenv['request']
-		"""
-		if not g.get('dspy_cache',False):
-			g.dspy_cache = ObjectCache()
-		func = g.dspy_cache.get(self.path)
-		if not func:
-			txt = self.loadScript()
-			exec(txt,lenv,lenv)
-			func = lenv['myfunc']
-			print('func=',func)
-			g.dspy_cache.store(self.path,func)
-		"""
-		txt = self.loadScript()
+		txt = self.loadScript(path)
 		exec(txt,lenv,lenv)
 		func = lenv['myfunc']
-		self.content = await func(request,**lenv)
+		return await func(request,**lenv)
+
+	async def datahandle(self,request):
+		self.content = await self.path_call(request, self.path)
 
 class MarkdownProcessor(BaseProcessor):
 	@classmethod
