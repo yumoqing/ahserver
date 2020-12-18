@@ -11,11 +11,8 @@ from appPublic.jsonConfig import getConfig
 from appPublic.dictObject import DictObject
 from appPublic.folderUtils import listFile
 
+from .utils import unicode_escape
 from .serverenv import ServerEnv
-
-def unicode_escape(s):
-	x = [ch if ord(ch) < 256 else ch.encode('unicode_escape').decode('utf-8') for ch in s]
-	return ''.join(x)
 
 class ObjectCache:
 	def __init__(self):
