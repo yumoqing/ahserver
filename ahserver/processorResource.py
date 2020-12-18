@@ -236,6 +236,7 @@ class ProcessorResource(StaticResource,Url2File):
 			return await processor.handle(request)
 
 		filepath = self.url2file(str(request.url))
+		print('filepath=',filepath,str(request.url))
 		if filepath and self.isHtml(filepath):
 			return await html_handle(request, filepath)
 
