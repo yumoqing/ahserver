@@ -1,5 +1,6 @@
 import os
 import re
+from traceback import print_exc
 
 import asyncio
 
@@ -40,7 +41,7 @@ from .filestorage import FileStorage
 from .restful import DBCrud
 from .dbadmin import DBAdmin
 from .filedownload import file_download, path_decode
-from utils import unicode_escape
+from .utils import unicode_escape
 
 def getHeaderLang(request):
 	al = request.headers.get('Accept-Language')
@@ -234,7 +235,7 @@ class ProcessorResource(StaticResource,Url2File):
 		if processor:
 			return await processor.handle(request)
 
-		filepath = self.url2filepath(str(request.url))
+		filepath = self.url2file(str(request.url))
 		if filepath and self.isHtml(filepath):
 			return await html_handle(request, filepath)
 
@@ -265,7 +266,9 @@ class ProcessorResource(StaticResource,Url2File):
 					return True
 				if b.stratswith('<!doctype html>'):
 					return True
-		except:
+		except Exception as e:
+			print_exc()
+			print(e)
 			return False
 		
 	def url2processor(self, request, url):
