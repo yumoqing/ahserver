@@ -1,4 +1,5 @@
 
+import inspect
 from appPublic.dictObject import DictObject
 from appPublic.registerfunction import RegisterFunction
 from aiohttp import web
@@ -14,13 +15,29 @@ class FunctionProcessor(BaseProcessor):
 		self.config_opts = opts
 		BaseProcessor.__init__(self,path,resource)
 
-	async def datahandle(self,request):
-		ns = self.config_opts.copy()
-		ns.update(self.run_ns)
-		ns = DictObject(**ns)
+	async def path_call(self, request, path):
+		path1 = request.path[len(self.config_opts['leading']):]
+		print('path1=',path1)
+		args = []
+		if len(path1) > 0:
+			if path1[0] == '/':
+				path1 = path1[1:]
+			args = path1.split('/')
+
+		
+		print('FunctionProcessor():args=',args)
+		rfname = self.config_opts['registerfunction']
+		ns = DictObject(**self.run_ns)
 		rf = RegisterFunction()
-		f = rf.get(ns.registerfunction)
-		x = await f(ns)
+		f = rf.get(rfname)
+		self.run_ns['request'] = request
+		globals().update(self.run_ns)
+		if inspect.iscoroutinefunction(f):
+			return await f(*args, **self.run_ns)
+		return f(*args)
+
+	async def datahandle(self,request):
+		x = await self.path_call(request, self.path)
 		if isinstance(x,Response):
 			self.retResponse = x
 		elif isinstance(x,web.FileResponse):

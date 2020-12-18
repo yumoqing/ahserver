@@ -21,11 +21,11 @@ class DataSourceProcessor(BaseProcessor):
 		}
 		self.g = ServerEnv()
 		
-	def getData(self,dict_data,ns,request):pass
-	def getPagingData(self,dict_data,ns,request):pass
-	def getArgumentsDesc(self,dict_data,ns,request):pass
-	def getDataDesc(self,dict_data,ns,request):pass
-	def getGridlist(self,dict_data,ns,request):
+	async def getData(self,dict_data,ns,request):pass
+	async def getPagingData(self,dict_data,ns,request):pass
+	async def getArgumentsDesc(self,dict_data,ns,request):pass
+	async def getDataDesc(self,dict_data,ns,request):pass
+	async def getGridlist(self,dict_data,ns,request):
 		ret = self.getDataDesc(dict_data,ns,request)
 		ffs = [ f for f in ret if f.get('frozen',False) ]
 		fs = [ f for f in ret if not f['frozen'] ]
@@ -49,15 +49,18 @@ class DataSourceProcessor(BaseProcessor):
 		}
 		return ret
 
-	async def datahandle(self,request):
+	async def path_call(self, request, path):
 		dict_data = {}
 		config = getConfig()
-		with codecs.open(self.path,'r',config.website.coding) as f:
+		with codecs.open(path,'r',config.website.coding) as f:
 			b = f.read()
 			dict_data = json.loads(b)
 		ns = self.run_ns
 		act = ns.get('action','getdata')
 		action = self.actions.get(act)
-		self.content = action(dict_data,ns,request)
+		return await action(dict_data,ns,request)
+
+	async def datahandle(self,request):
+		self.content = await path_call(request, self.path)
 		
 	

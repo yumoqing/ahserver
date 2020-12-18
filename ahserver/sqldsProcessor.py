@@ -35,7 +35,7 @@ class SQLDataSourceProcessor(DataSourceProcessor):
 		desc = dict_data.get('arguments',None)
 		return desc
 		
-	def getDataDesc(self,dict_data,ns,request):
+	async def getDataDesc(self,dict_data,ns,request):
 		pool = DBPools()
 		@pool.runSQLResultFields
 		def sql(dbname,NS):
@@ -54,22 +54,22 @@ class SQLDataSourceProcessor(DataSourceProcessor):
 			f.close()
 		return rec
 
-	def getData(self,dict_data,ns,request):
+	async def getData(self,dict_data,ns,request):
 		pool = DBPools()
 		@pool.runSQL
 		def sql(dbname,NS):
 			sqldesc = dict_data.get('sqldesc')
 			return sqldesc
 		db = dict_data['sqldesc']['db']
-		ret = [ i for i in sql(db,ns) ]
+		ret = [ i for i in await sql(db,ns) ]
 		return ret
 		
-	def getPagingData(self,dict_data,ns,request):
+	async def getPagingData(self,dict_data,ns,request):
 		pool = DBPools()
 		@pool.runSQLPaging
 		def sql(dbname,NS):
 			sqldesc = dict_data.get('sqldesc')
 			return sqldesc
 		db = dict_data['sqldesc']['db']
-		ret = sql(db,ns)
+		ret = await sql(db,ns)
 		return ret
