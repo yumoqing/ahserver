@@ -1,5 +1,6 @@
 import os
 import re
+import codecs
 from traceback import print_exc
 
 import asyncio
@@ -238,7 +239,7 @@ class ProcessorResource(StaticResource,Url2File):
 		filepath = self.url2file(str(request.url))
 		print('filepath=',filepath,str(request.url))
 		if filepath and self.isHtml(filepath):
-			return await html_handle(request, filepath)
+			return await self.html_handle(request, filepath)
 
 		print(f'path={path} handler by StaticResource..')
 		if self.isFolder(path):
@@ -247,7 +248,7 @@ class ProcessorResource(StaticResource,Url2File):
 				raise HTTPNotFound
 		return await super()._handle(request)
 
-	def html_handle(self,request,filepath):
+	async def html_handle(self,request,filepath):
 		with codecs.open(filepath,'r', 'utf-8') as f:
 			b = f.read()
 			b = unicode_escape(b)
@@ -265,7 +266,7 @@ class ProcessorResource(StaticResource,Url2File):
 				b = f.read()
 				if b.startswith('<html>'):
 					return True
-				if b.stratswith('<!doctype html>'):
+				if b.startswith('<!doctype html>'):
 					return True
 		except Exception as e:
 			print_exc()

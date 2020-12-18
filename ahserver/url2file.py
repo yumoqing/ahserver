@@ -51,14 +51,12 @@ class Url2File:
 		if url[-1] == '/':
 			url = url[:-1]
 
-		print('url2file.py:self.starts=',self.starts)
-		if url.startswith(self.starts):
-			f = self.path + url[len(self.starts):]
-			real_path = os.path.abspath(f)
-
+		paths = url.split('/')[3:]
+		f = os.path.join(self.path,*paths)
+		real_path = os.path.abspath(f)
 		if os.path.isdir(real_path):
-			for f in self.indexes:
-				p = os.path.join(real_path,'f)
+			for idx in self.indexes:
+				p = os.path.join(real_path,idx)
 				if os.path.isfile(p):
 					return p
 
@@ -66,7 +64,6 @@ class Url2File:
 			return real_path
 
 		if not self.inherit:
-			print('url2file.py:real_path=',real_path)
 			return None
 		items = url.split('/')
 		if len(items) > 2:
