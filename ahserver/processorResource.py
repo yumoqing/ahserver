@@ -1,5 +1,7 @@
 import os
 import re
+import codecs
+from traceback import print_exc
 
 import asyncio
 
@@ -40,6 +42,7 @@ from .filestorage import FileStorage
 from .restful import DBCrud
 from .dbadmin import DBAdmin
 from .filedownload import file_download, path_decode
+from .utils import unicode_escape
 
 def getHeaderLang(request):
 	al = request.headers.get('Accept-Language')
@@ -226,13 +229,43 @@ class ProcessorResource(StaticResource,Url2File):
 		processor = self.url2processor(request, str(request.url))
 		if processor:
 			return await processor.handle(request)
-			
+
+		filepath = self.url2file(str(request.url))
+		print('filepath=',filepath,str(request.url))
+		if filepath and self.isHtml(filepath):
+			return await self.html_handle(request, filepath)
+
 		print(f'path={path} handler by StaticResource..')
 		if self.isFolder(path):
 			config = getConfig()
 			if not config.website.allowListFolder:
 				raise HTTPNotFound
 		return await super()._handle(request)
+
+	async def html_handle(self,request,filepath):
+		with codecs.open(filepath,'r', 'utf-8') as f:
+			b = f.read()
+			b = unicode_escape(b)
+			headers = {
+				'Content-Type': 'text/html; utf-8',
+				'Accept-Ranges': 'bytes',
+				'Content-Length': str(len(b))
+			}
+			resp = Response(text=b,headers=headers)
+			return resp
+			
+	def isHtml(self,fn):
+		try:
+			with codecs.open(fn,'r','utf-8') as f:
+				b = f.read()
+				if b.startswith('<html>'):
+					return True
+				if b.startswith('<!doctype html>'):
+					return True
+		except Exception as e:
+			print_exc()
+			print(e)
+			return False
 		
 	def url2processor(self, request, url):
 		config = getConfig()

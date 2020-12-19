@@ -18,10 +18,12 @@ def path_decode(dpath):
 	rc4 = RC4()
 	return rc4.decode(dpath,crypto_aim)
 
-async def file_download(request, filepath):
+async def file_download(request, filepath, content_type=None):
 	filename = os.path.basename(filepath)
 	r = web.FileResponse(filepath)
-	ct, encoding = mimetypes.guess_type(filepath)
+	ct = content_type
+	if ct is None:
+		ct, encoding = mimetypes.guess_type(filepath)
 	if ct is not None:
 		r.content_type = ct
 	else:
