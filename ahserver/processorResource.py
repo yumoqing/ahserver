@@ -264,7 +264,9 @@ class ProcessorResource(StaticResource,Url2File):
 
 	async def path_call(self,request, path, params={}):
 		processor = self.url2processor(request, path)
-		return await processor.path_call(request, path)
+		real_path = self.url2file(path)
+		print('processorResource.py:real_path=',real_path)
+		return await processor.path_call(request, real_path)
 		
 	def url_call(self,request, url,params={}):
 		processor = self.url2processor(request, url)

@@ -60,8 +60,7 @@ class BaseProcessor:
 		}
 		self.content = ''
 
-	
-	async def execute(self,request):
+	async def set_run_env(self, request):
 		g = ServerEnv()
 		self.run_ns = {}
 		self.run_ns.update(g)
@@ -69,6 +68,9 @@ class BaseProcessor:
 		self.run_ns['request'] = request
 		self.run_ns['params_kw'] = await self.run_ns['request2ns']()
 		self.run_ns['ref_real_path'] = self.path
+
+	async def execute(self,request):
+		await self.set_run_env(request)
 		await self.datahandle(request)
 		return self.content
 
@@ -154,7 +156,7 @@ class PythonScriptProcessor(BaseProcessor):
 		return txt
 		
 	async def path_call(self, request, path):
-		g = ServerEnv()
+		await self.set_run_env(request)
 		lenv = self.run_ns
 		del lenv['request']
 		txt = self.loadScript(path)
