@@ -16,6 +16,7 @@ class TmplLoader(BaseLoader, TmplUrl2File):
 	def get_source(self,env: Environment,template: str):
 		config = getConfig()
 		coding = config.website.coding
+
 		fp = self.url2file(template)
 		if not os.path.isfile(fp):
 			raise TemplateNotFound(template)

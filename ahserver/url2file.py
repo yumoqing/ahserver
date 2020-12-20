@@ -21,62 +21,44 @@ class Url2File:
 					break
 		return '/'.join(items)
 
-	def isFolder(self,url: str) ->bool:
-		if url.startswith(self.starts):
-			rp = self.path + url[len(self.starts):]
-			real_path = os.path.abspath(rp)
-			if os.path.isdir(real_path):
-				return True
-		return False
-
-	
-	def isFile(self,url:str) ->bool:
-		if url.startswith(self.starts):
-			rp = self.path + url[len(self.starts):]
-			real_path = os.path.abspath(rp)
-			if os.path.isfile(real_path):
-				return True
-		return False
-
-
-	def defaultIndex(self,url: str) -> str:
-		for p in self.indexes:
-			rp = url + '/' + p
-			r = self.url2file(rp)
-			if r is not None:
-				return r
-		return None
-
-	def url2file(self,url: str):
+	def url2file(self, url: str):
+		
 		if url[-1] == '/':
 			url = url[:-1]
-
-		paths = url.split('/')[3:]
+		paths = url.split('/')
+		if url.startswith('http://') or url.startswith('https://'):
+			paths = paths[3:]
 		f = os.path.join(self.path,*paths)
 		real_path = os.path.abspath(f)
+		print('0 - url2file():real_path=', real_path,'url=',url)
 		if os.path.isdir(real_path):
 			for idx in self.indexes:
 				p = os.path.join(real_path,idx)
 				if os.path.isfile(p):
+					print('find it:',p, 'url=', url)
 					return p
 
 		if os.path.isfile(real_path):
+			print('find it here:',real_path, 'url=', url)
 			return real_path
 
 		if not self.inherit:
+			print('1-real_path=', real_path, ' not exists')
 			return None
 		items = url.split('/')
 		if len(items) > 2:
 			del items[-2]
 			url = '/'.join(items)
 			return self.url2file(url)
+		print('2-real_path=', real_path, ' not exists')
 		return None
 
 	def relatedurl(self,url: str, name: str) -> str:
 		if url[-1] == '/':
 			url = url[:-1]
 
-		if not self.isFolder(url):
+		fp = self.url2file(url)
+		if os.path.isfile(fp):
 			items = url.split('/')
 			del items[-1]
 			url = '/'.join(items)
@@ -88,7 +70,7 @@ class Url2File:
 		return self.url2file(url)
 
 class TmplUrl2File(Url2File):
-	def __init__(self,paths,indexes, subffixes=['.tmpl'],inherit=False):
+	def __init__(self,paths,indexes, subffixes=['.tmpl','.ui' ],inherit=False):
 		self.paths = paths
 		self.u2fs = [ Url2File(p,prefix,indexes,inherit=inherit) \
 						for p,prefix in paths ]

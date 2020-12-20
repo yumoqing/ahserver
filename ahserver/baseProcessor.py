@@ -47,6 +47,7 @@ class BaseProcessor:
 
 	def __init__(self,path,resource):
 		self.path = path
+		print('self.path=',self.path)
 		self.resource = resource
 		self.retResponse = None
 		# self.last_modified = os.path.getmtime(path)
@@ -58,6 +59,7 @@ class BaseProcessor:
 		self.content = ''
 
 	async def set_run_env(self, request):
+		self.real_path = self.resource.url2file(self.resource.entireUrl(request, self.path))
 		g = ServerEnv()
 		self.run_ns = {}
 		self.run_ns.update(g)
@@ -101,11 +103,17 @@ class TemplateProcessor(BaseProcessor):
 	def isMe(self,name):
 		return name=='tmpl'
 
-	async def datahandle(self,request):
-		path = request.path
+	async def path_call(self, request):
+		await self.set_run_env(request)
+		path = self.path
+		url = self.resource.entireUrl(request, path)
 		ns = self.run_ns
 		te = self.run_ns['tmpl_engine']
-		self.content = te.render(path,**ns)
+		print('****url=',url,'*****')
+		return te.render(url,**ns)
+
+	async def datahandle(self,request):
+		self.content = await self.path_call(request)
 		
 	def setheaders(self):
 		super(TemplateProcessor,self).setheaders()
@@ -121,20 +129,14 @@ class JSUIProcessor(TemplateProcessor):
 	def isMe(self,name):
 		return name=='jsui'
 
-	async def path_call(self, request, path):
-		ns = self.run_ns
-		te = self.run_ns['tmpl_engine']
-		return te.render(path,**ns)
-		
-
 	async def datahandle(self, request):
 		params = await self.resource.y_env['request2ns']()
 		if params.get('_jsui',None):
 			super().datahandle(request)
 		else:
-			content0 = await self.path_call(request,'/header.tmpl')
-			content1 = await self.path_call(request,self.path)
-			content2 = await self.path_call(request,'/footer.tmpl')
+			content0 = await self.resource.path_call(request,'/header.tmpl')
+			content1 = await self.resource.path_call(request,self.path)
+			content2 = await self.resource.path_call(request,'/footer.tmpl')
 			self.content = '%s%s%s' % (content0,content1,content2)
 
 class PythonScriptProcessor(BaseProcessor):
@@ -144,6 +146,7 @@ class PythonScriptProcessor(BaseProcessor):
 
 	def loadScript(self, path):
 		data = ''
+		print('path=',path)
 		with codecs.open(path,'rb','utf-8') as f:
 			data = f.read()
 		b= ''.join(data.split('\r'))
@@ -152,17 +155,18 @@ class PythonScriptProcessor(BaseProcessor):
 		txt = "async def myfunc(request,**ns):\n" + '\n'.join(lines)
 		return txt
 		
-	async def path_call(self, request, path):
+	async def path_call(self, request):
 		await self.set_run_env(request)
 		lenv = self.run_ns
 		del lenv['request']
-		txt = self.loadScript(path)
+		txt = self.loadScript(self.real_path)
 		exec(txt,lenv,lenv)
 		func = lenv['myfunc']
 		return await func(request,**lenv)
 
 	async def datahandle(self,request):
-		self.content = await self.path_call(request, self.path)
+		print('self.real_path=',self.real_path)
+		self.content = await self.path_call(request)
 
 class MarkdownProcessor(BaseProcessor):
 	@classmethod
@@ -171,7 +175,7 @@ class MarkdownProcessor(BaseProcessor):
 
 	async def datahandle(self,request:Request):
 		data = ''
-		with codecs.open(self.path,'rb','utf-8') as f:
+		with codecs.open(self.real_path,'rb','utf-8') as f:
 			data = f.read()
 		b = data
 		b = self.urlreplace(b,request)

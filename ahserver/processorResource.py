@@ -93,13 +93,10 @@ class ProcessorResource(StaticResource,Url2File):
 	def setIndexes(self, indexes):
 		self.y_indexes = indexes
 
-	def abspath(self,path:str):
-		path = path[len(self.y_prefix):]
-		if len(path)>0 and path[0] == '/':
-			path = path[1:]
-		rp = os.path.join(self.y_directory , path)
-		real_path = os.path.abspath(rp)
-		return real_path
+	def abspath(self, request, path:str):
+		url =  self.entireUrl(request, path)
+		print('url=',url, 'path=',path)
+		return self.url2file(url)
 
 	async def getPostData(self,request: Request) -> dict:
 		reader = await request.multipart()
@@ -236,7 +233,7 @@ class ProcessorResource(StaticResource,Url2File):
 			return await self.html_handle(request, filepath)
 
 		print(f'path={path} handler by StaticResource..')
-		if self.isFolder(path):
+		if os.path.isdir(filepath):
 			config = getConfig()
 			if not config.website.allowListFolder:
 				raise HTTPNotFound
@@ -272,16 +269,18 @@ class ProcessorResource(StaticResource,Url2File):
 		url = self.entireUrl(request, url)
 		host =  '/'.join(str(request.url).split('/')[:3])
 		path = url[len(host):].split('?')[0]
+		real_path = self.abspath(request, path)
+		print('real_path=', real_path)
 		if config.website.startswiths:
 			for a in config.website.startswiths:
 				if path.startswith(a.leading):
-					processor = FunctionProcessor(self.abspath(path),self,a)
+					processor = FunctionProcessor(path,self,a)
 					return processor
 
 		for word, handlername in self.y_processors:
 			if path.endswith(word):
 				Klass = getProcessor(handlername)
-				processor = Klass(self.abspath(path),self)
+				processor = Klass(path,self)
 				return processor
 		return None
 
@@ -296,10 +295,9 @@ class ProcessorResource(StaticResource,Url2File):
 		return '%s%s' % (h, p)
 
 	async def path_call(self,request, path, params={}):
-		processor = self.url2processor(request, path)
-		real_path = self.url2file(path)
-		print('processorResource.py:real_path=',real_path)
-		return await processor.path_call(request, real_path)
+		url = self.entireUrl(request, path)
+		processor = self.url2processor(request, url)
+		return await processor.path_call(request)
 		
 	def url_call(self,request, url,params={}):
 		processor = self.url2processor(request, url)
@@ -321,4 +319,5 @@ class ProcessorResource(StaticResource,Url2File):
 		if url.startswith('https://') or url.startswith('http://') :
 			return url
 		path = request.path
-		return self.relatedurl(path,url)
+		new_path = self.relatedurl(path,url)
+		return self.entireUrl(request, new_path)
