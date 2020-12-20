@@ -17,7 +17,6 @@ class FunctionProcessor(BaseProcessor):
 
 	async def path_call(self, request, path):
 		path1 = request.path[len(self.config_opts['leading']):]
-		print('path1=',path1)
 		args = []
 		if len(path1) > 0:
 			if path1[0] == '/':
@@ -25,7 +24,6 @@ class FunctionProcessor(BaseProcessor):
 			args = path1.split('/')
 
 		
-		print('FunctionProcessor():args=',args)
 		rfname = self.config_opts['registerfunction']
 		ns = DictObject(**self.run_ns)
 		rf = RegisterFunction()

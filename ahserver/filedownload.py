@@ -30,7 +30,6 @@ async def file_download(request, filepath, content_type=None):
 		r.content_type = 'application/octet-stream'
 	r.content_disposition = 'attachment; filename=%s' % filename
 	r.enable_compression()
-	print(filepath,filename)
 	return r
 	if os.path.exists(filepath):
 		length = os.path.getsize(filepath)
@@ -40,17 +39,14 @@ async def file_download(request, filepath, content_type=None):
 			'Content-Disposition': 'attrachment;filename={}'.format(filename)
 		}
 		)
-		print('downloading',filepath,'size',length)
 		await response.prepare(request)
 		cnt = 0
 		with open(filepath, 'rb') as f:
 			chunk = f.read(10240000)
 			cnt = cnt + len(chunk)
 			await response.write(chunk)
-		print('write size=',cnt)
 		await response.fsyn()
 		await response.write_eof()
-		print('end')
 		return response
 	raise HTTPNotFound
 

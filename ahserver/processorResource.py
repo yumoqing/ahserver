@@ -95,7 +95,6 @@ class ProcessorResource(StaticResource,Url2File):
 
 	def abspath(self, request, path:str):
 		url =  self.entireUrl(request, path)
-		print('url=',url, 'path=',path)
 		return self.url2file(url)
 
 	async def getPostData(self,request: Request) -> dict:
@@ -228,11 +227,9 @@ class ProcessorResource(StaticResource,Url2File):
 			return await processor.handle(request)
 
 		filepath = self.url2file(str(request.url))
-		print('filepath=',filepath,str(request.url))
 		if filepath and self.isHtml(filepath):
 			return await self.html_handle(request, filepath)
 
-		print(f'path={path} handler by StaticResource..')
 		if os.path.isdir(filepath):
 			config = getConfig()
 			if not config.website.allowListFolder:
@@ -270,7 +267,6 @@ class ProcessorResource(StaticResource,Url2File):
 		host =  '/'.join(str(request.url).split('/')[:3])
 		path = url[len(host):].split('?')[0]
 		real_path = self.abspath(request, path)
-		print('real_path=', real_path)
 		if config.website.startswiths:
 			for a in config.website.startswiths:
 				if path.startswith(a.leading):
@@ -297,7 +293,7 @@ class ProcessorResource(StaticResource,Url2File):
 	async def path_call(self,request, path, params={}):
 		url = self.entireUrl(request, path)
 		processor = self.url2processor(request, url)
-		return await processor.path_call(request)
+		return await processor.path_call(request, params=params)
 		
 	def url_call(self,request, url,params={}):
 		processor = self.url2processor(request, url)
@@ -308,9 +304,7 @@ class ProcessorResource(StaticResource,Url2File):
 			return processor.content
 		long_url = self.entireUrl(request,url)
 		hc = Http_Client()
-		print('url_call() called,long_url=',long_url) 
 		x = hc(long_url,method=method,params=params)
-		print('url_call() call finished') 
 		return x
 		
 	def absUrl(self,request,url):

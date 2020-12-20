@@ -53,7 +53,6 @@ class RestEndpoint:
 
 class DBCrud(RestEndpoint):
 	def __init__(self, request,dbname,tablename, id=None):
-		print(f'***{dbname}*{tablename}*{id}************')
 		super().__init__()
 		self.dbname = dbname
 		self.tablename = tablename

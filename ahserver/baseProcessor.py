@@ -47,7 +47,6 @@ class BaseProcessor:
 
 	def __init__(self,path,resource):
 		self.path = path
-		print('self.path=',self.path)
 		self.resource = resource
 		self.retResponse = None
 		# self.last_modified = os.path.getmtime(path)
@@ -82,7 +81,6 @@ class BaseProcessor:
 				indent=4)
 		elif  isinstance(self.content,DictObject):
 			mydict = self.content.to_dict()
-			print('mydict=',mydict,type(mydict))
 			self.content = json.dumps(mydict, indent=4)
 		elif type(self.content) == type([]):
 			self.content = json.dumps(self.content,
@@ -103,13 +101,13 @@ class TemplateProcessor(BaseProcessor):
 	def isMe(self,name):
 		return name=='tmpl'
 
-	async def path_call(self, request):
+	async def path_call(self, request, params={}):
 		await self.set_run_env(request)
 		path = self.path
 		url = self.resource.entireUrl(request, path)
 		ns = self.run_ns
+		ns.update(params)
 		te = self.run_ns['tmpl_engine']
-		print('****url=',url,'*****')
 		return te.render(url,**ns)
 
 	async def datahandle(self,request):
@@ -146,7 +144,6 @@ class PythonScriptProcessor(BaseProcessor):
 
 	def loadScript(self, path):
 		data = ''
-		print('path=',path)
 		with codecs.open(path,'rb','utf-8') as f:
 			data = f.read()
 		b= ''.join(data.split('\r'))
@@ -155,9 +152,10 @@ class PythonScriptProcessor(BaseProcessor):
 		txt = "async def myfunc(request,**ns):\n" + '\n'.join(lines)
 		return txt
 		
-	async def path_call(self, request):
+	async def path_call(self, request,params={}):
 		await self.set_run_env(request)
 		lenv = self.run_ns
+		lenv.update(params)
 		del lenv['request']
 		txt = self.loadScript(self.real_path)
 		exec(txt,lenv,lenv)
@@ -165,7 +163,6 @@ class PythonScriptProcessor(BaseProcessor):
 		return await func(request,**lenv)
 
 	async def datahandle(self,request):
-		print('self.real_path=',self.real_path)
 		self.content = await self.path_call(request)
 
 class MarkdownProcessor(BaseProcessor):

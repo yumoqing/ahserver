@@ -30,27 +30,22 @@ class Url2File:
 			paths = paths[3:]
 		f = os.path.join(self.path,*paths)
 		real_path = os.path.abspath(f)
-		print('0 - url2file():real_path=', real_path,'url=',url)
 		if os.path.isdir(real_path):
 			for idx in self.indexes:
 				p = os.path.join(real_path,idx)
 				if os.path.isfile(p):
-					print('find it:',p, 'url=', url)
 					return p
 
 		if os.path.isfile(real_path):
-			print('find it here:',real_path, 'url=', url)
 			return real_path
 
 		if not self.inherit:
-			print('1-real_path=', real_path, ' not exists')
 			return None
 		items = url.split('/')
 		if len(items) > 2:
 			del items[-2]
 			url = '/'.join(items)
 			return self.url2file(url)
-		print('2-real_path=', real_path, ' not exists')
 		return None
 
 	def relatedurl(self,url: str, name: str) -> str:

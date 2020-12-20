@@ -48,8 +48,6 @@ class TemplateEngine(Environment):
 def setupTemplateEngine():
 	config = getConfig()
 	subffixes = [ i[0] for i in config.website.processors if i[1] == 'tmpl' ]
-	print(subffixes)
-	# paths = [ os.path.abspath(p) for p,prefix in config.website.paths ]
 	loader = TmplLoader(config.website.paths,
 				config.website.indexes,
 				subffixes,
