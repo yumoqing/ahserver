@@ -257,8 +257,6 @@ class ProcessorResource(StaticResource,Url2File):
 				if b.startswith('<!doctype html>'):
 					return True
 		except Exception as e:
-			print_exc()
-			print(e)
 			return False
 		
 	def url2processor(self, request, url):
