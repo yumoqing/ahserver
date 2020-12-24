@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 # python setup.py bdist_egg generate a egg file
 # Release information about eway
 
-version = "0.0.1"
+version = "0.0.2"
 name = "ahserver"
 description = "ahserver"
 author = "yumoqing"

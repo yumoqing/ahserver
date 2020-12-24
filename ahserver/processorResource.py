@@ -230,7 +230,7 @@ class ProcessorResource(StaticResource,Url2File):
 		if filepath and self.isHtml(filepath):
 			return await self.html_handle(request, filepath)
 
-		if os.path.isdir(filepath):
+		if filepath and os.path.isdir(filepath):
 			config = getConfig()
 			if not config.website.allowListFolder:
 				raise HTTPNotFound
@@ -252,9 +252,11 @@ class ProcessorResource(StaticResource,Url2File):
 		try:
 			with codecs.open(fn,'r','utf-8') as f:
 				b = f.read()
-				if b.startswith('<html>'):
+				while b[0] in ['\n',' ','\t']:
+					b = b[1:]
+				if b.lower().startswith('<html>'):
 					return True
-				if b.startswith('<!doctype html>'):
+				if b.lower().startswith('<!doctype html>'):
 					return True
 		except Exception as e:
 			return False
@@ -285,6 +287,9 @@ class ProcessorResource(StaticResource,Url2File):
 		if url.startswith('/'):
 			return '%s%s' % (h,url)
 		path = request.path
+		fn = self.url2file(str(request.url))
+		if fn and os.path.isdir(fn):
+			path = '%s/oops' % path
 		p = self.relatedurl(path,url)
 		return '%s%s' % (h, p)
 
