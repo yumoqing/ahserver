@@ -5,8 +5,6 @@ import codecs
 from aiohttp.web_request import Request
 from aiohttp.web_response import Response, StreamResponse
 
-from jinja2 import Template,Environment,BaseLoader
-
 from appPublic.jsonConfig import getConfig
 from appPublic.dictObject import DictObject
 from appPublic.folderUtils import listFile
@@ -64,7 +62,9 @@ class BaseProcessor:
 		self.run_ns.update(g)
 		self.run_ns.update(self.resource.y_env)
 		self.run_ns['request'] = request
-		self.run_ns['params_kw'] = await self.run_ns['request2ns']()
+		kw = await self.run_ns['request2ns']()
+		self.run_ns['params_kw'] = kw
+		self.run_ns.update(kw)
 		self.run_ns['ref_real_path'] = self.path
 
 	async def execute(self,request):
@@ -108,7 +108,7 @@ class TemplateProcessor(BaseProcessor):
 		ns = self.run_ns
 		ns.update(params)
 		te = self.run_ns['tmpl_engine']
-		return te.render(url,**ns)
+		return await te.render(url,**ns)
 
 	async def datahandle(self,request):
 		self.content = await self.path_call(request)

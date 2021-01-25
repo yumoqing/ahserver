@@ -34,16 +34,16 @@ class TmplLoader(BaseLoader, TmplUrl2File):
 
 class TemplateEngine(Environment):
 	def __init__(self,loader=None):
-		Environment.__init__(self,loader=loader)
+		Environment.__init__(self,loader=loader, enable_async=True)
 		self.urlpaths = {}
 		self.loader = loader
 	
 	def join_path(self,template: str, parent: str):
 		return self.loader.join_path(template, parent)
 
-	def render(self,___name: str, **globals):
+	async def render(self,___name: str, **globals):
 		t = self.get_template(___name,globals=globals)
-		return t.render(globals)
+		return await t.render_async(globals)
 
 def setupTemplateEngine():
 	config = getConfig()
