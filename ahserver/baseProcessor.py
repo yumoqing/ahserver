@@ -174,36 +174,13 @@ class MarkdownProcessor(BaseProcessor):
 		data = ''
 		with codecs.open(self.real_path,'rb','utf-8') as f:
 			data = f.read()
-		b = data
-		b = self.urlreplace(b,request)
-		ret = {
-				"__widget__":"markdown",
-				"data":{
-					"md_text":b
-				}
-		}
-		config = getConfig()
-		self.content = json.dumps(ret,indent=4)
+			self.content = self.urlreplace(data, request)
 
 	def urlreplace(self,mdtxt,request):
-		def replaceURL(s):
-			p1 = '\[.*?\]\((.*?)\)'
-			url = re.findall(p1,s)[0]
-			txts = s.split(url)
-			url = self.resource.absUrl(request,url)
-			return url.join(txts)
-
-		p = '\[.*?\]\(.*?\)'
-		textarray = re.split(p,mdtxt)
-		links = re.findall(p,mdtxt)
-		newlinks = [ replaceURL(link) for link in links]
-		if len(links)>0:
-			mdtxt = ''
-			for i in range(len(newlinks)):
-				mdtxt = mdtxt + textarray[i]
-				mdtxt = mdtxt + newlinks[i]
-			mdtxt = mdtxt + textarray[i+1]
-		return mdtxt
+		p = '\[(.*)\]\((.*)\)'
+		return re.sub(p,
+				lambda x:'['+x.group(1)+'](' + self.resource.entireUrl(request, x.group(2)) + ')',
+				mdtxt)
 
 def getProcessor(name):
 	return _getProcessor(BaseProcessor,name)
