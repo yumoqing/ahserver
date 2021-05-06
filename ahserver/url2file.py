@@ -21,15 +21,20 @@ class Url2File:
 					break
 		return '/'.join(items)
 
-	def url2file(self, url: str):
-		
-		if url[-1] == '/':
+	def url2ospath(self, url: str) -> str:
+		url = url.split('?')[0]
+		if len(url) > 0 and url[-1] == '/':
 			url = url[:-1]
 		paths = url.split('/')
 		if url.startswith('http://') or url.startswith('https://'):
 			paths = paths[3:]
 		f = os.path.join(self.path,*paths)
 		real_path = os.path.abspath(f)
+		return real_path
+
+	def url2file(self, url: str) -> str:
+		url = url.split('?')[0]
+		real_path  = self.url2ospath(url)
 		if os.path.isdir(real_path):
 			for idx in self.indexes:
 				p = os.path.join(real_path,idx)
@@ -39,8 +44,12 @@ class Url2File:
 		if os.path.isfile(real_path):
 			return real_path
 
+		if not os.path.isdir(os.path.dirname(real_path)):
+			return None
+
 		if not self.inherit:
 			return None
+
 		items = url.split('/')
 		if len(items) > 2:
 			del items[-2]
@@ -49,10 +58,10 @@ class Url2File:
 		return None
 
 	def relatedurl(self,url: str, name: str) -> str:
-		if url[-1] == '/':
+		if len(url) > 0 and url[-1] == '/':
 			url = url[:-1]
 
-		fp = self.url2file(url)
+		fp = self.url2ospath(url)
 		if os.path.isfile(fp):
 			items = url.split('/')
 			del items[-1]

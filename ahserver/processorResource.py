@@ -192,11 +192,13 @@ class ProcessorResource(StaticResource,Url2File):
 		self.y_env.gethost = gethost
 		self.y_env.path_call = partial(self.path_call,request)
 		self.user = await auth.get_auth(request)
+		self.request_filename = self.url2file(str(request.url))
 		path = request.path
 		config = getConfig()
 		if config.website.dbadm and path.startswith(config.website.dbadm):
 			pp = path.split('/')[2:]
 			if len(pp)<3:
+				print(str(request.url), 'not found')
 				raise HTTPNotFound
 			dbname = pp[0]
 			tablename = pp[1]
@@ -206,6 +208,7 @@ class ProcessorResource(StaticResource,Url2File):
 		if config.website.dbrest and path.startswith(config.website.dbrest):
 			pp = path.split('/')[2:]
 			if len(pp)<2:
+				print(str(request.url), 'not found')
 				raise HTTPNotFound
 			dbname = pp[0]
 			tablename = pp[1]
@@ -217,22 +220,24 @@ class ProcessorResource(StaticResource,Url2File):
 		if config.website.download and path.startswith(config.website.download):
 			pp = path.split('/')[2:]
 			if len(pp)<1:
+				print(str(request.url), 'not found')
 				raise HTTPNotFound
 			dp = '/'.join(pp)
 			path = path_decode(dp)
 			return await file_download(request, path)
 
-		processor = self.url2processor(request, str(request.url))
+		# processor = self.url2processor(request, str(request.url))
+		processor = self.url2processor(request, str(request.url), self.request_filename)
 		if processor:
 			return await processor.handle(request)
 
-		filepath = self.url2file(str(request.url))
-		if filepath and self.isHtml(filepath):
-			return await self.html_handle(request, filepath)
+		if self.request_filename and self.isHtml(self.request_filename):
+			return await self.html_handle(request, self.request_filename)
 
-		if filepath and os.path.isdir(filepath):
+		if self.request_filename and os.path.isdir(self.request_filename):
 			config = getConfig()
 			if not config.website.allowListFolder:
+				print(str(request.url), 'not found')
 				raise HTTPNotFound
 		return await super()._handle(request)
 
@@ -261,7 +266,7 @@ class ProcessorResource(StaticResource,Url2File):
 		except Exception as e:
 			return False
 		
-	def url2processor(self, request, url):
+	def url2processor(self, request, url, fpath):
 		config = getConfig()
 		url = self.entireUrl(request, url)
 		host =  '/'.join(str(request.url).split('/')[:3])
@@ -273,8 +278,12 @@ class ProcessorResource(StaticResource,Url2File):
 					processor = FunctionProcessor(path,self,a)
 					return processor
 
+		if self.request_filename is None:
+			print(url, 'not found')
+			raise HTTPNotFound
+			
 		for word, handlername in self.y_processors:
-			if path.endswith(word):
+			if fpath.endswith(word):
 				Klass = getProcessor(handlername)
 				processor = Klass(path,self)
 				return processor
@@ -287,28 +296,16 @@ class ProcessorResource(StaticResource,Url2File):
 		if url.startswith('/'):
 			return '%s%s' % (h,url)
 		path = request.path
-		fn = self.url2file(str(request.url))
-		if fn and os.path.isdir(fn):
+		if self.request_filename and os.path.isdir(self.request_filename):
 			path = '%s/oops' % path
 		p = self.relatedurl(path,url)
 		return '%s%s' % (h, p)
 
 	async def path_call(self,request, path, params={}):
 		url = self.entireUrl(request, path)
-		processor = self.url2processor(request, url)
+		fpath = self.url2file(url)
+		processor = self.url2processor(request, url, fpath)
 		return await processor.path_call(request, params=params)
-		
-	def url_call(self,request, url,params={}):
-		processor = self.url2processor(request, url)
-		if processor:
-			# self.y_env.update(params)
-			loop = asyncio.get_event_loop()
-			loop.run_until_complete(processor.execute(request))
-			return processor.content
-		long_url = self.entireUrl(request,url)
-		hc = Http_Client()
-		x = hc(long_url,method=method,params=params)
-		return x
 		
 	def absUrl(self,request,url):
 		http='http://'
