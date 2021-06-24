@@ -172,7 +172,7 @@ class MarkdownProcessor(BaseProcessor):
 
 	async def datahandle(self,request:Request):
 		data = ''
-		with codecs.open(self.real_path,'rb','utf-8') as f:
+		with codecs.open(self.real_path,'r','utf-8') as f:
 			data = f.read()
 			self.content = self.urlreplace(data, request)
 
