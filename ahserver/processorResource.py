@@ -242,15 +242,16 @@ class ProcessorResource(StaticResource,Url2File):
 		return await super()._handle(request)
 
 	async def html_handle(self,request,filepath):
-		with codecs.open(filepath,'r', 'utf-8') as f:
+		with open(filepath,'rb') as f:
 			b = f.read()
-			b = unicode_escape(b)
+			utxt = b.decode('unicode_escape')
+			txt = b.decode('utf-8')
 			headers = {
 				'Content-Type': 'text/html; utf-8',
 				'Accept-Ranges': 'bytes',
-				'Content-Length': str(len(b))
+				'Content-Length': str(len(utxt))
 			}
-			resp = Response(text=b,headers=headers)
+			resp = Response(text=txt,headers=headers)
 			return resp
 			
 	def isHtml(self,fn):

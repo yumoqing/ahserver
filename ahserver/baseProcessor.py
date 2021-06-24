@@ -85,7 +85,7 @@ class BaseProcessor:
 		elif type(self.content) == type([]):
 			self.content = json.dumps(self.content,
 				indent=4)
-		self.content = unicode_escape(self.content)
+		# self.content = unicode_escape(self.content)
 		self.setheaders()
 		return Response(text=self.content,headers=self.headers)
 
@@ -94,7 +94,8 @@ class BaseProcessor:
 		self.content=''
 
 	def setheaders(self):
-		self.headers['Content-Length'] = str(len(self.content))
+		pass
+		# self.headers['Content-Length'] = str(len(self.content))
 
 class TemplateProcessor(BaseProcessor):
 	@classmethod
@@ -172,7 +173,7 @@ class MarkdownProcessor(BaseProcessor):
 
 	async def datahandle(self,request:Request):
 		data = ''
-		with codecs.open(self.real_path,'r','utf-8') as f:
+		with codecs.open(self.real_path,'rb','utf-8') as f:
 			data = f.read()
 			self.content = self.urlreplace(data, request)
 
