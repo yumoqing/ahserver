@@ -12,3 +12,4 @@ jinja2
 ujson
 openpyxl
 pillow
+py-natpmp

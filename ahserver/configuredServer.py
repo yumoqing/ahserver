@@ -14,7 +14,10 @@ from .processorResource import ProcessorResource
 from .auth_api import AuthAPI
 from .myTE import setupTemplateEngine
 from .globalEnv import initEnv
-from natpmp import NATPMP as pmp
+try:
+	from natpmp import NATPMP as pmp
+except:
+	pmp = None
 
 class ConfiguredServer:
 	def __init__(self,auth_klass=AuthAPI):
@@ -69,7 +72,7 @@ class ConfiguredServer:
 			ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
 			ssl_context.load_cert_chain(config.website.ssl.crtfile,
 						config.website.ssl.keyfile)
-		if config.natpmp:
+		if pmp and config.natpmp:
 			self.nat_heartbeat = True
 			b = Background(self.natpmp_heartbeat)
 			b.start()
