@@ -36,9 +36,9 @@ class FunctionProcessor(BaseProcessor):
 
 	async def datahandle(self,request):
 		x = await self.path_call(request, self.path)
-		if isinstance(x,Response):
+		if isinstance(x,web.FileResponse):
 			self.retResponse = x
-		elif isinstance(x,web.FileResponse):
+		elif isinstance(x,Response):
 			self.retResponse = x
 		else:
 			self.content = x
