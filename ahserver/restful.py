@@ -21,7 +21,7 @@ from aiohttp.web_routedef import AbstractRouteDef
 from aiohttp.web import json_response
 
 
-from sqlor.crud import CRUD
+from sqlor.dbpools import DBPools
 
 from appPublic.dictObject import multiDict2Dict
 from appPublic.jsonConfig import getConfig
@@ -44,7 +44,7 @@ class RestEndpoint:
 		self.methods[method_name.upper()] = method
 
 	async def dispatch(self):
-		method = self.methods.get(self.request.method.upper())
+		method = self.methods.get(self.request.method.lower())
 		if not method:
 			raise HTTPMethodNotAllowed('', DEFAULT_METHODS)
 
@@ -57,18 +57,14 @@ class DBCrud(RestEndpoint):
 		self.dbname = dbname
 		self.tablename = tablename
 		self.request = request
+		self.db = DBPools()
 		self.id = id
-		try:
-			self.crud = CRUD(dbname,tablename)
-		except Exception as e:
-			print('e=',e)
-			traceback.print_exc()
-			raise HTTPNotFound
 		
 	async def options(self) -> Response:
 		try:
-			d = await self.crud.I()
-			return json_response(Success(d))
+			with self.db.sqlorContext(self.dbname) as sor:
+				d = await sor.I(self.tablename)
+				return json_response(Success(d))
 		except Exception as e:
 			print(e)
 			traceback.print_exc()
@@ -80,10 +76,9 @@ class DBCrud(RestEndpoint):
 		"""
 		try:
 			ns = multiDict2Dict(self.request.query)
-			if self.id is not None:
-				ns['__id'] = self.id
-			d = await self.crud.R(NS=ns)
-			return json_response(Success(d))
+			with self.db.sqlorContext(self.dbname) as sor:
+				d = await sor.R(self.tablename, ns)
+				return json_response(Success(d))
 		except Exception as e:
 			print(e)
 			traceback.print_exc()
@@ -95,8 +90,9 @@ class DBCrud(RestEndpoint):
 		"""
 		try:
 			ns = multiDict2Dict(await self.request.post())
-			d = await self.crud.C(ns)
-			return json_response(Success(d))
+			with self.db.sqlorContext(self.dbname) as sor:
+				d = await sor.C(self.tablename, ns)
+				return json_response(Success(d))
 		except Exception as e:
 			print(e)
 			traceback.print_exc()
@@ -108,8 +104,9 @@ class DBCrud(RestEndpoint):
 		"""
 		try:
 			ns = multiDict2Dict(await self.request.post())
-			d = await self.crud.U(ns)
-			return json_response(Success(''))
+			with self.db.sqlorContext(self.dbname) as sor:
+				d = await sor.U(self.tablename, ns)
+				return json_response(Success(' '))
 		except Exception as e:
 			print(e)
 			traceback.print_exc()
@@ -121,8 +118,9 @@ class DBCrud(RestEndpoint):
 		"""
 		try:
 			ns = multiDict2Dict(self.request.query)
-			d = await self.crud.D(ns)
-			return json_response(Success(d))
+			with self.db.sqlorContext(self.dbname) as sor:
+				d = await sor.D(self.tablename, ns)
+				return json_response(Success(d))
 		except Exception as e:
 			print(e)
 			traceback.print_exc()
