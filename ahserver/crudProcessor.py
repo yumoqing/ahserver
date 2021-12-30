@@ -1,3 +1,9 @@
+
+import os
+import codecs
+from aiohttp.web_exceptions import (
+HTTPException
+)
 import ujson as json
 from .baseProcessor import BaseProcessor
 from crud_engine.crud_engine import CRUDEngine
@@ -22,22 +28,17 @@ class CrudProcessor(BaseProcessor):
 	async def path_call(self, request, params={}):
 		await self.set_run_env(request)
 		dic = {}
-		with codees.open(self.real_path, 'r', 'utf-8') as f:
+		with codecs.open(self.real_path, 'r', 'utf-8') as f:
 			dic = json.load(f)
 		x = request.path.split('/')
-		if len(x) >= 3:
+		if len(x) >= 2:
 			act = x[-2]
-			if act in [':browser', ':filter', ':add', ':edit', ':delete']:
-				database = x[-4]
-				table = x[-3]
-			else:
-				database = x[-3]
-				table = x[-2]
-				act = ':browser'
+			if not CRUDEngine.is_legal_cmd(act):
+				act = CRUDEngine.defaultcmd()
 			default_filter_data = self.get_default_filter_data()
-			ce = CRUDEngine(database, table, dic, default_filter_data)
+			ce = CRUDEngine(self.resource, dic, default_filter_data)
 			return await ce.dispatch(act)
-		raise HttpError(500)
+		raise HttpException(555)
 
 	async def datahandle(self, request):
 		self.content =  await self.path_call(request)
