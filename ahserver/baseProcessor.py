@@ -65,7 +65,8 @@ class BaseProcessor:
 		kw = await self.run_ns['request2ns']()
 		self.run_ns['params_kw'] = kw
 		self.run_ns.update(kw)
-		self.run_ns['ref_real_path'] = self.path
+		self.run_ns['ref_real_path'] = self.real_path
+		self.run_ns['processor'] = self
 
 	async def execute(self,request):
 		await self.set_run_env(request)

@@ -193,6 +193,7 @@ class ProcessorResource(StaticResource,Url2File):
 		self.y_env.gethost = gethost
 		self.y_env.path_call = partial(self.path_call,request)
 		self.user = await auth.get_auth(request)
+		self.y_env.user = self.user
 		self.request_filename = self.url2file(str(request.url))
 		path = request.path
 		config = getConfig()
