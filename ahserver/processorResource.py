@@ -33,7 +33,6 @@ from appPublic.timecost import TimeCost
 from appPublic.timeUtils import timestampstr
 
 from .baseProcessor import getProcessor
-from .crudProcessor import CrudProcessor
 from .xlsxdsProcessor import XLSXDataSourceProcessor
 from .sqldsProcessor import SQLDataSourceProcessor
 from .functionProcessor import FunctionProcessor
