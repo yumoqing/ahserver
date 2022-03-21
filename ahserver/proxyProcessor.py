@@ -16,6 +16,7 @@ class proxyProcessor(BaseProcessor):
 		te = self.run_ns['tmpl_engine']
 		txt = await te.render(url,**ns)
 		data = json.loads(txt)
+		print('proxyProcessor: data=', data)
 		return data
 
 	async def datahandle(self,request):
@@ -34,6 +35,8 @@ class proxyProcessor(BaseProcessor):
 					status = res.status,
 					body = body
 			)
+			print('proxy: datahandle() finish', self.retResponse)
+
 		
 	def setheaders(self):
 		pass
