@@ -27,7 +27,7 @@ class ProxyProcessor(BaseProcessor):
 				d['url'],
 				headers = reqH,
 				allow_redirects=False,
-				data=await req.read()) as res:
+				data=await request.read()) as res:
 			headers = res.headers.copy()
 			body = await res.read()
 			self.retResponse = web.Response(
