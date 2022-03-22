@@ -20,6 +20,7 @@ class ProxyProcessor(BaseProcessor):
 		return data
 
 	async def datahandle(self,request):
+		chunk_size = 40960
 		d  = await self.path_call(request)
 		reqH = request.headers.copy()
 		async with client.request(
