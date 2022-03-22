@@ -36,6 +36,7 @@ class ProxyProcessor(BaseProcessor):
 					status = res.status
 					# , body=body
 			)
+			await self.retResponse.prepare(request)
 			async for chunk in res.content.iter_chunked(chunk_size):
 				await self.retResponse.write(chunk)
 			print('proxy: datahandle() finish', self.retResponse)
