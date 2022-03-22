@@ -34,7 +34,7 @@ class ProxyProcessor(BaseProcessor):
 			self.retResponse = web.StreamResponse(
 					headers = headers,
 					status = res.status
-					body=body
+					,body=body
 			)
 			# await self.retResponse.prepare(request)
 			async for chunk in res.content.iter_chunked(chunk_size):
