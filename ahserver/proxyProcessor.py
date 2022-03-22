@@ -39,7 +39,7 @@ class ProxyProcessor(BaseProcessor):
 			await self.retResponse.prepare(request)
 			async for chunk in res.content.iter_chunked(chunk_size):
 				await self.retResponse.write(chunk)
-			print('proxy: datahandle() finish', self.res)
+			print('proxy: datahandle() finish', res)
 
 		
 	def setheaders(self):
