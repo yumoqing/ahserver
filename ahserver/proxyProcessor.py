@@ -30,13 +30,13 @@ class ProxyProcessor(BaseProcessor):
 				allow_redirects=False,
 				data=await request.read()) as res:
 			headers = res.headers.copy()
-			body = await res.read()
+			# body = await res.read()
 			self.retResponse = web.StreamResponse(
 					headers = headers,
 					status = res.status
-					,body=body
+					# ,body=body
 			)
-			# await self.retResponse.prepare(request)
+			await self.retResponse.prepare(request)
 			async for chunk in res.content.iter_chunked(chunk_size):
 				await self.retResponse.write(chunk)
 			print('proxy: datahandle() finish', self.res)
