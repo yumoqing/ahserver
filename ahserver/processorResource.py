@@ -36,6 +36,7 @@ from .baseProcessor import getProcessor
 from .xlsxdsProcessor import XLSXDataSourceProcessor
 from .sqldsProcessor import SQLDataSourceProcessor
 from .functionProcessor import FunctionProcessor
+from .proxyProcessor import ProxyProcessor
 from .serverenv import ServerEnv
 from .url2file import Url2File
 from .filestorage import FileStorage

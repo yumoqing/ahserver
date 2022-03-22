@@ -2,7 +2,7 @@ from aiohttp import web
 from aiohttp import client
 from .baseProcessor import *
 
-class proxyProcessor(BaseProcessor):
+class ProxyProcessor(BaseProcessor):
 	@classmethod
 	def isMe(self,name):
 		return name=='proxy'
