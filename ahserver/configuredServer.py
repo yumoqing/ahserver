@@ -20,13 +20,14 @@ except:
 	pmp = None
 
 class ConfiguredServer:
-	def __init__(self,auth_klass=AuthAPI):
-		pp = ProgramPath()
-		self.natpmp_loop = True
-		self.nat_heartbeat = False
-		workdir = pp
-		if len(sys.argv) > 1:
-			workdir = sys.argv[1]
+	def __init__(self,auth_klass=AuthAPI, workdir=None):
+		if workdir is None:
+			pp = ProgramPath()
+			self.natpmp_loop = True
+			self.nat_heartbeat = False
+			workdir = pp
+			if len(sys.argv) > 1:
+				workdir = sys.argv[1]
 		config = getConfig(workdir,{'workdir':workdir,'ProgramPath':pp})
 		if config.databases:
 			DBPools(config.databases)
