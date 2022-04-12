@@ -1,4 +1,5 @@
-from aiohttp import web
+import aiohttp
+from aiohttp import web, BasicAuth
 from aiohttp import client
 from .baseProcessor import *
 
@@ -23,9 +24,13 @@ class ProxyProcessor(BaseProcessor):
 		chunk_size = 40960
 		d  = await self.path_call(request)
 		reqH = request.headers.copy()
+		auth = None
+		if d.get('user') and d.get('password'):
+			auth = BasicAuth(d['user'], d['password'])
 		async with client.request(
 				request.method,
 				d['url'],
+				auth=auth,
 				headers = reqH,
 				allow_redirects=False,
 				data=await request.read()) as res:
