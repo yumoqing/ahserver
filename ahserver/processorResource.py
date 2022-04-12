@@ -171,9 +171,6 @@ class ProcessorResource(StaticResource,Url2File):
 			l = c.langMapping.get(lang,lang)
 			return g.myi18n(s,l)
 
-		def gethost():
-			return '/'.join(str(request.url).split('/')[:3])
-			
 			
 		async def getArgs():
 			ns = DictObject()
@@ -190,7 +187,7 @@ class ProcessorResource(StaticResource,Url2File):
 		self.y_env.abspath = self.abspath
 		self.y_env.request2ns = getArgs
 		self.y_env.resource = self
-		self.y_env.gethost = gethost
+		self.y_env.gethost = partial(self.gethost, request)
 		self.y_env.path_call = partial(self.path_call,request)
 		self.user = await auth.get_auth(request)
 		self.y_env.user = self.user
@@ -243,6 +240,15 @@ class ProcessorResource(StaticResource,Url2File):
 				raise HTTPNotFound
 		return await super()._handle(request)
 
+	def gethost(self, request):
+		host = request.headers.get('X-Forwarded-Host')
+		if host:
+			return host
+		host = request.headers.get('Host')
+		if host:
+			return host
+		return '/'.join(str(request.url).split('/')[:3])
+		
 	async def html_handle(self,request,filepath):
 		with open(filepath,'rb') as f:
 			b = f.read()
@@ -273,7 +279,7 @@ class ProcessorResource(StaticResource,Url2File):
 		config = getConfig()
 		url = self.entireUrl(request, url)
 		host =  '/'.join(str(request.url).split('/')[:3])
-		path = url[len(host):].split('?')[0]
+		path = request.path 	#url[len(host):].split('?')[0]
 		real_path = self.abspath(request, path)
 		if config.website.startswiths:
 			for a in config.website.startswiths:
@@ -295,14 +301,14 @@ class ProcessorResource(StaticResource,Url2File):
 	def entireUrl(self, request, url):
 		if url.startswith('http://') or url.startswith('https://'):
 			return url
-		h = '/'.join(str(request.url).split('/')[:3])
+		h = self.gethost(request)
 		if url.startswith('/'):
-			return '%s%s' % (h,url)
+			return '%s://%s%s' % (request.scheme, h, url)
 		path = request.path
 		if self.request_filename and os.path.isdir(self.request_filename):
 			path = '%s/oops' % path
 		p = self.relatedurl(path,url)
-		return '%s%s' % (h, p)
+		return '%s://%s%s' % (request.scheme, h, p)
 
 	async def path_call(self,request, path, params={}):
 		url = self.entireUrl(request, path)
