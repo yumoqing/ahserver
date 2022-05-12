@@ -279,7 +279,7 @@ class ProcessorResource(StaticResource,Url2File):
 		config = getConfig()
 		url = self.entireUrl(request, url)
 		host =  '/'.join(str(request.url).split('/')[:3])
-		path = request.path 	#url[len(host):].split('?')[0]
+		path = url[len(host):].split('?')[0]
 		real_path = self.abspath(request, path)
 		if config.website.startswiths:
 			for a in config.website.startswiths:
@@ -310,8 +310,9 @@ class ProcessorResource(StaticResource,Url2File):
 		p = self.relatedurl(path,url)
 		return '%s://%s%s' % (request.scheme, h, p)
 
-	async def path_call(self,request, path, params={}):
+	async def path_call(self, request, path, params={}):
 		url = self.entireUrl(request, path)
+		
 		fpath = self.url2file(url)
 		processor = self.url2processor(request, url, fpath)
 		return await processor.path_call(request, params=params)
