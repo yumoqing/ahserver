@@ -86,8 +86,8 @@ class BaseProcessor:
 		elif type(self.content) == type([]):
 			self.content = json.dumps(self.content,
 				indent=4)
-		# self.content = unicode_escape(self.content)
-		self.setheaders()
+		
+		self.headers['Content-Type'] = "application/json; utf-8"
 		return Response(text=self.content,headers=self.headers)
 
 	async def datahandle(self,request):

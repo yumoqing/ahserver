@@ -182,7 +182,6 @@ class ProcessorResource(StaticResource,Url2File):
 		self.y_env.i18n = serveri18n
 		self.y_env.i18nDict = i18nDICT
 		self.y_env.terminalType = getClientType(request)
-		self.y_env.absurl = self.absUrl
 		self.y_env.entire_url = partial(self.entireUrl,request)
 		self.y_env.abspath = self.abspath
 		self.y_env.request2ns = getArgs
@@ -316,11 +315,3 @@ class ProcessorResource(StaticResource,Url2File):
 		processor = self.url2processor(request, url, fpath)
 		return await processor.path_call(request, params=params)
 		
-	def absUrl(self,request,url):
-		http='http://'
-		https='https://'
-		if url.startswith('https://') or url.startswith('http://') :
-			return url
-		path = request.path
-		new_path = self.relatedurl(path,url)
-		return self.entireUrl(request, new_path)
