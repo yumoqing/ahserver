@@ -20,9 +20,9 @@ except:
 	pmp = None
 
 class ConfiguredServer:
-	def __init__(self,auth_klass=AuthAPI, workdir=None):
+	def __init__(self, auth_klass=AuthAPI, workdir=None):
+		pp = ProgramPath()
 		if workdir is None:
-			pp = ProgramPath()
 			self.natpmp_loop = True
 			self.nat_heartbeat = False
 			workdir = pp
