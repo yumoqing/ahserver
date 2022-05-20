@@ -27,7 +27,7 @@ from aiohttp.web_response import Response, StreamResponse
 from aiohttp.web_routedef import AbstractRouteDef
 
 from appPublic.jsonConfig import getConfig
-from appPublic.MiniI18N import getI18N
+from appPublic.i18n import getI18N
 from appPublic.dictObject import DictObject, multiDict2Dict
 from appPublic.timecost import TimeCost
 from appPublic.timeUtils import timestampstr

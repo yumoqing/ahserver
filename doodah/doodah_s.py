@@ -37,6 +37,7 @@ rf.register('getI18nMapping', getI18nMapping)
 p = os.getcwd()
 if len(sys.argv) > 1:
 	p = sys.argv[1]
+print('p=', p)
 server = ConfiguredServer(auth_klass=MyAuthAPI,workdir=p)
 load_plugins(p)
 server.run()
