@@ -2,10 +2,7 @@ import os
 import re
 import traceback
 
-from aiohttp.web_urldispatcher import StaticResource, _WebHandler, PathLike
-from aiohttp.web_urldispatcher import Optional, _ExpectHandler
-from aiohttp.web_urldispatcher import Path
-from aiohttp.web_response import Response, StreamResponse
+from aiohttp.web_response import Response
 from aiohttp.web_exceptions import (
     HTTPException,
     HTTPExpectationFailed,
@@ -14,10 +11,7 @@ from aiohttp.web_exceptions import (
     HTTPNotFound,
 )
 from aiohttp import web
-from aiohttp.web_fileresponse import FileResponse
 from aiohttp.web_request import Request
-from aiohttp.web_response import Response, StreamResponse
-from aiohttp.web_routedef import AbstractRouteDef
 from aiohttp.web import json_response
 
 
