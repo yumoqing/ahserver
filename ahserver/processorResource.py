@@ -10,7 +10,7 @@ from yarl import URL
 from appPublic.http_client import Http_Client
 from functools import partial
 from aiohttp_auth import auth
-from aiohttp.web_urldispatcher import StaticResource, _WebHandler, PathLike
+from aiohttp.web_urldispatcher import StaticResource, PathLike
 from aiohttp.web_urldispatcher import Optional, _ExpectHandler
 from aiohttp.web_urldispatcher import Path
 from aiohttp.web_response import Response, StreamResponse
