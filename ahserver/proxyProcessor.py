@@ -17,7 +17,7 @@ class ProxyProcessor(BaseProcessor):
 		te = self.run_ns['tmpl_engine']
 		txt = await te.render(url,**ns)
 		data = json.loads(txt)
-		print('proxyProcessor: data=', data)
+		self.debug('proxyProcessor: data=%s' % data)
 		return data
 
 	async def datahandle(self,request):
@@ -44,7 +44,7 @@ class ProxyProcessor(BaseProcessor):
 			await self.retResponse.prepare(request)
 			async for chunk in res.content.iter_chunked(chunk_size):
 				await self.retResponse.write(chunk)
-			print('proxy: datahandle() finish', res)
+			self.debug('proxy: datahandle() finish')
 
 		
 	def setheaders(self):

@@ -8,7 +8,10 @@ from aiohttp_session.cookie_storage import EncryptedCookieStorage
 
 from appPublic.jsonConfig import getConfig
 from appPublic.rsa import RSA
-class AuthAPI:
+from appPublic.app_logger import AppLogger
+class AuthAPI(AppLogger):
+	def __init__(self):
+		super().__init__()
 
 	def getPrivateKey(self):
 		if not hasattr(self,'rsaEngine'):
@@ -45,14 +48,14 @@ class AuthAPI:
 		"""
 		authinfo = request.headers.get('authorization')
 		if authinfo is None:
-			print('header not include "authorization" info', request.headers)
+			self.debug('header not include "authorization" info %s' % request.headers)
 			raise web.HTTPUnauthorized()
 			
 		authdata = self.rsaDecode(authinfo)
 		# print('authdata=',authdata)
 		alist = authdata.split('::')
 		if len(alist) != 3:
-			print('auth data format error')
+			self.debug('auth data format error %s' % authdata)
 			raise web.HTTPUnauthorized()
 
 		login_method=alist[0]

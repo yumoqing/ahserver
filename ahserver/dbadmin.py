@@ -20,6 +20,7 @@ from sqlor.crud import CRUD
 
 from appPublic.dictObject import multiDict2Dict
 from appPublic.jsonConfig import getConfig
+from appPublic.app_logger import AppLogger
 
 from .error import Error,Success
 actions = [
@@ -29,19 +30,19 @@ actions = [
 	"filter"
 ]
 
-class DBAdmin:
+class DBAdmin(AppLogger):
 	def __init__(self, request,dbname,tablename, action):
 		self.dbname = dbname
 		self.tablename = tablename
 		self.request = request
 		self.action = action
 		if action not in actions:
-			print('action not defined',action)
+			self.debug('action not defined:%s' % action)
 			raise HTTPNotFound
 		try:
 			self.crud = CRUD(dbname,tablename)
 		except Exception as e:
-			print('e=',e)
+			self.info('e= %s' % e)
 			traceback.print_exc()
 			raise HTTPNotFound
 		
@@ -50,7 +51,7 @@ class DBAdmin:
 			d = await self.crud.I()
 			return json_response(Success(d))
 		except Exception as e:
-			print(e)
+			self.debug('except=%s' % e)
 			traceback.print_exc()
 			return json_response(Error(errno='metaerror',msg='get metadata error'))
 

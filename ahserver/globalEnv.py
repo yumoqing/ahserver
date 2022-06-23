@@ -60,7 +60,7 @@ class FileOutZone(Exception):
 def openfile(url,m):
 	fp = abspath(url)
 	if fp is None:
-		print('openfile(',url,m,'),url is not match a file')
+		print(f'openfile({url},{m}),url is not match a file')
 		raise Exception('url can not mathc a file')
 	config = getConfig()
 	paths = [ os.path.abspath(p) for p in config.website.paths ]

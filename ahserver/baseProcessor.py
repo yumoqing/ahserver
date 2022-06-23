@@ -8,6 +8,7 @@ from aiohttp.web_response import Response, StreamResponse
 from appPublic.jsonConfig import getConfig
 from appPublic.dictObject import DictObject
 from appPublic.folderUtils import listFile
+from appPublic.app_logger import AppLogger
 
 from .utils import unicode_escape
 from .serverenv import ServerEnv
@@ -38,7 +39,10 @@ class ObjectCache:
 
 
 		
-class BaseProcessor:
+class BaseProcessor(AppLogger):
+	def __init__(self):
+		super().__init__()
+
 	@classmethod
 	def isMe(self,name):
 		return name=='base'
@@ -91,7 +95,7 @@ class BaseProcessor:
 		return Response(text=self.content,headers=self.headers)
 
 	async def datahandle(self,request):
-		print('*******Error*************')
+		self.debug('*******Error*************')
 		self.content=''
 
 	def setheaders(self):

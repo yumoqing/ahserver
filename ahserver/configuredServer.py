@@ -8,6 +8,7 @@ from appPublic.folderUtils import ProgramPath
 from appPublic.background import Background
 from appPublic.jsonConfig import getConfig
 from appPublic.i18n import getI18N
+from appPublic.app_logger import AppLogger
 
 from sqlor.dbpools import DBPools
 
@@ -20,8 +21,9 @@ try:
 except:
 	pmp = None
 
-class ConfiguredServer:
+class ConfiguredServer(AppLogger):
 	def __init__(self, auth_klass=AuthAPI, workdir=None):
+		super().__init__()
 		pp = ProgramPath()
 		if workdir is None:
 			self.natpmp_loop = True
@@ -56,14 +58,14 @@ class ConfiguredServer:
 		t = config.natpmp.portmap_period or 3600
 		while self.natpmp_loop:
 			gateway = pmp.get_gateway_addr()
-			print('gateway=', gateway)
+			self.debug('gateway=%s' % gateway)
 			try:
 				x = pmp.map_port(pmp.NATPMP_PROTOCOL_TCP, 
 								config.natpmp.public_port, config.website.port, 
 								t, gateway_ip=gateway)
-				print('gateway=', gateway, 'map_port()=', x)
+				self.debug('gateway=%s map_port=%s' %( gateway, x))
 			except Exception as e:
-				print('mat_pmp():Exception:',e)
+				self.debug('mat_pmp():Exception:%s' % e)
 			time.sleep(t - 1)
 			
 

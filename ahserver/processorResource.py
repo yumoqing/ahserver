@@ -31,6 +31,7 @@ from appPublic.i18n import getI18N
 from appPublic.dictObject import DictObject, multiDict2Dict
 from appPublic.timecost import TimeCost
 from appPublic.timeUtils import timestampstr
+from appPublic.app_logger import AppLogger
 
 from .baseProcessor import getProcessor
 from .xlsxdsProcessor import XLSXDataSourceProcessor
@@ -59,7 +60,7 @@ def i18nDICT(request):
 	return json.dumps(i18n.getLangDict(l)).encode(c.website.coding)
 
 
-class ProcessorResource(StaticResource,Url2File):
+class ProcessorResource(AppLogger, StaticResource,Url2File):
 	def __init__(self, prefix: str, directory: PathLike,
 				 *, name: Optional[str]=None,
 				 expect_handler: Optional[_ExpectHandler]=None,
@@ -68,6 +69,7 @@ class ProcessorResource(StaticResource,Url2File):
 				 append_version: bool=False,
 				 indexes:list=[],
 				 processors:dict={}) -> None:
+		AppLogger.__init__(self)
 		StaticResource.__init__(self,prefix, directory,
 				 name=name,
 				 expect_handler=expect_handler,
@@ -130,8 +132,11 @@ class ProcessorResource(StaticResource,Url2File):
 		name = str(request.url)
 		t = TimeCost(name)
 		with t:
-			x = await self._handle1(request)
-		print(timestampstr(),':',name,':', 'time cost=', t.end_time - t.begin_time)
+			try:
+				x = await self._handle1(request)
+			except:
+				return None
+		self.info(f'{name}:time cost={t.end_time - t.begin_time}')
 		return x
 		
 	async def _handle1(self,request:Request) -> StreamResponse:
@@ -196,7 +201,7 @@ class ProcessorResource(StaticResource,Url2File):
 		if config.website.dbadm and path.startswith(config.website.dbadm):
 			pp = path.split('/')[2:]
 			if len(pp)<3:
-				print(str(request.url), 'not found')
+				self.error('%s:not found' % str(request.url))
 				raise HTTPNotFound
 			dbname = pp[0]
 			tablename = pp[1]
@@ -206,7 +211,7 @@ class ProcessorResource(StaticResource,Url2File):
 		if config.website.dbrest and path.startswith(config.website.dbrest):
 			pp = path.split('/')[2:]
 			if len(pp)<2:
-				print(str(request.url), 'not found')
+				self.error('%s:not found' % str(request.url))
 				raise HTTPNotFound
 			dbname = pp[0]
 			tablename = pp[1]
@@ -218,7 +223,7 @@ class ProcessorResource(StaticResource,Url2File):
 		if config.website.download and path.startswith(config.website.download):
 			pp = path.split('/')[2:]
 			if len(pp)<1:
-				print(str(request.url), 'not found')
+				self.error('%s:not found' % str(request.url))
 				raise HTTPNotFound
 			dp = '/'.join(pp)
 			path = path_decode(dp)
@@ -235,7 +240,7 @@ class ProcessorResource(StaticResource,Url2File):
 		if self.request_filename and os.path.isdir(self.request_filename):
 			config = getConfig()
 			if not config.website.allowListFolder:
-				print(str(request.url), 'not found')
+				self.error('%s:not found' % str(request.url))
 				raise HTTPNotFound
 		return await super()._handle(request)
 
@@ -287,7 +292,7 @@ class ProcessorResource(StaticResource,Url2File):
 					return processor
 
 		if self.request_filename is None:
-			print(url, 'not found')
+			self.error('%s:not found' % str(request.url))
 			raise HTTPNotFound
 			
 		for word, handlername in self.y_processors:
