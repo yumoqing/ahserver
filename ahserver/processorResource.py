@@ -134,9 +134,12 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 		with t:
 			try:
 				x = await self._handle1(request)
-			except:
-				return None
+			except Exception as e:
+				self.error(f'{name}:error={e}')
+				x = e
 		self.info(f'{name}:time cost={t.end_time - t.begin_time}')
+		if x is None:
+			return HTTPException()
 		return x
 		
 	async def _handle1(self,request:Request) -> StreamResponse:
