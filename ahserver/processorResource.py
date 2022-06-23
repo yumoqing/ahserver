@@ -136,10 +136,10 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 				x = await self._handle1(request)
 			except Exception as e:
 				self.error(f'{name}:error={e}')
+				print_exc()
 				x = e
 		self.info(f'{name}:time cost={t.end_time - t.begin_time}')
 		if not isinstance(x, StreamResponse):
-			self.error(f'x type={type(x)}error({str(x)}) happend')
 			return HTTPException
 		return x
 		
