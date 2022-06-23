@@ -7,7 +7,6 @@ from aiohttp import web
 from appPublic.folderUtils import ProgramPath
 from appPublic.background import Background
 from appPublic.jsonConfig import getConfig
-from appPublic.i18n import getI18N
 from appPublic.app_logger import AppLogger
 
 from sqlor.dbpools import DBPools
@@ -25,7 +24,6 @@ class ConfiguredServer(AppLogger):
 			config = getConfig(workdir,{'workdir':workdir,'ProgramPath':pp})
 		else:
 			config = getConfig()
-		i18n = getI18N(path=workdir)
 		if config.databases:
 			DBPools(config.databases)
 		initEnv()
