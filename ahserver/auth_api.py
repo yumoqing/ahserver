@@ -7,7 +7,7 @@ from aiohttp_session import get_session, session_middleware
 from aiohttp_session.cookie_storage import EncryptedCookieStorage
 
 from appPublic.jsonConfig import getConfig
-from appPublic.rsa import RSA
+from appPublic.rsawrap import RSA
 from appPublic.app_logger import AppLogger
 class AuthAPI(AppLogger):
 	def __init__(self):
