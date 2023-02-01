@@ -45,9 +45,11 @@ class Url2File:
 			return real_path
 
 		if not os.path.isdir(os.path.dirname(real_path)):
+			print(f'url2file() return None, {real_path:}')
 			return None
 
 		if not self.inherit:
+			print(f'url2file() return None, self.inherit is false')
 			return None
 
 		items = url.split('/')
@@ -55,6 +57,7 @@ class Url2File:
 			del items[-2]
 			url = '/'.join(items)
 			return self.url2file(url)
+		print(f'url2file() return None finally, {items:}')
 		return None
 
 	def relatedurl(self,url: str, name: str) -> str:
