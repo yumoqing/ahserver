@@ -76,7 +76,7 @@ class Url2File:
 		url = self.relatedurl(url,name)
 		return self.url2file(url)
 
-class TmplUrl2File(Url2File):
+class TmplUrl2File:
 	def __init__(self,paths,indexes, subffixes=['.tmpl','.ui' ],inherit=False):
 		self.paths = paths
 		self.u2fs = [ Url2File(p,prefix,indexes,inherit=inherit) \
