@@ -15,6 +15,7 @@ from .processorResource import ProcessorResource
 from .auth_api import AuthAPI
 from .myTE import setupTemplateEngine
 from .globalEnv import initEnv
+from .filestorage import TmpFileRecord
 
 class ConfiguredServer(AppLogger):
 	def __init__(self, auth_klass=AuthAPI, workdir=None):
@@ -34,6 +35,7 @@ class ConfiguredServer(AppLogger):
 		self.configPath(config)
 
 	def run(self):
+		a = TmpFileRecord()
 		config = getConfig()
 		ssl_context = None
 		if config.website.ssl:
