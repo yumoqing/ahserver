@@ -34,7 +34,7 @@ class Url2File:
 
 	def url2file(self, url: str) -> str:
 		url = url.split('?')[0]
-		real_path  = self.url2ospath(url)
+		real_path = self.url2ospath(url)
 		if os.path.isdir(real_path):
 			for idx in self.indexes:
 				p = os.path.join(real_path,idx)
@@ -90,6 +90,13 @@ class TmplUrl2File:
 				return fp
 		return None
 
+	def relatedurl(self,url: str, name: str) -> str:
+		for u2f in self.u2fs:
+			fp = u2f.relatedurl(url, name)
+			if fp:
+				return fp
+		return None
+		
 	def list_tmpl(self):
 		ret = []
 		for rp,_ in self.paths:

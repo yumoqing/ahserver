@@ -40,14 +40,13 @@ class ObjectCache:
 
 		
 class BaseProcessor(AppLogger):
-	def __init__(self):
-		super().__init__()
-
 	@classmethod
 	def isMe(self,name):
 		return name=='base'
 
 	def __init__(self,path,resource):
+		super().__init__()
+		self.env_set = False
 		self.path = path
 		self.resource = resource
 		self.retResponse = None
@@ -60,6 +59,8 @@ class BaseProcessor(AppLogger):
 		self.content = ''
 
 	async def set_run_env(self, request):
+		if self.env_set:
+			return
 		self.real_path = self.resource.url2file(self.resource.entireUrl(request, self.path))
 		g = ServerEnv()
 		self.run_ns = {}
@@ -71,6 +72,7 @@ class BaseProcessor(AppLogger):
 		self.run_ns.update(kw)
 		self.run_ns['ref_real_path'] = self.real_path
 		self.run_ns['processor'] = self
+		self.env_set = True
 
 	async def execute(self,request):
 		await self.set_run_env(request)

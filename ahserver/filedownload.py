@@ -5,7 +5,7 @@ import mimetypes
 from aiohttp.web_exceptions import HTTPNotFound
 from aiohttp.web import StreamResponse
 from aiohttp import web
-import aiofile
+import aiofiles
 
 from appPublic.rc4 import RC4
 
@@ -17,6 +17,9 @@ def path_encode(path):
 def path_decode(dpath):
 	rc4 = RC4()
 	return rc4.decode(dpath,crypto_aim)
+
+async def file_upload(request):
+	pass
 
 async def file_download(request, filepath, content_type=None):
 	filename = os.path.basename(filepath)
@@ -41,12 +44,11 @@ async def file_download(request, filepath, content_type=None):
 		)
 		await response.prepare(request)
 		cnt = 0
-		with open(filepath, 'rb') as f:
-			chunk = f.read(10240000)
+		async with aiofiles.open(filepath, 'rb') as f:
+			chunk = await f.read(10240000)
 			cnt = cnt + len(chunk)
 			await response.write(chunk)
 		await response.fsyn()
 		await response.write_eof()
 		return response
 	raise HTTPNotFound
-

@@ -2,6 +2,7 @@ import os
 import re
 import codecs
 from traceback import print_exc
+# from showcallstack import showcallstack
 
 import asyncio
 
@@ -108,24 +109,34 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 			return ns
 		ns = {}
 		while 1:
-			field = await reader.next()
-			if not field:
-				break
-			value = ''
-			if hasattr(field,'filename'):
-				saver = FileStorage()
-				value = await saver.save(field.filename,field.read_chunk)
-			else:
-				value = await field.read(decode=True)
-			ov = ns.get(field.name)
-			if ov:
-				if type(ov) == type([]):
-					ov.append(value)
+			try:
+				field = await reader.next()
+				if not field:
+					break
+				value = ''
+				if hasattr(field,'filename') and field.filename is not None:
+					saver = FileStorage()
+					value = await saver.save(field.filename,field.read_chunk)
 				else:
-					ov = [ov,value]
-			else:
-				ov = value
-			ns.update({field.name:ov})
+					value = await field.read(decode=True)
+					value = value.decode('utf-8')
+				ov = ns.get(field.name)
+				if ov:
+					if type(ov) == type([]):
+						ov.append(value)
+					else:
+						ov = [ov,value]
+				else:
+					ov = value
+				ns.update({field.name:ov})
+				# print(f'getPostData():{ns=}')
+			except Exception as e:
+				print(e)
+				print_exc()
+				print('-----------except out ------------')
+				break;
+		print(f'getPostData():{ns=}')
+		# showcallstack()
 		return ns
 
 	async def _handle(self,request:Request) -> StreamResponse:
@@ -182,10 +193,15 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 
 			
 		async def getArgs():
+			print(f'getArgs, url={str(request.url)}')
+			if hasattr(request, 'params_kw'):
+				return request.params_kw
+			print('request.params=', request.get('params_kw'))
 			ns = DictObject()
 			if request.method == 'POST':
 				return await self.getPostData(request)
 			ns = multiDict2Dict(request.query)
+			request.params_kw = ns
 			return ns
 
 		self.y_env.i18n = serveri18n

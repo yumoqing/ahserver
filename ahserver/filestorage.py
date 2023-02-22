@@ -3,7 +3,7 @@
 import os
 import time
 import tempfile
-import aiofile
+import aiofiles
 
 from appPublic.folderUtils import _mkdir
 from appPublic.jsonConfig import getConfig
@@ -35,14 +35,19 @@ class FileStorage:
 		return path
 
 	async def save(self,name,read_data):
+		# print(f'FileStorage():save():{name=}')
 		p = self._name2path(name)
+		fpath = p[len(self.root):]
 		_mkdir(os.path.dirname(p))
-		async with aiofile.AIOFile(p,'wb') as f:
+		async with aiofiles.open(p,'wb') as f:
+			siz = 0
 			while 1:
 				d = await read_data()
 				if not d:
 					break
+				siz += len(d);
 				await f.write(d)
-			await f.fsync()
+				await f.flush()
+			print(f'{name=} file({fpath}) write {siz} bytes')
 				
-		return p[len(self.root):]
+		return fpath
