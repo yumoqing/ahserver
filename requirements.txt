@@ -1,5 +1,5 @@
 asyncio
-aiofile
+aiofiles
 aiodns
 cchardet
 aiohttp
