@@ -86,9 +86,6 @@ class BaseProcessor(AppLogger):
 		elif type(self.content) == type({}) :
 			self.content = json.dumps(self.content,
 				indent=4)
-		elif  isinstance(self.content,DictObject):
-			mydict = self.content.to_dict()
-			self.content = json.dumps(mydict, indent=4)
 		elif type(self.content) == type([]):
 			self.content = json.dumps(self.content,
 				indent=4)
