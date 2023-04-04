@@ -19,6 +19,7 @@ from appPublic.folderUtils import folderInfo
 from appPublic.uniqueID import setNode,getID
 from appPublic.unicoding import unicoding,uDict,uObject
 from appPublic.Singleton import SingletonDecorator
+from appPublic.rc4 import password
 
 from sqlor.dbpools import DBPools,runSQL,runSQLPaging
 from sqlor.crud import CRUD
@@ -26,6 +27,7 @@ from sqlor.crud import CRUD
 
 from .xlsxData import XLSXData
 from .uriop import URIOp
+from .error import Success, Error, NeedLogin, NoPermission
 
 from .serverenv import ServerEnv
 
@@ -160,3 +162,9 @@ def initEnv():
 	g.openfile = openfile
 	g.CRUD = CRUD
 	g.DBPools = DBPools
+	g.Error = Error
+	g.Success = Success
+	g.NeedLogin = NeedLogin
+	g.NoPermission = NoPermission
+	g.password = password
+

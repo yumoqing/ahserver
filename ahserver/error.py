@@ -12,3 +12,16 @@ def Success(data):
 		"status":"OK",
 		"data":data
 	}
+
+def NeedLogin(path):
+	return {
+		"status":"need_login",
+		"data":path
+	}
+
+def NoPermission(path):
+	return {
+		"status":"no_permission",
+		"data":path
+	}
+

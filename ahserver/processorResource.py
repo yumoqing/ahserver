@@ -8,6 +8,7 @@ import asyncio
 
 from yarl import URL
 
+from aiohttp_auth import auth
 from appPublic.http_client import Http_Client
 from functools import partial
 from aiohttp_auth import auth
@@ -199,7 +200,15 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 			ns = multiDict2Dict(request.query)
 			return ns
 
+		async def remember_user(userid):
+			await auth.remember(request, userid)
+
+		async def get_user():
+			return await auth.get_auth(request)
+
 		self.y_env.i18n = serveri18n
+		self.y_env.remember_user = remember_user
+		self.y_env.get_user = get_user
 		self.y_env.i18nDict = i18nDICT
 		self.y_env.terminalType = getClientType(request)
 		self.y_env.entire_url = partial(self.entireUrl,request)

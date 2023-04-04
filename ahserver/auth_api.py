@@ -87,9 +87,8 @@ class AuthAPI(AppLogger):
 			# print('-----------auth.get_auth() return None--------------')
 			user = await self.checkLogin(request)
 			#raise web.HTTPFound(f'/login_form?from_path={path}')
-		user_perms = await self.getUserPermissions(user)
-		need_perm = await self.getPermissionNeed(path)
-		if need_perm in user_perms:
+		is_ok = await self.checkUserPermission(user, path)
+		if is_ok:
 			return await handler(request)
 		# print(f'**{path} forbidden**')
 		raise web.HTTPForbidden()
