@@ -2,6 +2,7 @@ from aiohttp_auth import auth
 from os import urandom
 from aiohttp import web
 import aiohttp_session
+import base64
 
 from aiohttp_session import get_session, session_middleware
 from aiohttp_session.cookie_storage import EncryptedCookieStorage
@@ -50,6 +51,10 @@ class AuthAPI(AppLogger):
 		if authinfo is None:
 			self.debug('header not include "authorization" info %s' % request.headers)
 			raise web.HTTPUnauthorized()
+		if isinstance(authinfo, str):
+			authinfo = authinfo.encode('ascii')
+		authinfo = base64.b64decode(authinfo)
+		authinfo = authinfo.decode('ascii')
 			
 		authdata = self.rsaDecode(authinfo)
 		# print('authdata=',authdata)
