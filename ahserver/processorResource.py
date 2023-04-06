@@ -315,10 +315,6 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 					processor = FunctionProcessor(path,self,a)
 					return processor
 
-		if self.request_filename is None:
-			self.error('%s:not found' % str(request.url))
-			raise HTTPNotFound
-			
 		for word, handlername in self.y_processors:
 			if fpath.endswith(word):
 				Klass = getProcessor(handlername)

@@ -38,6 +38,7 @@ class AuthAPI(AppLogger):
 											   include_ip=True)
 
 		# setup aiohttp_auth.auth middleware in aiohttp fashion
+		# print('policy = ', policy)
 		auth.setup(app, policy)
 		app.middlewares.append(self.checkAuth)
 		app.router.add_route('GET', '/logout', self.logout)
