@@ -304,6 +304,7 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 			return False
 		
 	def url2processor(self, request, url, fpath):
+		print('fpath=', fpath)
 		config = getConfig()
 		url = self.entireUrl(request, url)
 		host =  '/'.join(str(request.url).split('/')[:3])
