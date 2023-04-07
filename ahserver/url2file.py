@@ -33,6 +33,7 @@ class Url2File:
 		return real_path
 
 	def url2file(self, url: str) -> str:
+		ourl = url
 		url = url.split('?')[0]
 		real_path = self.url2ospath(url)
 		if os.path.isdir(real_path):
@@ -45,11 +46,11 @@ class Url2File:
 			return real_path
 
 		if not os.path.isdir(os.path.dirname(real_path)):
-			print(f'url2file() return None, {real_path:}')
+			print(f'url2file() return None, {real_path=}, {url=},{ourl=}, {self.path=}')
 			return None
 
 		if not self.inherit:
-			print(f'url2file() return None, self.inherit is false')
+			print(f'url2file() return None, self.inherit is false, {url:}, {self.path=}')
 			return None
 
 		items = url.split('/')
@@ -57,7 +58,7 @@ class Url2File:
 			del items[-2]
 			url = '/'.join(items)
 			return self.url2file(url)
-		print(f'url2file() return None finally, {items:}')
+		print(f'url2file() return None finally, {items:}, {url=}, {ourl=}, {self.path=}')
 		return None
 
 	def relatedurl(self,url: str, name: str) -> str:
