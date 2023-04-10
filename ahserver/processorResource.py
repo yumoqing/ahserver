@@ -308,6 +308,8 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 		
 	def url2processor(self, request, url, fpath):
 		print('fpath=', fpath)
+		if fpath is None:
+			return None
 		config = getConfig()
 		url = self.entireUrl(request, url)
 		host =  '/'.join(str(request.url).split('/')[:3])
