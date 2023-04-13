@@ -37,6 +37,7 @@ from appPublic.app_logger import AppLogger
 
 from .baseProcessor import getProcessor
 from .xlsxdsProcessor import XLSXDataSourceProcessor
+from .websocketProcessor import WebsocketProcessor
 from .sqldsProcessor import SQLDataSourceProcessor
 from .functionProcessor import FunctionProcessor
 from .proxyProcessor import ProxyProcessor
