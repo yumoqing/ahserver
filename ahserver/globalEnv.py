@@ -166,5 +166,5 @@ def initEnv():
 	g.Success = Success
 	g.NeedLogin = NeedLogin
 	g.NoPermission = NoPermission
-	g.password = password
+	g.password_encode = password
 

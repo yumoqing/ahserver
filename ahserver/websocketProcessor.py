@@ -2,7 +2,7 @@ import aiohttp
 from aiohttp import web
 from .baseProcessor import PythonScriptProcessor
 
-class WebSocketProcessor(PythonScriptProcessor):
+class WebsocketProcessor(PythonScriptProcessor):
 	@classmethod
 	def isMe(self,name):
 		return name=='ws'
