@@ -106,7 +106,11 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 		return fname
 
 	async def getPostData(self,request: Request) -> dict:
-		reader = await request.multipart()
+		reader = None
+		try:
+			reader = await request.multipart()
+		except:
+			pass
 		if reader is None:
 			md = await request.post()
 			ns = multiDict2Dict(md)
