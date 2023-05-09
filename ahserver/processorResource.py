@@ -313,21 +313,22 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 		
 	def url2processor(self, request, url, fpath):
 		print('fpath=', fpath)
-		if fpath is None:
-			return None
 		config = getConfig()
 		url = self.entireUrl(request, url)
 		host =  '/'.join(str(request.url).split('/')[:3])
-		path = url[len(host):].split('?')[0]
+		path = request.path
 		real_path = self.abspath(request, path)
-		if real_path is None:
-			return None
+		print(f'url2processor():{path=}, {real_path=}')
 		if config.website.startswiths:
 			for a in config.website.startswiths:
 				if path.startswith(a.leading):
 					processor = FunctionProcessor(path,self,a)
 					return processor
 
+		if real_path is None:
+			return None
+		if fpath is None:
+			return None
 		for word, handlername in self.y_processors:
 			if fpath.endswith(word):
 				Klass = getProcessor(handlername)
