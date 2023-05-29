@@ -22,7 +22,7 @@ class TmpFileRecord:
 		self.filename = self.savefilename()
 		self.loop = asyncio.get_event_loop()
 		self.loop.call_later(0.01, self.load)
-		print('TmpFileRecord() .........................')
+		# print('TmpFileRecord() .........................')
 
 	def newtmpfile(self, path:str):
 		self.filetime[path] = time.time()
@@ -44,7 +44,7 @@ class TmpFileRecord:
 			self.change_flg = False
 
 	async def load(self):
-		print('load() called ............')
+		# print('load() called ............')
 		fn = self.filename
 		if not os.path.isfile(fn):
 			return
@@ -110,6 +110,6 @@ class FileStorage:
 				siz += len(d);
 				await f.write(d)
 				await f.flush()
-				print(f'{name=} file({fpath}) write {siz} bytes')
+				# print(f'{name=} file({fpath}) write {siz} bytes')
 		self.tfr.newtmpfile(fpath)		
 		return fpath
