@@ -110,6 +110,6 @@ class FileStorage:
 				siz += len(d);
 				await f.write(d)
 				await f.flush()
-		# print(f'{name=} file({fpath}) write {siz} bytes')
+				print(f'{name=} file({fpath}) write {siz} bytes')
 		self.tfr.newtmpfile(fpath)		
 		return fpath
