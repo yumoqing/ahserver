@@ -30,6 +30,9 @@ class ConfiguredServer(AppLogger):
 		initEnv()
 		setupTemplateEngine()
 		client_max_size = 1024 * 10240
+		if config.website.client_max_size:
+			client_max_size = config.website.client_max_size
+			
 		self.app = web.Application(client_max_size=client_max_size)
 		auth = auth_klass()
 		auth.setupAuth(self.app)
