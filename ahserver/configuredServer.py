@@ -29,7 +29,8 @@ class ConfiguredServer(AppLogger):
 			DBPools(config.databases)
 		initEnv()
 		setupTemplateEngine()
-		self.app = web.Application()
+		client_max_size = 1024 * 10240
+		self.app = web.Application(client_max_size=client_max_size)
 		auth = auth_klass()
 		auth.setupAuth(self.app)
 		self.configPath(config)
