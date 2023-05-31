@@ -102,7 +102,6 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 	def abspath(self, request, path:str):
 		url =  self.entireUrl(request, path)
 		fname = self.url2file(url)
-		print(f'abspath():, {path=}, {url=}, {fname=}')
 		return fname
 
 	async def getPostData(self,request: Request) -> dict:
@@ -227,7 +226,6 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 		self.user = await auth.get_auth(request)
 		self.y_env.user = self.user
 		self.request_filename = self.url2file(str(request.path))
-		print(f'225:{request.path=}, {self.request_filename=}')
 		path = request.path
 		config = getConfig()
 		if config.website.dbadm and path.startswith(config.website.dbadm):
@@ -312,13 +310,11 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 			return False
 		
 	def url2processor(self, request, url, fpath):
-		print('fpath=', fpath)
 		config = getConfig()
 		url = self.entireUrl(request, url)
 		host =  '/'.join(str(request.url).split('/')[:3])
 		path = request.path
 		real_path = self.abspath(request, path)
-		print(f'url2processor():{path=}, {real_path=}')
 		if config.website.startswiths:
 			for a in config.website.startswiths:
 				if path.startswith(a.leading):
@@ -351,7 +347,6 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 	async def path_call(self, request, path, params={}):
 		url = self.entireUrl(request, path)
 		fpath = self.url2file(url)
-		print(f'path_call():{path=}, {url=}, {fpath=}')
 		processor = self.url2processor(request, url, fpath)
 		return await processor.path_call(request, params=params)
 		
