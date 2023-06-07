@@ -209,11 +209,15 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 		async def remember_user(userid):
 			await auth.remember(request, userid)
 
+		async def forget_user():
+			await auth.forget(request)
+
 		async def get_user():
 			return await auth.get_auth(request)
 
 		self.y_env.i18n = serveri18n
 		self.y_env.remember_user = remember_user
+		self.y_env.forget_user = forget_user
 		self.y_env.get_user = get_user
 		self.y_env.i18nDict = i18nDICT
 		self.y_env.terminalType = getClientType(request)
