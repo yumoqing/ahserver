@@ -82,7 +82,7 @@ class BaseProcessor(AppLogger):
 	async def handle(self,request):
 		await self.execute(request)
 		if self.retResponse is not None:
-			self.retResponse.headers['Access-Control-Expose-Headers'] = '*'
+			self.retResponse.headers['Access-Control-Expose-Headers'] = 'Set-Cokkie'
 			return self.retResponse
 		elif type(self.content) == type({}) :
 			self.content = json.dumps(self.content,
@@ -92,7 +92,7 @@ class BaseProcessor(AppLogger):
 				indent=4)
 		
 		self.headers['Content-Type'] = "application/json; utf-8"
-		self.headers['Access-Control-Expose-Headers'] = '*'
+		self.headers['Access-Control-Expose-Headers'] = 'Set-Cokkie'
 		return Response(text=self.content,headers=self.headers)
 
 	async def datahandle(self,request):
