@@ -80,9 +80,9 @@ class BaseProcessor(AppLogger):
 		return self.content
 
 	def set_response_headers(self, response):
-		response.headers['Access-Control-Expose-Headers'] = 'AIOHTTP_SESSION'
-		response.headers['Access-Control-Allow-Credentials'] = 'true'
-		response.headers['Access-Control-Allow-Origin'] = '47.93.12.75'
+		response.headers['Access-Control-Expose-Headers'] = 'Set-Cookie'
+		# response.headers['Access-Control-Allow-Credentials'] = 'true'
+		# response.headers['Access-Control-Allow-Origin'] = '47.93.12.75'
 
 	async def handle(self,request):
 		await self.execute(request)
