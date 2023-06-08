@@ -216,6 +216,9 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 			return await auth.get_auth(request)
 
 		self.y_env.i18n = serveri18n
+		self.y_env.info = self.info
+		self.y_env.error = self.error
+		self.y_env.debug = self.debug
 		self.y_env.remember_user = remember_user
 		self.y_env.forget_user = forget_user
 		self.y_env.get_user = get_user
