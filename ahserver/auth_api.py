@@ -48,8 +48,9 @@ class AuthAPI(AppLogger):
 		# setup aiohttp_auth.auth middleware in aiohttp fashion
 		# print('policy = ', policy)
 		auth.setup(app, policy)
+		print('add auth middleware ....................')
 		app.middlewares.append(self.checkAuth)
-		app.router.add_route('GET', '/logout', self.logout)
+		# app.router.add_route('GET', '/logout', self.logout)
 
 	async def logout(self,request):
 		await auth.forget(request)
