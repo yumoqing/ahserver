@@ -64,7 +64,7 @@ class AuthAPI(AppLogger):
 		is_ok = await self.checkUserPermission(user, path)
 		if is_ok:
 			return await handler(request)
-		# print(f'**{path} forbidden**')
+		print(f'**{user=}, {path} forbidden**')
 		raise web.HTTPForbidden()
 
 	async def checkUserPermission(self, user, path):
