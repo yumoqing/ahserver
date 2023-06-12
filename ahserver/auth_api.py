@@ -59,7 +59,7 @@ class AuthAPI(AppLogger):
 		# print(f'**{path} forbidden**')
 		raise web.HTTPForbidden()
 
-	async def checkUserPermission(user, path):
+	async def checkUserPermission(self, user, path):
 		return True
 
 	async def needAuth(self,path):
