@@ -58,11 +58,10 @@ class AuthAPI(AppLogger):
 	@web.middleware
 	async def checkAuth(self,request,handler):
 		path = request.path
-		if not await self.needAuth(path):
-			return await handler(request)
 		user = await auth.get_auth(request)
 		is_ok = await self.checkUserPermission(user, path)
 		if is_ok:
+			print(f'**{user=}, {path} access **')
 			return await handler(request)
 		print(f'**{user=}, {path} forbidden**')
 		raise web.HTTPForbidden()
