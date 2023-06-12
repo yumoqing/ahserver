@@ -34,7 +34,8 @@ class AuthAPI(AppLogger):
 		# Create an auth ticket mechanism that expires after 1 minute (60
 		# seconds), and has a randomly generated secret. Also includes the
 		# optional inclusion of the users IP address in the hash
-		policy = auth.SessionTktAuthentication(urandom(32), 3600,
+		policy = auth.SessionTktAuthentication(urandom(32), 120,
+												reissue_time=100,
 											   include_ip=True)
 
 		# setup aiohttp_auth.auth middleware in aiohttp fashion

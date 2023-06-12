@@ -208,6 +208,12 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 
 		async def remember_user(userid):
 			await auth.remember(request, userid)
+		
+		async def remember_ticket(ticket):
+			await auth.remember_ticket(request, ticket)
+
+		async def get_ticket():
+			return await auth.get_ticket(request)
 
 		async def forget_user():
 			await auth.forget(request)
