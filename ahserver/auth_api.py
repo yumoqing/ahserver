@@ -50,11 +50,6 @@ class AuthAPI(AppLogger):
 		auth.setup(app, policy)
 		print('add auth middleware ....................')
 		app.middlewares.append(self.checkAuth)
-		# app.router.add_route('GET', '/logout', self.logout)
-
-	async def logout(self,request):
-		await auth.forget(request)
-		return web.Response(body='OK'.encode('utf-8'))
 
 	@web.middleware
 	async def checkAuth(self,request,handler):
@@ -68,7 +63,8 @@ class AuthAPI(AppLogger):
 		raise web.HTTPForbidden()
 
 	async def checkUserPermission(self, user, path):
-		return True
+		raise Exception('checkUserPermission()')
+		return False
 
 	async def needAuth(self,path):
 		return False
