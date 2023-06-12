@@ -34,7 +34,7 @@ class AuthAPI(AppLogger):
 		# Create an auth ticket mechanism that expires after 1 minute (60
 		# seconds), and has a randomly generated secret. Also includes the
 		# optional inclusion of the users IP address in the hash
-		policy = auth.SessionTktAuthentication(urandom(32), 60,
+		policy = auth.SessionTktAuthentication(urandom(32), 3600,
 											   include_ip=True)
 
 		# setup aiohttp_auth.auth middleware in aiohttp fashion
@@ -43,41 +43,6 @@ class AuthAPI(AppLogger):
 		app.middlewares.append(self.checkAuth)
 		app.router.add_route('GET', '/logout', self.logout)
 
-	async def checkLogin(self,request):
-		"""
-		authorization header has the format:
-		login_method:user_id:auth_code
-		"""
-		authinfo = request.headers.get('authorization')
-		if authinfo is None:
-			self.debug('header not include "authorization" info %s' % request.headers)
-			raise web.HTTPUnauthorized()
-		if isinstance(authinfo, str):
-			authinfo = authinfo.encode('ascii')
-		authinfo = base64.b64decode(authinfo)
-		authinfo = authinfo.decode('ascii')
-			
-		authdata = self.rsaDecode(authinfo)
-		# print('authdata=',authdata)
-		alist = authdata.split('::')
-		if len(alist) != 3:
-			self.debug('auth data format error %s' % authdata)
-			raise web.HTTPUnauthorized()
-
-		login_method=alist[0]
-		user_id = alist[1]
-		password = alist[2]
-		if login_method == 'password':
-			if await self.checkUserPassword(user_id,password):
-				await auth.remember(request,user_id)
-				# print('auth success,',user_id, password)
-				return user_id
-			# print('auth failed')
-			raise web.HTTPUnauthorized()
-		else:
-			# print('auth method unrecognized------------------------')
-			raise web.HTTPUnauthorized()
-
 	async def logout(self,request):
 		await auth.forget(request)
 		return web.Response(body='OK'.encode('utf-8'))
@@ -85,29 +50,18 @@ class AuthAPI(AppLogger):
 	@web.middleware
 	async def checkAuth(self,request,handler):
 		path = request.path
-		# print(f'*****{path} checkAuth called********')
 		if not await self.needAuth(path):
 			return await handler(request)
 		user = await auth.get_auth(request)
-		if user is None:
-			# print('-----------auth.get_auth() return None--------------')
-			user = await self.checkLogin(request)
-			#raise web.HTTPFound(f'/login_form?from_path={path}')
 		is_ok = await self.checkUserPermission(user, path)
 		if is_ok:
 			return await handler(request)
 		# print(f'**{path} forbidden**')
 		raise web.HTTPForbidden()
 
+	async def checkUserPermission(user, path):
+		return True
+
 	async def needAuth(self,path):
 		return False
-
-	async def getPermissionNeed(self,path):
-		return 'admin'
-
-	async def checkUserPassword(self,user_id,password):
-		return True
-	
-	async def getUserPermissions(self,user):
-		return ['admin','view']
 
