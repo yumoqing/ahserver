@@ -1,0 +1,3 @@
+# 2023-06-22
+fix bug for getPostData to support post data in request.query
+
