@@ -112,7 +112,11 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 			pass
 		if reader is None:
 			md = await request.post()
+			if md == {}:
+				if request.query:
+					return multiDict2Dict(request.query)
 			ns = multiDict2Dict(md)
+			print(f'{ns=} reader is None, {request.query=}')
 			return ns
 		ns = {}
 		while 1:
@@ -142,8 +146,8 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 				print_exc()
 				print('-----------except out ------------')
 				break;
-		# print(f'getPostData():{ns=}')
 		# showcallstack()
+		print(f'getPostData():{ns=}')
 		return ns
 
 	async def _handle(self,request:Request) -> StreamResponse:
