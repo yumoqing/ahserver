@@ -42,7 +42,7 @@ class AuthAPI(AppLogger):
 			session_reissue_time = self.conf.website.session_reissue_time
 		
 		policy = auth.SessionTktAuthentication(urandom(32), session_max_time,
-												reissue_time=30,
+												reissue_time=session_reissue_time,
 											   include_ip=True)
 
 		# setup aiohttp_auth.auth middleware in aiohttp fashion
