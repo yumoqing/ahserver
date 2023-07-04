@@ -61,7 +61,7 @@ class BaseProcessor(AppLogger):
 	async def be_call(self, request, params={}):
 		return await self.path_call(request, params=params)
 
-	async def set_run_env(self, request):
+	async def set_run_env(self, request, params={}):
 		if self.env_set:
 			return
 		self.real_path = self.resource.url2file(self.resource.entireUrl(request, self.path))
@@ -71,6 +71,7 @@ class BaseProcessor(AppLogger):
 		self.run_ns.update(self.resource.y_env)
 		self.run_ns['request'] = request
 		kw = await self.run_ns['request2ns']()
+		kw.update(params)
 		self.run_ns['params_kw'] = kw
 		self.run_ns.update(kw)
 		self.run_ns['ref_real_path'] = self.real_path
@@ -119,11 +120,10 @@ class TemplateProcessor(BaseProcessor):
 		return name=='tmpl'
 
 	async def path_call(self, request, params={}):
-		await self.set_run_env(request)
+		await self.set_run_env(request, params=params)
 		path = self.path
 		url = self.resource.entireUrl(request, path)
 		ns = self.run_ns
-		ns.update(params)
 		te = self.run_ns['tmpl_engine']
 		return await te.render(url,**ns)
 
@@ -170,9 +170,8 @@ class PythonScriptProcessor(BaseProcessor):
 		return txt
 		
 	async def path_call(self, request,params={}):
-		await self.set_run_env(request)
+		await self.set_run_env(request, params=params)
 		lenv = self.run_ns
-		lenv.update(params)
 		del lenv['request']
 		txt = self.loadScript(self.real_path)
 		exec(txt,lenv,lenv)
