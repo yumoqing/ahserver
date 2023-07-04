@@ -116,7 +116,7 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 				if request.query:
 					return multiDict2Dict(request.query)
 			ns = multiDict2Dict(md)
-			print(f'{ns=} reader is None, {request.query=}')
+			# print(f'{ns=} reader is None, {request.query=}')
 			return ns
 		ns = {}
 		while 1:
@@ -147,7 +147,7 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 				print('-----------except out ------------')
 				break;
 		# showcallstack()
-		print(f'getPostData():{ns=}')
+		# print(f'getPostData():{ns=}')
 		return ns
 
 	async def _handle(self,request:Request) -> StreamResponse:
@@ -329,8 +329,8 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 	def url2processor(self, request, url, fpath):
 		config = getConfig()
 		url = self.entireUrl(request, url)
-		host =  '/'.join(str(request.url).split('/')[:3])
-		path = request.path
+		host =  '/'.join(url.split('/')[:3])
+		path = '/' + '/'.join(url.split('/')[3:])
 		real_path = self.abspath(request, path)
 		if config.website.startswiths:
 			for a in config.website.startswiths:
@@ -365,5 +365,7 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 		url = self.entireUrl(request, path)
 		fpath = self.url2file(url)
 		processor = self.url2processor(request, url, fpath)
-		return await processor.path_call(request, params=params)
+		new_request = request.clone(rel_url=url)
+		# new_request.path = path
+		return await processor.be_call(new_request, params=params)
 		

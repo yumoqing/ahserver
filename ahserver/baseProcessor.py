@@ -58,6 +58,9 @@ class BaseProcessor(AppLogger):
 		}
 		self.content = ''
 
+	async def be_call(self, request, params={}):
+		return await self.path_call(request, params=params)
+
 	async def set_run_env(self, request):
 		if self.env_set:
 			return

@@ -15,6 +15,9 @@ class AuthAPI(AppLogger):
 		super().__init__()
 		self.conf = getConfig()
 
+	async def checkUserPermission(self, user, path):
+		return True
+
 	def getPrivateKey(self):
 		if not hasattr(self,'rsaEngine'):
 			self.rsaEngine = RSA()
@@ -63,10 +66,6 @@ class AuthAPI(AppLogger):
 			raise web.HTTPUnauthorized
 		print(f'**{user=}, {path} forbidden**')
 		raise web.HTTPForbidden()
-
-	async def checkUserPermission(self, user, path):
-		raise Exception('checkUserPermission()')
-		return False
 
 	async def needAuth(self,path):
 		return False
