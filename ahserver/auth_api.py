@@ -16,6 +16,7 @@ class AuthAPI(AppLogger):
 		self.conf = getConfig()
 
 	async def checkUserPermission(self, user, path):
+		print('************* checkUserPermission() use default one ****************')
 		return True
 
 	def getPrivateKey(self):
