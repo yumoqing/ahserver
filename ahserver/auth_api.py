@@ -57,6 +57,7 @@ class AuthAPI(AppLogger):
 
 	@web.middleware
 	async def checkAuth(self,request,handler):
+		print('checkAuth() called ..................')
 		path = request.path
 		user = await auth.get_auth(request)
 		is_ok = await self.checkUserPermission(user, path)
