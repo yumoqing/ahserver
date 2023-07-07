@@ -1,4 +1,6 @@
+import time
 from aiohttp_auth import auth
+from aiohttp_auth.auth.ticket_auth import TktAuthentication
 from os import urandom
 from aiohttp import web
 import aiohttp_session
@@ -45,6 +47,23 @@ class AuthAPI(AppLogger):
 		if self.conf.website.session_reissue_time:
 			session_reissue_time = self.conf.website.session_reissue_time
 		
+		def _get_ip(self,request):
+			ip = request.headers.get('X-Forwarded-For')
+			if not ip:
+				ip = request.remote
+			return ip
+
+		def _new_ticket(self, request, user_id):
+			client_uuid = request.headers.get('client_uuid')
+			ip = self._get_ip(request)
+			if not ip:
+				ip = request.remote
+			valid_until = int(time.time()) + self._max_age
+			print(f'hack: my _new_ticket() called ...remote {ip=}, {client_uuid=}')
+			return self._ticket.new(user_id, valid_until=valid_until, client_ip=ip, user_data=client_uuid)
+
+		TktAuthentication._get_ip = _get_ip
+		TktAuthentication._new_ticket = _new_ticket
 		policy = auth.SessionTktAuthentication(urandom(32), session_max_time,
 												reissue_time=session_reissue_time,
 											   include_ip=True)
