@@ -226,6 +226,14 @@ it will search translate text in ms* txt file in folder named by language name i
 
 To be list here
 
+## Behind the nginx
+when ahserver running behind the nginx, nginx should be forward following header to ahserver
+
+* X-Forwarded-For: client real ip
+* X-Forwarded-Scheme: scheme in client browser
+* X-Forwarded-Host: host in client browser
+* X-Forwarded-Url: url in client browser
+
 ## environment for processors
 
 When coding in processors, ahserver provide some environment stuff for build apllication, there are modules, functions, classes and variables
