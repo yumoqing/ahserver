@@ -4,14 +4,17 @@ from aiohttp_auth.auth.ticket_auth import TktAuthentication
 from os import urandom
 from aiohttp import web
 import aiohttp_session
+import aioredis
 import base64
 
 from aiohttp_session import get_session, session_middleware
 from aiohttp_session.cookie_storage import EncryptedCookieStorage
+from aiohttp_session.redis_storage import RedisStorage
 
 from appPublic.jsonConfig import getConfig
 from appPublic.rsawrap import RSA
 from appPublic.app_logger import AppLogger
+
 class AuthAPI(AppLogger):
 	def __init__(self):
 		super().__init__()
@@ -34,7 +37,15 @@ class AuthAPI(AppLogger):
 
 	def setupAuth(self,app):
 		# setup session middleware in aiohttp fashion
+			
 		storage = EncryptedCookieStorage(urandom(32))
+		"""
+		if self.conf.website.session_redis:
+			url = self.conf.website.session_redis.url
+			# redis = await aioredis.from_url("redis://127.0.0.1:6379")
+			redis = await aioredis.from_url(url)
+			storage = aiohttp_session.redis_storage.RedisStorage(redis)
+		"""
 		aiohttp_session.setup(app, storage)
 
 		# Create an auth ticket mechanism that expires after 1 minute (60

@@ -19,10 +19,13 @@ from .filestorage import TmpFileRecord
 
 class ConfiguredServer(AppLogger):
 	def __init__(self, auth_klass=AuthAPI, workdir=None):
+		self.auth_klass = auth_klass
+		self.workdir = workdir
 		super().__init__()
-		if workdir is not None:
+		if self.workdir is not None:
 			pp = ProgramPath()
-			config = getConfig(workdir,{'workdir':workdir,'ProgramPath':pp})
+			config = getConfig(self.workdir,
+					{'workdir':self.workdir,'ProgramPath':pp})
 		else:
 			config = getConfig()
 		if config.databases:
@@ -35,11 +38,11 @@ class ConfiguredServer(AppLogger):
 
 		print(f'{client_max_size=}')
 		self.app = web.Application(client_max_size=client_max_size)
-		auth = auth_klass()
-		auth.setupAuth(self.app)
-		self.configPath(config)
 
 	def run(self):
+		auth = self.auth_klass()
+		await auth.setupAuth(self.app)
+		self.configPath(config)
 		a = TmpFileRecord()
 		config = getConfig()
 		ssl_context = None

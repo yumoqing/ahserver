@@ -6,6 +6,7 @@ aiohttp
 aiohttp_session
 aiohttp_auth_autz
 aiomysql
+aioredis
 psycopg2-binary
 aiopg
 jinja2
