@@ -30,6 +30,7 @@ class ConfiguredServer(AppLogger):
 			config = getConfig()
 		if config.databases:
 			DBPools(config.databases)
+		self.config = config
 		initEnv()
 		setupTemplateEngine()
 		client_max_size = 1024 * 10240
@@ -41,10 +42,10 @@ class ConfiguredServer(AppLogger):
 
 	def run(self):
 		auth = self.auth_klass()
-		await auth.setupAuth(self.app)
+		auth.setupAuth(self.app)
+		config = getConfig()
 		self.configPath(config)
 		a = TmpFileRecord()
-		config = getConfig()
 		ssl_context = None
 		if config.website.ssl:
 			ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
