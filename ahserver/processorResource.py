@@ -359,7 +359,8 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 		if self.request_filename and os.path.isdir(self.request_filename):
 			path = '%s/oops' % path
 		p = self.relatedurl(path,url)
-		return '%s://%s%s' % (request.scheme, h, p)
+		schema = request.headers.get('X-Forward-Scheme') or request.scheme
+		return '%s://%s%s' % (scheme, h, p)
 
 	async def path_call(self, request, path, params={}):
 		url = self.entireUrl(request, path)
