@@ -35,17 +35,15 @@ class AuthAPI(AppLogger):
 		self.getPrivateKey()
 		return self.rsaEngine.decode(self.privatekey,cdata)
 
-	def setupAuth(self,app):
+	async def setupAuth(self,app):
 		# setup session middleware in aiohttp fashion
 			
 		storage = EncryptedCookieStorage(urandom(32))
-		"""
 		if self.conf.website.session_redis:
 			url = self.conf.website.session_redis.url
 			# redis = await aioredis.from_url("redis://127.0.0.1:6379")
 			redis = await aioredis.from_url(url)
 			storage = aiohttp_session.redis_storage.RedisStorage(redis)
-		"""
 		aiohttp_session.setup(app, storage)
 
 		# Create an auth ticket mechanism that expires after 1 minute (60

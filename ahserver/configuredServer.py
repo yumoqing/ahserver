@@ -39,10 +39,13 @@ class ConfiguredServer(AppLogger):
 
 		print(f'{client_max_size=}')
 		self.app = web.Application(client_max_size=client_max_size)
-
-	def run(self):
+	
+	async def init_auth(self):
 		auth = self.auth_klass()
-		auth.setupAuth(self.app)
+		await auth.setupAuth(self.app)
+		return self.app
+		
+	def run(self):
 		config = getConfig()
 		self.configPath(config)
 		a = TmpFileRecord()
@@ -52,7 +55,7 @@ class ConfiguredServer(AppLogger):
 			ssl_context.load_cert_chain(config.website.ssl.crtfile,
 						config.website.ssl.keyfile)
 
-		web.run_app(self.app,host=config.website.host or '0.0.0.0',
+		web.run_app(self.init_auth(),host=config.website.host or '0.0.0.0',
 							port=config.website.port or 8080,
 							ssl_context=ssl_context)
 
