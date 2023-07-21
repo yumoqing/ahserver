@@ -243,8 +243,10 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 		self.user = await auth.get_auth(request)
 		self.y_env.user = self.user
 		self.request_filename = self.url2file(str(request.path))
+		request['request_filename'] = self.request_filename
 		path = request.path
 		config = getConfig()
+		request['port'] = config.website.port
 		if config.website.dbadm and path.startswith(config.website.dbadm):
 			pp = path.split('/')[2:]
 			if len(pp)<3:
@@ -358,9 +360,10 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 		path = request.path
 		if self.request_filename and os.path.isdir(self.request_filename):
 			path = '%s/oops' % path
+		# print(f'entireUrl():{path=}, {url=},{request["request_filename"]=}')
 		p = self.relatedurl(path,url)
 		scheme = request.headers.get('X-Forwarded-Scheme') or request.scheme
-		port = request.headers.get('X-Forwarded-Port') or str(request.port)
+		port = request.headers.get('X-Forwarded-Port') or str(request['port'])
 		return '%s://%s:%s%s' % (scheme, h, port, p)
 
 	async def path_call(self, request, path, params={}):
