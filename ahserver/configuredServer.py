@@ -57,7 +57,7 @@ class ConfiguredServer(AppLogger):
 
 		web.run_app(self.init_auth(),host=config.website.host or '0.0.0.0',
 							port=config.website.port or 8080,
-							ssl_context=ssl_context,reuse_port=True)
+							ssl_context=ssl_context)
 
 	def configPath(self,config):
 		for p,prefix in config.website.paths:
