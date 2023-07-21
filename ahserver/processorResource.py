@@ -360,7 +360,8 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 			path = '%s/oops' % path
 		p = self.relatedurl(path,url)
 		scheme = request.headers.get('X-Forwarded-Scheme') or request.scheme
-		return '%s://%s%s' % (scheme, h, p)
+		port = request.headers.get('X-Forwarded-Port') or str(request.port)
+		return '%s://%s:%s%s' % (scheme, h, port, p)
 
 	async def path_call(self, request, path, params={}):
 		url = self.entireUrl(request, path)
