@@ -354,16 +354,16 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 	def entireUrl(self, request, url):
 		if url.startswith('http://') or url.startswith('https://'):
 			return url
+		scheme = request.headers.get('X-Forwarded-Scheme') or request.scheme
+		port = request.headers.get('X-Forwarded-Port') or str(request['port'])
 		h = self.gethost(request)
 		if url.startswith('/'):
-			return '%s://%s%s' % (request.scheme, h, url)
+			return f'{scheme}://{h}:{port}{url}'
 		path = request.path
 		if self.request_filename and os.path.isdir(self.request_filename):
 			path = '%s/oops' % path
-		# print(f'entireUrl():{path=}, {url=},{request["request_filename"]=}')
 		p = self.relatedurl(path,url)
-		scheme = request.headers.get('X-Forwarded-Scheme') or request.scheme
-		port = request.headers.get('X-Forwarded-Port') or str(request['port'])
+		return f'{scheme}://{h}:{port}{p}'
 		return '%s://%s:%s%s' % (scheme, h, port, p)
 
 	async def path_call(self, request, path, params={}):
