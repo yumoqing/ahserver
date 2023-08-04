@@ -22,6 +22,7 @@ from aiohttp.web_exceptions import (
 	HTTPForbidden,
 	HTTPMethodNotAllowed,
 	HTTPNotFound,
+	HTTPFound,
 )
 from aiohttp.web_fileresponse import FileResponse
 from aiohttp.web_request import Request
@@ -210,6 +211,10 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 			ns = multiDict2Dict(request.query)
 			return ns
 
+		async def redirect(url):
+			url = self.entireUrl(request, url)
+			raise HTTPFound(url)
+
 		async def remember_user(userid):
 			await auth.remember(request, userid)
 		
@@ -226,6 +231,7 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 			return await auth.get_auth(request)
 
 		self.y_env.i18n = serveri18n
+		self.y_env.redirect = redirect
 		self.y_env.info = self.info
 		self.y_env.error = self.error
 		self.y_env.debug = self.debug
