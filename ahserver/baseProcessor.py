@@ -90,17 +90,26 @@ class BaseProcessor(AppLogger):
 
 	async def handle(self,request):
 		await self.execute(request)
+		jsonflg = False
 		if self.retResponse is not None:
 			self.set_response_headers(self.retResponse)
 			return self.retResponse
 		elif type(self.content) == type({}) :
-			self.content = json.dumps(self.content,
-				indent=4)
+			self.content = json.dumps(self.content, indent=4)
+			jsonflg = True
 		elif type(self.content) == type([]):
-			self.content = json.dumps(self.content,
-				indent=4)
+			self.content = json.dumps(self.content, indent=4)
+			jsonflg = True
+		else:
+			try:
+				json.loads(self.content)
+				jsonflg = True
+			except:
+				pass
 		
-		self.headers['Content-Type'] = "application/json; utf-8"
+		if jsonflg:
+			self.headers['Content-Type'] = "application/json; utf-8"
+
 		self.headers['Access-Control-Expose-Headers'] = 'Set-Cookie'
 		resp =  Response(text=self.content,headers=self.headers)
 		self.set_response_headers(resp)
