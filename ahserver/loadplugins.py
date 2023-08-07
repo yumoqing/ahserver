@@ -14,7 +14,7 @@ def load_plugins(p_dir):
 	sys.path.append(pdir)
 	ef.set('sys',sys)
 	ef.set('ServerEnv', ServerEnv)
-	for m in listFile(pdir, subfixs='.py'):
+	for m in listFile(pdir, suffixs='.py'):
 		if m.endswith('__init__.py'):
 			continue
 		__import__(m[:-3], locals(), globals())
