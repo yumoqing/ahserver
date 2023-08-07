@@ -17,7 +17,7 @@ def load_plugins(p_dir):
 	for m in listFile(pdir, suffixs='.py'):
 		if m.endswith('__init__.py'):
 			continue
-		print('module=', module)
 		module = os.path.basename(m[:-3])
+		print('module=', module)
 		__import__(module, locals(), globals())
 
