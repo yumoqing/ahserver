@@ -16,6 +16,7 @@ from .auth_api import AuthAPI
 from .myTE import setupTemplateEngine
 from .globalEnv import initEnv
 from .filestorage import TmpFileRecord
+from .loadplugins import load_plugins
 
 class ConfiguredServer(AppLogger):
 	def __init__(self, auth_klass=AuthAPI, workdir=None):
@@ -37,7 +38,7 @@ class ConfiguredServer(AppLogger):
 		if config.website.client_max_size:
 			client_max_size = config.website.client_max_size
 
-		print(f'{client_max_size=}')
+		load_plugins(self.workdir)
 		self.app = web.Application(client_max_size=client_max_size)
 	
 	async def init_auth(self):
