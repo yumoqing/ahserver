@@ -107,29 +107,30 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 		return fname
 
 	async def getPostData(self,request: Request) -> dict:
+		qd = {}
+		if request.query:
+			qd = multiDict2Dict(request.query)
 		reader = None
 		try:
 			reader = await request.multipart()
 		except:
-			print('reader is None')
+			# print('reader is None')
 			pass
 		if reader is None:
-			md = await request.post()
-			if md == {}:
-				if request.query:
-					return multiDict2Dict(request.query)
-				else:
-					if request.can_read_body:
-						x = await request.read()
-						try:
-							md = json.loads(x)
-						except:
-							print('body is not a json')
-				print('request.query is None, md=', md)
-			ns = multiDict2Dict(md)
-			print(f'{ns=} reader is None, {request.query=}')
-			return ns
-		ns = {}
+			pd = await request.post()
+			pd = multiDict2Dict(pd)
+			if pd == {}:
+				if request.can_read_body:
+					x = await request.read()
+					try:
+						pd = json.loads(x)
+					except:
+						# print('body is not a json')
+						pass
+			qd.update(pd)
+			# print(f'{qd=} reader is None, {pd=}')
+			return qd
+		ns = qd
 		while 1:
 			try:
 				field = await reader.next()
