@@ -5,6 +5,7 @@ from traceback import print_exc
 # from showcallstack import showcallstack
 
 import asyncio
+import json
 
 from yarl import URL
 
@@ -110,14 +111,23 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 		try:
 			reader = await request.multipart()
 		except:
+			print('reader is None')
 			pass
 		if reader is None:
 			md = await request.post()
 			if md == {}:
 				if request.query:
 					return multiDict2Dict(request.query)
+				else:
+					if request.can_read_body:
+						x = await request.read()
+						try:
+							md = json.loads(x)
+						except:
+							print('body is not a json')
+				print('request.query is None, md=', md)
 			ns = multiDict2Dict(md)
-			# print(f'{ns=} reader is None, {request.query=}')
+			print(f'{ns=} reader is None, {request.query=}')
 			return ns
 		ns = {}
 		while 1:
