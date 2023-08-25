@@ -30,6 +30,7 @@ class Url2File:
 			paths = paths[3:]
 		f = os.path.join(self.path,*paths)
 		real_path = os.path.abspath(f)
+		# print(f'{real_path=}, {url=}, {f=}')
 		return real_path
 
 	def url2file(self, url: str) -> str:
@@ -40,6 +41,7 @@ class Url2File:
 			for idx in self.indexes:
 				p = os.path.join(real_path,idx)
 				if os.path.isfile(p):
+					# print(f'{url=}, {real_path=}, {idx=}, {p=}')
 					return p
 
 		if os.path.isfile(real_path):
@@ -56,7 +58,9 @@ class Url2File:
 		items = url.split('/')
 		if len(items) > 2:
 			del items[-2]
+			oldurl = url
 			url = '/'.join(items)
+			# print(f'{oldurl=}, {url=}')
 			return self.url2file(url)
 		print(f'url2file() return None finally, {items:}, {url=}, {ourl=}, {self.path=}')
 		return None

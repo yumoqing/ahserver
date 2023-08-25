@@ -183,6 +183,7 @@ class PythonScriptProcessor(BaseProcessor):
 		lenv = self.run_ns
 		del lenv['request']
 		txt = self.loadScript(self.real_path)
+		# print(self.real_path, "#########", txt)
 		exec(txt,lenv,lenv)
 		func = lenv['myfunc']
 		return await func(request,**lenv)
