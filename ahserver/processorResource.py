@@ -9,6 +9,7 @@ import json
 
 from yarl import URL
 
+from aiohttp import client
 from aiohttp_auth import auth
 from appPublic.http_client import Http_Client
 from functools import partial
@@ -254,6 +255,7 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 		self.y_env.entire_url = partial(self.entireUrl,request)
 		self.y_env.abspath = self.abspath
 		self.y_env.request2ns = getArgs
+		self.y_env.aiohttp_client = client
 		self.y_env.resource = self
 		self.y_env.gethost = partial(self.gethost, request)
 		self.y_env.path_call = partial(self.path_call,request)
