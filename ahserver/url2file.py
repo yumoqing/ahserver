@@ -26,7 +26,10 @@ class Url2File:
 		if len(url) > 0 and url[-1] == '/':
 			url = url[:-1]
 		paths = url.split('/')
-		if url.startswith('http://') or url.startswith('https://'):
+		if url.startswith('http://') or \
+					url.startswith('https://') or \
+					url.startswith('ws://') or \
+					url.startswith('wss://'):
 			paths = paths[3:]
 		f = os.path.join(self.path,*paths)
 		real_path = os.path.abspath(f)

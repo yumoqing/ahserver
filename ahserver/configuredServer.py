@@ -46,18 +46,20 @@ class ConfiguredServer(AppLogger):
 		await auth.setupAuth(self.app)
 		return self.app
 		
-	def run(self):
+	def run(self, port=None):
 		config = getConfig()
 		self.configPath(config)
 		a = TmpFileRecord()
 		ssl_context = None
+		if port is None:
+			port = config.website.port or 8080
 		if config.website.ssl:
 			ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
 			ssl_context.load_cert_chain(config.website.ssl.crtfile,
 						config.website.ssl.keyfile)
 
 		web.run_app(self.init_auth(),host=config.website.host or '0.0.0.0',
-							port=config.website.port or 8080,
+							port=port,
 							ssl_context=ssl_context)
 
 	def configPath(self,config):

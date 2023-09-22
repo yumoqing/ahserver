@@ -40,7 +40,7 @@ from appPublic.app_logger import AppLogger
 
 from .baseProcessor import getProcessor
 from .xlsxdsProcessor import XLSXDataSourceProcessor
-from .websocketProcessor import WebsocketProcessor
+from .websocketProcessor import WebsocketProcessor, XtermProcessor
 from .sqldsProcessor import SQLDataSourceProcessor
 from .functionProcessor import FunctionProcessor
 from .proxyProcessor import ProxyProcessor
@@ -253,6 +253,7 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 		self.y_env.i18nDict = i18nDICT
 		self.y_env.terminalType = getClientType(request)
 		self.y_env.entire_url = partial(self.entireUrl,request)
+		self.y_env.websocket_url = partial(self.websocketUrl,request)
 		self.y_env.abspath = self.abspath
 		self.y_env.request2ns = getArgs
 		self.y_env.aiohttp_client = client
@@ -367,12 +368,25 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 		for word, handlername in self.y_processors:
 			if fpath.endswith(word):
 				Klass = getProcessor(handlername)
-				processor = Klass(path,self)
-				return processor
+				try:
+					processor = Klass(path,self)
+					return processor
+				except Exception as e:
+					print('Exception:',e, 'handlername=', handlername)
+					return None
 		return None
 
+	def websocketUrl(self, request, url):
+		url = entireUrl(request, url)
+		if url.startswith('https'):
+			return 'wss' + url[5:]
+		return 'ws' + url[4:]
+
 	def entireUrl(self, request, url):
-		if url.startswith('http://') or url.startswith('https://'):
+		if url.startswith('http://') or \
+					url.startswith('https://') or \
+					url.startswith('ws://') or \
+					url.startswith('wss://'):
 			return url
 		scheme = request.headers.get('X-Forwarded-Scheme') or request.scheme
 		port = request.headers.get('X-Forwarded-Port') or str(request['port'])
