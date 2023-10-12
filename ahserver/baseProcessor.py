@@ -2,6 +2,7 @@ import os
 import re
 import json
 import codecs
+import aiofiles
 from aiohttp.web_request import Request
 from aiohttp.web_response import Response, StreamResponse
 
@@ -168,10 +169,10 @@ class PythonScriptProcessor(BaseProcessor):
 	def isMe(self,name):
 		return name=='dspy'
 
-	def loadScript(self, path):
+	async def loadScript(self, path):
 		data = ''
-		with codecs.open(path,'rb','utf-8') as f:
-			data = f.read()
+		async with aiofiles.open(path,'r', encoding='utf-8') as f:
+			data = await f.read()
 		b= ''.join(data.split('\r'))
 		lines = b.split('\n')
 		lines = ['\t' + l for l in lines ]
@@ -182,7 +183,7 @@ class PythonScriptProcessor(BaseProcessor):
 		await self.set_run_env(request, params=params)
 		lenv = self.run_ns
 		del lenv['request']
-		txt = self.loadScript(self.real_path)
+		txt = await self.loadScript(self.real_path)
 		# print(self.real_path, "#########", txt)
 		exec(txt,lenv,lenv)
 		func = lenv['myfunc']
@@ -198,8 +199,8 @@ class MarkdownProcessor(BaseProcessor):
 
 	async def datahandle(self,request:Request):
 		data = ''
-		with codecs.open(self.real_path,'rb','utf-8') as f:
-			data = f.read()
+		async with aiofiles.open(self.real_path,'r',encoding='utf-8') as f:
+			data = await f.read()
 			self.content = self.urlreplace(data, request)
 
 	def urlreplace(self,mdtxt,request):

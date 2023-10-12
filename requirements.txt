@@ -5,6 +5,7 @@ cchardet
 aiohttp
 aiohttp_session
 aiohttp_auth_autz
+aiohttp-cors
 aiomysql
 aioredis
 psycopg2-binary

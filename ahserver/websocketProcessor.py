@@ -1,5 +1,6 @@
 import asyncio
 import aiohttp
+import aiofiles
 import json
 import codecs
 from aiohttp import web
@@ -43,14 +44,15 @@ class XtermProcessor(BaseProcessor):
 		self.retResponse = ws
 		return ws
 
-	def get_login_info(self):
-		with codecs.open(self.real_path, 'r', 'utf-8') as f:
-			self.login_info = json.load(f)
+	async def get_login_info(self):
+		async with aiofiles.open(self.real_path, 'r', encoding='utf-8') as f:
+			txt = await f.read()
+			self.login_info = json.loads(txt)
 		print(f'{self.login_info=}')
 
 	async def create_process(self):
 		# id = lenv['params_kw'].get('termid')
-		self.get_login_info()
+		await self.get_login_info()
 		host = self.login_info['host']
 		port = self.login_info.get('port', 22)
 		username = self.login_info.get('username', 'root')

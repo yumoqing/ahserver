@@ -1,5 +1,6 @@
 import codecs
 import json
+import aiofiles
 from appPublic.jsonConfig import getConfig
 from appPublic.dictObject import DictObject
 from .baseProcessor import BaseProcessor
@@ -52,8 +53,8 @@ class DataSourceProcessor(BaseProcessor):
 	async def path_call(self, request, path):
 		dict_data = {}
 		config = getConfig()
-		with codecs.open(path,'r',config.website.coding) as f:
-			b = f.read()
+		async with aiofiles.open(path,'r',encoding=config.website.coding) as f:
+			b = await f.read()
 			dict_data = json.loads(b)
 		ns = self.run_ns
 		act = ns.get('action','getdata')

@@ -1,6 +1,7 @@
 import os
 import re
 import codecs
+import aiofiles
 from traceback import print_exc
 # from showcallstack import showcallstack
 
@@ -303,7 +304,7 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 		if processor:
 			return await processor.handle(request)
 
-		if self.request_filename and self.isHtml(self.request_filename):
+		if self.request_filename and await self.isHtml(self.request_filename):
 			return await self.html_handle(request, self.request_filename)
 
 		if self.request_filename and os.path.isdir(self.request_filename):
@@ -324,10 +325,8 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 		return '/'.join(str(request.url).split('/')[:3])
 		
 	async def html_handle(self,request,filepath):
-		with open(filepath,'rb') as f:
-			b = f.read()
-			utxt = b.decode('unicode_escape')
-			txt = b.decode('utf-8')
+		async with aiofiles.open(filepath,'r', encoding='utf-8') as f:
+			txt = await f.read()
 			headers = {
 				'Content-Type': 'text/html; utf-8',
 				'Accept-Ranges': 'bytes',
@@ -336,10 +335,10 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 			resp = Response(text=txt,headers=headers)
 			return resp
 			
-	def isHtml(self,fn):
+	async def isHtml(self,fn):
 		try:
-			with codecs.open(fn,'r','utf-8') as f:
-				b = f.read()
+			async with aiofiles.open(fn,'r',encoding='utf-8') as f:
+				b = await f.read()
 				while b[0] in ['\n',' ','\t']:
 					b = b[1:]
 				if b.lower().startswith('<html>'):
