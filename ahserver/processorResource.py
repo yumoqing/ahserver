@@ -330,7 +330,7 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 			headers = {
 				'Content-Type': 'text/html; utf-8',
 				'Accept-Ranges': 'bytes',
-				'Content-Length': str(len(utxt))
+				'Content-Length': str(len(txt))
 			}
 			resp = Response(text=txt,headers=headers)
 			return resp
