@@ -327,10 +327,11 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 	async def html_handle(self,request,filepath):
 		async with aiofiles.open(filepath,'r', encoding='utf-8') as f:
 			txt = await f.read()
+			utxt = txt.encode('utf-8')
 			headers = {
 				'Content-Type': 'text/html; utf-8',
 				'Accept-Ranges': 'bytes',
-				'Content-Length': str(len(txt))
+				'Content-Length': str(len(utxt))
 			}
 			resp = Response(text=txt,headers=headers)
 			return resp
