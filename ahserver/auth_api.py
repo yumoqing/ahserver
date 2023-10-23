@@ -85,16 +85,26 @@ class AuthAPI(AppLogger):
 
 	@web.middleware
 	async def checkAuth(self,request,handler):
-		print('checkAuth() called ..................')
+		self.info(f'checkAuth() called ...{request.path}')
+		t1 = time.time()
 		path = request.path
 		user = await auth.get_auth(request)
 		is_ok = await self.checkUserPermission(user, path)
+		t2 = time.time()
 		if is_ok:
-			return await handler(request)
+			try:
+				ret = await handler(request)
+				t3 = time.time()
+				self.info(f'timecost={user} access {path} cost {t3-t1}, ({t2-t1})')
+				return ret
+			except Exception as e:
+				self.info(f'timecost={user} access {path} cost {t3-t1}, ({t2-t1}), except={e}')
+				raise e
+				
 		if user is None:
-			print(f'**{user=}, {path} need login**')
+			self.info(f'timecost={user} access need login to access {path} ({t2-t1})')
 			raise web.HTTPUnauthorized
-		print(f'**{user=}, {path} forbidden**')
+		self.info(f'timecost={user} access {path} forbidden ({t2-t1})')
 		raise web.HTTPForbidden()
 
 	async def needAuth(self,path):

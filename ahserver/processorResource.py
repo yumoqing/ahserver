@@ -165,21 +165,6 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 		return ns
 
 	async def _handle(self,request:Request) -> StreamResponse:
-		name = str(request.url)
-		t = TimeCost(name)
-		with t:
-			try:
-				x = await self._handle1(request)
-			except Exception as e:
-				self.error(f'{name}:error={e}')
-				print_exc()
-				x = e
-		self.info(f'{name}:time cost={t.end_time - t.begin_time}')
-		if not isinstance(x, StreamResponse):
-			return HTTPException
-		return x
-		
-	async def _handle1(self,request:Request) -> StreamResponse:
 		clientkeys = {
 			"iPhone":"iphone",
 			"iPad":"ipad",
