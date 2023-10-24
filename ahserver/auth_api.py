@@ -35,6 +35,13 @@ class AuthAPI(AppLogger):
 		self.getPrivateKey()
 		return self.rsaEngine.decode(self.privatekey,cdata)
 
+	def get_client_ip(self, request):
+		ip = request.headers.get('X-Forwarded-For')
+		if not ip:
+			ip = request.remote
+		request['client_ip'] = ip
+		return ip
+
 	async def setupAuth(self,app):
 		# setup session middleware in aiohttp fashion
 			
@@ -56,22 +63,16 @@ class AuthAPI(AppLogger):
 		if self.conf.website.session_reissue_time:
 			session_reissue_time = self.conf.website.session_reissue_time
 		
-		def _get_ip(self,request):
-			ip = request.headers.get('X-Forwarded-For')
-			if not ip:
-				ip = request.remote
-			return ip
-
 		def _new_ticket(self, request, user_id):
 			client_uuid = request.headers.get('client_uuid')
-			ip = self._get_ip(request)
+			ip = self.get_client_ip(request)
 			if not ip:
 				ip = request.remote
 			valid_until = int(time.time()) + self._max_age
 			print(f'hack: my _new_ticket() called ...remote {ip=}, {client_uuid=}')
 			return self._ticket.new(user_id, valid_until=valid_until, client_ip=ip, user_data=client_uuid)
 
-		TktAuthentication._get_ip = _get_ip
+		TktAuthentication._get_ip = self.get_client_ip
 		TktAuthentication._new_ticket = _new_ticket
 		policy = auth.SessionTktAuthentication(urandom(32), session_max_time,
 												reissue_time=session_reissue_time,
@@ -91,20 +92,21 @@ class AuthAPI(AppLogger):
 		user = await auth.get_auth(request)
 		is_ok = await self.checkUserPermission(user, path)
 		t2 = time.time()
+		ip = self.get_client_ip(request)
 		if is_ok:
 			try:
 				ret = await handler(request)
 				t3 = time.time()
-				self.info(f'timecost={user} access {path} cost {t3-t1}, ({t2-t1})')
+				self.info(f'timecost=client({ip}) {user} access {path} cost {t3-t1}, ({t2-t1})')
 				return ret
 			except Exception as e:
-				self.info(f'timecost={user} access {path} cost {t3-t1}, ({t2-t1}), except={e}')
+				self.info(f'timecost=client({ip}) {user} access {path} cost {t3-t1}, ({t2-t1}), except={e}')
 				raise e
 				
 		if user is None:
-			self.info(f'timecost={user} access need login to access {path} ({t2-t1})')
+			self.info(f'timecost=client({ip}) {user} access need login to access {path} ({t2-t1})')
 			raise web.HTTPUnauthorized
-		self.info(f'timecost={user} access {path} forbidden ({t2-t1})')
+		self.info(f'timecost=client({ip}) {user} access {path} forbidden ({t2-t1})')
 		raise web.HTTPForbidden()
 
 	async def needAuth(self,path):
