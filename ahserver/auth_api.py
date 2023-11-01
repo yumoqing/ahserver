@@ -29,9 +29,13 @@ class MyRedisStorage(RedisStorage):
 	def key_gen(self, request):
 		key = request.headers.get('client_uuid')
 		if not key:
-			return uuid.uuid4().hex
-		b = key.encode('utf-8')
-		return binascii.hexlify(b)
+			key = uuid.uuid4().hex
+			return key
+		if isinstance(key, str):
+			key = key.encode('utf-8')
+		key = binascii.hexlify(key)
+		key = key.decode('utf-8')
+		return key
 		
 	async def save_session(self, request: web.Request, 
 				response: web.StreamResponse, 
