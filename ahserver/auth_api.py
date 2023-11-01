@@ -27,10 +27,10 @@ def get_client_ip(obj, request):
 
 class MyRedisStorage(RedisStorage):
 	def key_gen(self, request):
-		uuid = request.headers.get('client_uuid')
-		if not uuid:
+		key = request.headers.get('client_uuid')
+		if not key:
 			return uuid.uuid4().hex
-		b = uuid.encode('utf-8')
+		b = key.encode('utf-8')
 		return binascii.hexlify(b)
 		
 	async def save_session(self, request: web.Request, 
