@@ -113,3 +113,8 @@ class FileStorage:
 				# print(f'{name=} file({fpath}) write {siz} bytes')
 		self.tfr.newtmpfile(fpath)		
 		return fpath
+
+def file_realpath(path):
+	fs = FileStorage()
+	return fs.realPath(path)
+

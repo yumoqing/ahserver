@@ -47,7 +47,7 @@ from .functionProcessor import FunctionProcessor
 from .proxyProcessor import ProxyProcessor
 from .serverenv import ServerEnv
 from .url2file import Url2File
-from .filestorage import FileStorage
+from .filestorage import FileStorage, file_realpath
 from .restful import DBCrud
 from .dbadmin import DBAdmin
 from .filedownload import file_download, path_decode
@@ -229,6 +229,7 @@ class ProcessorResource(AppLogger, StaticResource,Url2File):
 			return await auth.get_auth(request)
 
 		self.y_env.i18n = serveri18n
+		self.y_env.file_realpath = file_realpath
 		self.y_env.redirect = redirect
 		self.y_env.info = self.info
 		self.y_env.error = self.error
