@@ -21,11 +21,7 @@ from appPublic.rsawrap import RSA
 from appPublic.log import info, debug, warning, error, critical, exception
 
 def get_client_ip(obj, request):
-	ip = request.headers.get('X-Forwarded-For')
-	if not ip:
-		ip = request.remote
-	request['client_ip'] = ip
-	return ip
+	return request['client_ip']
 
 async def get_session_userinfo(request):
 	d = await auth.get_auth(request)

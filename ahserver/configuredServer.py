@@ -20,12 +20,14 @@ from .globalEnv import initEnv
 from .serverenv import ServerEnv
 from .filestorage import TmpFileRecord
 from .loadplugins import load_plugins
+from .real_ip import real_ip_middleware
 
 class AHApp(web.Application):
 	def __init__(self, *args, **kw):
 		kw['client_max_size'] = 1024000000
 		super().__init__(*args, **kw)
 		self.user_data = DictObject()
+		self.middlewares.insert(0, real_ip_middleware())
 	
 	def set_data(self, k, v):
 		self.user_data[k] = v
