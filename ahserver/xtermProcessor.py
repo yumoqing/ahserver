@@ -24,25 +24,31 @@ class XtermProcessor(PythonScriptProcessor):
 	async def ws_2_process(self, ws):
 		async for msg in ws:
 			if msg.type == aiohttp.WSMsgType.TEXT:
-				debug(f'recv from ws:{msg}')
-				data = msg.data
+				debug(f'recv from ws:{msg}.................')
+				data = DictObject(**json.loads(msg.data))
 				if data.type == 'input':
 					self.p_obj.stdin.write(data.data)
 				elif data.type == 'heartbeat':
 					await self.ws_send_heartbeat(ws)
 				elif data.type == 'resize':
 					exc = ResizeException(data.rows, data.cols)
-					await self.p_obj.feed_exception(exc)
+					debug(f'{exc=}, {data=}')
+					# self.p_obj.feed_exception(exc)
 			elif msg.type == aiohttp.WSMsgType.ERROR:
-				# print('ws connection closed with exception %s' % ws.exception())
+				debug(f'ws connection closed with exception {ws.exception()}')
 				return
+			else:
+				debug('recv from ws:{msg}+++++++++++')
 			await asyncio.sleep(0)
 		
 	async def process_2_ws(self, ws):
-		while self.running:
-			x = await self.p_obj.stdout.read(1024)
-			await self.ws_send_data(ws, x)
-			await asyncio.sleep(0)
+		try:
+			while self.running:
+				x = await self.p_obj.stdout.read(1024)
+				await self.ws_send_data(ws, x)
+				await asyncio.sleep(0)
+		finally:
+			self.p_obj.close()
 
 	async def datahandle(self,request):
 		await self.path_call(request)
@@ -71,16 +77,9 @@ class XtermProcessor(PythonScriptProcessor):
 		async with self.sshnode.get_connector() as conn:
 			self.running = True
 			self.p_obj = await conn.create_process(term_type='xterm', term_size=(24, 80))
-			stdin_task = asyncio.create_task(self.ws_2_process(ws))
-			try:
-				while self.running:
-					x = await self.p_obj.stdout.read(1024)
-					await self.ws_send_data(ws, x)
-			except (asyncio.CancelledError, EOFError):
-				pass
-			finally:
-				self.p_obj.close()
-				stdin_task.cancel()
+			r1 = self.ws_2_process(ws)
+			r2 = self.process_2_ws(ws)
+			await asyncio.gather(r1,r2)
 
 	async def ws_send_heartbeat(self, ws):
 		dic = {
@@ -102,6 +101,5 @@ class XtermProcessor(PythonScriptProcessor):
 		}
 		debug(f'{data=}')
 		await ws.send_str(json.dumps(data, indent=4, ensure_ascii=False))
-		debug(f'{data=} sended')
 
 
