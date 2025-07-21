@@ -11,6 +11,11 @@ from appPublic.dictObject import DictObject
 from appPublic.log import info, debug, warning, error, exception, critical
 from .baseProcessor import BaseProcessor, PythonScriptProcessor
 
+class ResizeException(Exception):
+	def __init__(self, rows, cols):
+		self.rows = rows
+		self.cols = cols
+
 class XtermProcessor(PythonScriptProcessor):
 	@classmethod
 	def isMe(self,name):
@@ -20,24 +25,23 @@ class XtermProcessor(PythonScriptProcessor):
 		async for msg in ws:
 			if msg.type == aiohttp.WSMsgType.TEXT:
 				debug(f'recv from ws:{msg}')
-				resize_pattern = '_#_resize_#_'
-				heartbeat_pattern = '_#_heartbeat_#_'
-				if msg.data.startswith(resize_pattern):
-					row, col = [ int(i) for i in msg.data[len(resize_pattern):].split(',')]
-					await self.p_obj.set_terminal_size(row, col)
-					continue
-				if msg.data == heartbeat_pattern:
-					await self.ws_sendstr(ws, heartbeat_pattern)
-					continue
-				self.p_obj.stdin.write(msg.data)
+				data = msg.data
+				if data.type == 'input':
+					self.p_obj.stdin.write(data.data)
+				elif data.type == 'heartbeat':
+					await self.ws_send_heartbeat(ws)
+				elif data.type == 'resize':
+					exc = ResizeException(data.rows, data.cols)
+					await self.p_obj.feed_exception(exc)
 			elif msg.type == aiohttp.WSMsgType.ERROR:
 				# print('ws connection closed with exception %s' % ws.exception())
 				return
+			await asyncio.sleep(0)
 		
 	async def process_2_ws(self, ws):
 		while self.running:
 			x = await self.p_obj.stdout.read(1024)
-			await self.ws_sendstr(ws, x)
+			await self.ws_send_data(ws, x)
 			await asyncio.sleep(0)
 
 	async def datahandle(self,request):
@@ -71,14 +75,27 @@ class XtermProcessor(PythonScriptProcessor):
 			try:
 				while self.running:
 					x = await self.p_obj.stdout.read(1024)
-					await self.ws_sendstr(ws, x)
+					await self.ws_send_data(ws, x)
 			except (asyncio.CancelledError, EOFError):
 				pass
 			finally:
 				self.p_obj.close()
 				stdin_task.cancel()
 
-	async def ws_sendstr(self, ws:web.WebSocketResponse, s:str):
+	async def ws_send_heartbeat(self, ws):
+		dic = {
+			'type':'heartbeat'
+		}
+		await self.ws_send(ws, dic)
+
+	async def ws_send_data(self, ws, d):
+		dic = {
+			'type':'data',
+			'data':d
+		}
+		await self.ws_send(ws, dic)
+
+	async def ws_send(self, ws:web.WebSocketResponse, s):
 		data = {
 			"type":1,
 			"data":s
