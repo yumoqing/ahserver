@@ -1,3 +1,4 @@
+from traceback import format_exc
 import asyncio
 import aiohttp
 import aiofiles
@@ -5,7 +6,6 @@ import json
 import codecs
 from aiohttp import web
 import aiohttp_cors
-from traceback import print_exc
 from appPublic.sshx import SSHServer
 from appPublic.dictObject import DictObject
 from appPublic.log import info, debug, warning, error, exception, critical
@@ -24,16 +24,18 @@ class XtermProcessor(PythonScriptProcessor):
 	async def ws_2_process(self, ws):
 		async for msg in ws:
 			if msg.type == aiohttp.WSMsgType.TEXT:
-				debug(f'recv from ws:{msg}.................')
+				# debug(f'recv from ws:{msg}.................')
 				data = DictObject(**json.loads(msg.data))
 				if data.type == 'input':
 					self.p_obj.stdin.write(data.data)
 				elif data.type == 'heartbeat':
 					await self.ws_send_heartbeat(ws)
 				elif data.type == 'resize':
-					exc = ResizeException(data.rows, data.cols)
-					debug(f'{exc=}, {data=}')
-					# self.p_obj.feed_exception(exc)
+					try:
+						self.p_obj._chan.change_terminal_size(data.rows, data.cols, data.width, data.height)
+					except Exception as e:
+						exception(f'{data=}, {e=}, {format_exc()}')
+						
 			elif msg.type == aiohttp.WSMsgType.ERROR:
 				debug(f'ws connection closed with exception {ws.exception()}')
 				return
@@ -64,7 +66,7 @@ class XtermProcessor(PythonScriptProcessor):
 		if login_info is None:
 			raise Exception('data error')
 
-		debug(f'{login_info=}')
+		# debug(f'{login_info=}')
 		ws = web.WebSocketResponse()
 		await ws.prepare(request)
 		await self.run_xterm(ws, login_info)
@@ -76,7 +78,7 @@ class XtermProcessor(PythonScriptProcessor):
 		self.sshnode = SSHServer(login_info)
 		async with self.sshnode.get_connector() as conn:
 			self.running = True
-			self.p_obj = await conn.create_process(term_type='xterm', term_size=(24, 80))
+			self.p_obj = await conn.create_process(term_type='xterm-256color', term_size=(80, 24))
 			r1 = self.ws_2_process(ws)
 			r2 = self.process_2_ws(ws)
 			await asyncio.gather(r1,r2)
@@ -99,7 +101,6 @@ class XtermProcessor(PythonScriptProcessor):
 			"type":1,
 			"data":s
 		}
-		debug(f'{data=}')
 		await ws.send_str(json.dumps(data, indent=4, ensure_ascii=False))
 
 
