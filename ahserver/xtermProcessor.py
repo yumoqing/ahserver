@@ -32,7 +32,9 @@ class XtermProcessor(PythonScriptProcessor):
 					await self.ws_send_heartbeat(ws)
 				elif data.type == 'resize':
 					try:
-						self.p_obj._chan.change_terminal_size(data.rows, data.cols, data.width, data.height)
+						debug(f'{data=}')
+						#self.p_obj._chan.change_terminal_size(data.rows, data.cols, data.width, data.height)
+						self.p_obj._chan.change_terminal_size(data.rows, data.cols)
 					except Exception as e:
 						exception(f'{data=}, {e=}, {format_exc()}')
 						
