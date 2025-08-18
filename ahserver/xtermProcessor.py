@@ -34,7 +34,8 @@ class XtermProcessor(PythonScriptProcessor):
 					try:
 						debug(f'{data=}')
 						#self.p_obj._chan.change_terminal_size(data.rows, data.cols, data.width, data.height)
-						self.p_obj._chan.change_terminal_size(data.rows, data.cols)
+						# self.p_obj._chan.change_terminal_size(data.rows, data.cols)
+						self.p_obj._chan.change_terminal_size(data.cols, data.rows)
 					except Exception as e:
 						exception(f'{data=}, {e=}, {format_exc()}')
 						
