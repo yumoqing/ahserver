@@ -7,6 +7,22 @@ from urllib.parse import quote
 import json
 import asyncio
 from aiohttp import BasicAuth
+from aiohttp.web import (
+	HTTPException,
+	HTTPBadRequest,
+	HTTPUnauthorized,
+	HTTPForbidden,
+	HTTPNotFound,
+	HTTPMethodNotAllowed,
+	HTTPRequestTimeout,
+	HTTPConflict,
+	HTTPGone,
+	HTTPUnsupportedMediaType,
+	HTTPTooManyRequests,
+	HTTPInternalServerError,
+	HTTPBadGateway,
+	HTTPServiceUnavailable
+	)
 from traceback import format_exc
 from functools import partial
 
@@ -45,6 +61,25 @@ from .filetest import current_fileno
 from .filedownload import path_download, file_download
 from .filestorage import FileStorage
 from .serverenv import ServerEnv
+
+def server_error(errcode):
+	exceptions = {
+		400: HTTPBadRequest,
+    	401: HTTPUnauthorized,
+    	403: HTTPForbidden,
+    	404: HTTPNotFound,
+    	405: HTTPMethodNotAllowed,
+    	408: HTTPRequestTimeout,
+    	409: HTTPConflict,
+    	410: HTTPGone,
+    	415: HTTPUnsupportedMediaType,
+    	429: HTTPTooManyRequests,
+    	500: HTTPInternalServerError,
+    	502: HTTPBadGateway,
+    	503: HTTPServiceUnavailable
+	}
+	E = exceptions.get(errcode, HTTPException)
+	raise E()
 
 def basic_auth_headers(user, passwd):
 	ba = BasicAuth(login=user, password=passwd)
@@ -275,6 +310,7 @@ def initEnv():
 	g.path_download = path_download
 	g.partial = partial
 	g.StreamHttpClient = StreamHttpClient
+	g.server_error = server_error
 
 def set_builtins():
 	all_builtins = [ i for i in dir(builtins) if not i.startswith('_')]
