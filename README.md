@@ -424,3 +424,26 @@ async with db.sqlorContext('dbname') as sor:
 
 ### classes
 * ArgsConvert
+
+## Change logs
+
+### 1.0.8
+#### server_error(errcode)
+add a new global function named "server_error(errcode)", it will raise a HTTPException, errcode should be one of:
+400	aiohttp.web.HTTPBadRequest	错误请求
+401	aiohttp.web.HTTPUnauthorized	未认证
+403	aiohttp.web.HTTPForbidden	禁止访问
+404	aiohttp.web.HTTPNotFound	未找到
+405	aiohttp.web.HTTPMethodNotAllowed	方法不允许
+408	aiohttp.web.HTTPRequestTimeout	请求超时
+409	aiohttp.web.HTTPConflict	冲突
+410	aiohttp.web.HTTPGone	已删除
+415	aiohttp.web.HTTPUnsupportedMediaType	不支持的媒体类型
+429	aiohttp.web.HTTPTooManyRequests	请求过多
+500	aiohttp.web.HTTPInternalServerError	服务器错误
+502	aiohttp.web.HTTPBadGateway	错误网关
+503	aiohttp.web.HTTPServiceUnavailable	服务不可用
+else it will raise HTTPException exception
+#### request['run_ns']
+global environment now can access from request['run_ns'], it contains all the globals variable in ServerEnv and related variables of request 
+
