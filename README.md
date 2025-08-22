@@ -448,20 +448,3 @@ else it will raise HTTPException exception
 #### request['run_ns']
 global environment now can access from request['run_ns'], it contains all the globals variable in ServerEnv and related variables of request 
 
-### 1.0.9
-
-#### MySession class
-add MySession class for script to get or set data to session
-
-usage
-
-```
-s = MySession(request)
-messages = s.messages
-if not messages:
-	messages = []
-messages.append("ergegrtgh")
-s.messages = messages
-```
-
-
