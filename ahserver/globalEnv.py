@@ -25,6 +25,7 @@ from aiohttp.web import (
 	)
 from traceback import format_exc
 from functools import partial
+from aiohttp_session import get_session
 
 import random
 import time
@@ -81,6 +82,12 @@ def server_error(errcode):
 	E = exceptions.get(errcode, HTTPException)
 	raise E()
 
+class MySession(DictObject):
+	def __init__(self, request, **kw):
+		super().__init__(**kw)
+		self.request = request
+		self.update(get_session(request))
+	
 def basic_auth_headers(user, passwd):
 	ba = BasicAuth(login=user, password=passwd)
 	return {
@@ -311,6 +318,7 @@ def initEnv():
 	g.partial = partial
 	g.StreamHttpClient = StreamHttpClient
 	g.server_error = server_error
+	g.MySession = MySession
 
 def set_builtins():
 	all_builtins = [ i for i in dir(builtins) if not i.startswith('_')]
