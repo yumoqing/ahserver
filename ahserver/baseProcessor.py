@@ -81,6 +81,7 @@ class BaseProcessor:
 		self.run_ns['processor'] = self
 		self.env_set = True
 		request['run_ns'] = self.run_ns
+		request._run_ns = self.run_ns
 
 	async def execute(self,request):
 		await self.set_run_env(request)
