@@ -445,6 +445,6 @@ add a new global function named "server_error(errcode)", it will raise a HTTPExc
 * 503	aiohttp.web.HTTPServiceUnavailable	服务不可用
 
 else it will raise HTTPException exception
-#### request['run_ns']
-global environment now can access from request['run_ns'], it contains all the globals variable in ServerEnv and related variables of request 
+#### request._run_ns
+global environment now can access from request._run_ns, it contains all the globals variable in ServerEnv and related variables of request 
 
