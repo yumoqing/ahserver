@@ -50,7 +50,6 @@ class XtermProcessor(PythonScriptProcessor):
 		try:
 			while self.running:
 				x = await self.p_obj.stdout.read(1024)
-				debug(f'{x=}')
 				await self.ws_send_data(ws, x)
 				await asyncio.sleep(0)
 		finally:
