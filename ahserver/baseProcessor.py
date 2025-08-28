@@ -174,11 +174,8 @@ class BricksAppProcessor(TemplateProcessor):
 		return name=='app'
 
 	async def datahandle(self, request):
-		params_kw = self.resource.y_env['params_kw']
+		params_kw = request._run_ns.parms_kw
 		await super().datahandle(request)
-		if params_kw._webbricks_ is None:
-			return
-		debug(f'{parmas_kw=}')
 		txt = self.content
 		entire_url = self.run_ns.get('entire_url')
 		content0 = await self.resource.path_call(request,entire_url('/bricks/bricksapp.tmpl'))
@@ -192,11 +189,17 @@ class BricksUIProcessor(TemplateProcessor):
 		return name=='bui'
 
 	async def datahandle(self, request):
-		params_kw = self.resource.y_env['params_kw']
+		params_kw = request._run_ns.params_kw
 		await super().datahandle(request)
+		ret = True
 		if params_kw._webbricks_ is None:
+			ret = False
+		else:
+			if int(params_kw._webbricks_) == 0:
+				ret = False
+		if ret:
 			return
-		debug(f'{parmas_kw=}')
+		debug(f'{params_kw=}')
 		txt = self.content
 		entire_url = self.run_ns.get('entire_url')
 		content0 = await self.resource.path_call(request,entire_url('/bricks/header.tmpl'))
