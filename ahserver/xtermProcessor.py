@@ -24,7 +24,7 @@ class XtermProcessor(PythonScriptProcessor):
 	async def ws_2_process(self, ws):
 		async for msg in ws:
 			if msg.type == aiohttp.WSMsgType.TEXT:
-				# debug(f'recv from ws:{msg}.................')
+				debug(f'recv from ws:{msg}.................')
 				data = DictObject(**json.loads(msg.data))
 				if data.type == 'input':
 					self.p_obj.stdin.write(data.data)
@@ -34,7 +34,8 @@ class XtermProcessor(PythonScriptProcessor):
 					try:
 						debug(f'{data=}')
 						#self.p_obj._chan.change_terminal_size(data.rows, data.cols, data.width, data.height)
-						self.p_obj._chan.change_terminal_size(data.rows, data.cols)
+						# self.p_obj._chan.change_terminal_size(data.rows, data.cols)
+						self.p_obj._chan.change_terminal_size(data.cols, data.rows)
 					except Exception as e:
 						exception(f'{data=}, {e=}, {format_exc()}')
 						
@@ -84,6 +85,7 @@ class XtermProcessor(PythonScriptProcessor):
 			r1 = self.ws_2_process(ws)
 			r2 = self.process_2_ws(ws)
 			await asyncio.gather(r1,r2)
+		debug(f'run_xterm() ended')
 
 	async def ws_send_heartbeat(self, ws):
 		dic = {
