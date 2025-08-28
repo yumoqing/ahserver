@@ -172,10 +172,11 @@ class BricksAppProcessor(TemplateProcessor):
 		return name=='app'
 
 	async def datahandle(self, request):
-		params = await self.resource.y_env['request2ns']()
+		params_kw = self.resource.y_env['params_kw']
 		await super().datahandle(request)
-		if params.get('_webbricks_',None):
+		if params_kw._webbricks_ is None:
 			return
+		debug(f'{parmas_kw=}')
 		txt = self.content
 		entire_url = self.run_ns.get('entire_url')
 		content0 = await self.resource.path_call(request,entire_url('/bricks/bricksapp.tmpl'))
@@ -189,16 +190,16 @@ class BricksUIProcessor(TemplateProcessor):
 		return name=='bui'
 
 	async def datahandle(self, request):
-		params = await self.resource.y_env['request2ns']()
+		params_kw = self.resource.y_env['params_kw']
 		await super().datahandle(request)
-		if params.get('_webbricks_',None):
+		if params_kw._webbricks_ is None:
 			return
+		debug(f'{parmas_kw=}')
 		txt = self.content
 		entire_url = self.run_ns.get('entire_url')
 		content0 = await self.resource.path_call(request,entire_url('/bricks/header.tmpl'))
 		content2 = await self.resource.path_call(request,entire_url('/bricks/footer.tmpl'))
 		self.content = f'{content0}{txt}{content2}'
-		debug(f'{len(txt)=}, {len(content0)=}, {len(content2)=}, {self.content=}')
 
 class PythonScriptProcessor(BaseProcessor):
 	@classmethod
