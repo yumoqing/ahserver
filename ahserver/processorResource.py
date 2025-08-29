@@ -239,6 +239,20 @@ class ProcessorResource(StaticResource,Url2File):
 		async def getArgs() -> DictObject:
 			if request.method == 'POST':
 				return await self.getPostData(request)
+			ns = {}
+			for k,v in request.query.items():
+				if k in ['_webbricks_', '_is_mobile', '_width', '_height', 'page', 'rows' ]:
+					v = int(v)
+				ov = ns.get(k,None)
+				if ov is None:
+					ns[k] = v
+				elif type(ov) == type([]):
+					ov.append(v)
+					ns[k] = ov
+				else:
+					ns[k] = [ov,v]
+			return ns
+
 			ns = multiDict2Dict(request.query)
 			return DictObject(**ns)
 
@@ -411,7 +425,7 @@ class ProcessorResource(StaticResource,Url2File):
 					return processor
 
 		if fpath is None:
-			print(f'fpath is None ..., {url=}, {url1=}')
+			debug(f'fpath is None ..., {url=}, {url1=}')
 			return None
 		for word, handlername in self.y_processors:
 			if fpath.endswith(word):
@@ -421,7 +435,7 @@ class ProcessorResource(StaticResource,Url2File):
 					# print(f'{f_cnt1=}, {f_cnt2=}, {f_cnt3=}, {f_cnt4=}, {f_cnt5=}')
 					return processor
 				except Exception as e:
-					print('Exception:',e, 'handlername=', handlername)
+					debug('Exception:',e, 'handlername=', handlername)
 					return None
 		return None
 
