@@ -24,7 +24,6 @@ class XtermProcessor(PythonScriptProcessor):
 	async def ws_2_process(self, ws):
 		async for msg in ws:
 			if msg.type == aiohttp.WSMsgType.TEXT:
-				debug(f'recv from ws:{msg}.................')
 				data = DictObject(**json.loads(msg.data))
 				if data.type == 'input':
 					self.p_obj.stdin.write(data.data)
@@ -32,9 +31,6 @@ class XtermProcessor(PythonScriptProcessor):
 					await self.ws_send_heartbeat(ws)
 				elif data.type == 'resize':
 					try:
-						debug(f'{data=}')
-						#self.p_obj._chan.change_terminal_size(data.rows, data.cols, data.width, data.height)
-						# self.p_obj._chan.change_terminal_size(data.rows, data.cols)
 						self.p_obj._chan.change_terminal_size(data.cols, data.rows)
 					except Exception as e:
 						exception(f'{data=}, {e=}, {format_exc()}')
