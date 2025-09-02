@@ -199,7 +199,6 @@ class BricksUIProcessor(TemplateProcessor):
 				ret = False
 		if ret:
 			return
-		debug(f'{params_kw=}')
 		txt = self.content
 		entire_url = self.run_ns.get('entire_url')
 		content0 = await self.resource.path_call(request,entire_url('/bricks/header.tmpl'))
