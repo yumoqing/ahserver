@@ -299,6 +299,7 @@ def initEnv():
 	g.DictObject = DictObject
 	g.async_sleep = asyncio.sleep
 	g.quotedstr = quotedstr
+	g.quote = quote
 	g.save_file = save_file
 	g.realpath = realpath
 	g.format_exc = format_exc
