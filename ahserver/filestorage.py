@@ -105,8 +105,9 @@ class FileStorage:
 					str(v % paths[0]),
 					str(v % paths[1]),
 					str(v % paths[2]),
-					str(v % paths[3]),
-					name))
+					str(v % paths[3]))
+		_mkdir(path)
+		path = os.path.join(path, name)
 		return path
 
 	def remove(self, path):
