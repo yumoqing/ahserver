@@ -101,7 +101,7 @@ class FileStorage:
 		root = self.root
 		if userid:
 			root += f'/{userid}'
-		path = os.path.abspath(os.path.join(root,
+		path = os.path.join(root,
 					str(v % paths[0]),
 					str(v % paths[1]),
 					str(v % paths[2]),
