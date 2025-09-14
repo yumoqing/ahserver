@@ -119,6 +119,28 @@ class FileStorage:
 		except Exception as e:
 			exception(f'{path=}, {p=} remove error')
 			
+	async def streaming_read(request, webpath, buf_size=8096):
+		fp = self.realPath(webpath)
+		stats = os.stat(fp)
+		startpos = 0
+		endpos = stats.st_size
+		range = request.headers.get('Range')
+		if range:
+			s,e = range.split('-')
+			if s:
+				startpos = int(s)
+			if e:
+				endpos = int(e)
+		debug(f'filesize={stats.st_size}, {startpos=}, {endpos=}')
+		async with aiofiles.open(fp, 'rb') as f:
+			if startpos > 0:
+				await f.seek(startpos)
+			pos = startpos
+			while pos < endpos:
+				b = f.read(buf_size)
+				yield b
+				pos += len(b)
+
 	async def save(self,name,read_data, userid=None):
 		p = self._name2path(name, userid=userid)
 		fpath = p[len(self.root):]
