@@ -119,7 +119,7 @@ class FileStorage:
 		except Exception as e:
 			exception(f'{path=}, {p=} remove error')
 			
-	async def streaming_read(request, webpath, buf_size=8096):
+	async def streaming_read(self, request, webpath, buf_size=8096):
 		fp = self.realPath(webpath)
 		stats = os.stat(fp)
 		startpos = 0
