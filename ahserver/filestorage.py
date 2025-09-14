@@ -138,7 +138,7 @@ class FileStorage:
 				await f.seek(startpos)
 			pos = startpos
 			while pos < endpos:
-				b = f.read(buf_size)
+				b = await f.read(buf_size)
 				yield b
 				pos += len(b)
 
