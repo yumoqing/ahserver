@@ -125,7 +125,10 @@ class FileStorage:
 		startpos = 0
 		endpos = stats.st_size
 		range = request.headers.get('Range')
+		bytes=0-
+		
 		if range:
+			range = range.split('=')[-1]
 			s,e = range.split('-')
 			if s:
 				startpos = int(s)
