@@ -6,6 +6,8 @@ import codecs
 from urllib.parse import quote
 import json
 import asyncio
+from contextlib import asynccontextmanager
+
 from aiohttp import BasicAuth
 from aiohttp.web import (
 	HTTPException,
@@ -51,7 +53,7 @@ from appPublic.httpclient import HttpClient
 from appPublic.log import debug, exception
 from appPublic.streamhttpclient import StreamHttpClient
 
-from sqlor.dbpools import DBPools,runSQL,runSQLPaging
+from sqlor.dbpools import DBPools
 from sqlor.filter import DBFilter, default_filterjson
 from aiohttp.web import StreamResponse
 
@@ -246,9 +248,16 @@ def password_encode(s):
 def password_decode(c):
 	k = get_password_key()
 	return unpassword(c, key=k)
-	
+
+@asynccontextmanager	
+async def sqlorContext(module):
+	db = DBPools()
+	env = ServerEnv()
+	dbname = env.get_module_dbname(module)
+	async with db.sqlorContext(dbname) as sor:
+		yield sor
+
 def initEnv():
-	pool = DBPools()
 	g = ServerEnv()
 	set_builtins()
 	g.paramify = paramify
@@ -271,14 +280,6 @@ def initEnv():
 	g.strdate_add = strdate_add
 	g.uObject = uObject
 	g.uuid = getID
-	g.runSQL = runSQL
-	g.runSQLPaging = runSQLPaging
-	g.runSQLIterator = pool.runSQL
-	g.runSQLResultFields = pool.runSQLResultFields
-	g.getTables = pool.getTables
-	g.getTableFields = pool.getTableFields
-	g.getTablePrimaryKey = pool.getTablePrimaryKey
-	g.getTableForignKeys = pool.getTableForignKeys
 	g.folderInfo = folderInfo
 	g.abspath = abspath
 	g.data2xlsx = data2xlsx
