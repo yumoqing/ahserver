@@ -25,6 +25,10 @@ class XtermProcessor(PythonScriptProcessor):
 		async for msg in ws:
 			if msg.type == aiohttp.WSMsgType.TEXT:
 				data = DictObject(**json.loads(msg.data))
+				if data.type == 'close':
+					debug(f'accept client close request, close the ws')
+					self.running = False
+					return
 				if data.type == 'input':
 					self.p_obj.stdin.write(data.data)
 				elif data.type == 'heartbeat':

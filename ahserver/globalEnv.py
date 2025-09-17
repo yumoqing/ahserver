@@ -314,6 +314,7 @@ def initEnv():
 	g.partial = partial
 	g.StreamHttpClient = StreamHttpClient
 	g.server_error = server_error
+	g.FileStorage = FileStorage
 
 def set_builtins():
 	all_builtins = [ i for i in dir(builtins) if not i.startswith('_')]
