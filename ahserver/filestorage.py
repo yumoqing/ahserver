@@ -9,6 +9,7 @@ import json
 import time
 
 from appPublic.folderUtils import _mkdir
+from appPublic.base64_to_file import base64_to_file, getFilenameFromBase64
 from appPublic.jsonConfig import getConfig
 from appPublic.Singleton import SingletonDecorator
 from appPublic.log import info, debug, warning, exception, critical
@@ -88,10 +89,16 @@ class FileStorage:
 		p = os.path.abspath(os.path.join(self.root,path))
 		return p
 
+	def save_base64_file(self, b64str):
+		filename = getFilenameFromBase64(b64str)
+		rfp = self._name2path(filename)
+		base64_to_file(b64str, rfp)
+		return rfp
+
 	def webpath(self, path):
 		if path.startswith(self.root):
 			return path[len(self.root):]
-
+		
 	def _name2path(self,name, userid=None):
 		name = os.path.basename(name)
 		paths=[191,193,197,97]
