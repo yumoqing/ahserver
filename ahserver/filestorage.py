@@ -7,6 +7,7 @@ import tempfile
 import aiofiles
 import json
 import time
+import base64
 
 from appPublic.folderUtils import _mkdir
 from appPublic.base64_to_file import base64_to_file, getFilenameFromBase64
@@ -184,11 +185,11 @@ def file_realpath(path):
 async def downloadfile(url, headers=None, params=None, data={}):
 	filename = url.split('/')[-1]
 	fs = FileStorage()
-	fpath = fs._name2path(filename, 'tmp')
+	fpath = fs._name2path(filename, userid='tmp')
 	try:
-		async with aiofiles.open(fpath,'wb') as f:
-			shc = StreamHttpClient()
-			async for chunk in shc('GET', url, 
+		shc = StreamHttpClient()
+		async for chunk in shc('GET', url, 
+			async with aiofiles.open(fpath,'wb') as f:
 					headers=headers, 
 					params=params,
 					data=data):
@@ -197,3 +198,14 @@ async def downloadfile(url, headers=None, params=None, data={}):
 	except Exception as e:
 		exception(f'save {url} to {fpath} exception:{e}'
 		raise e
+
+async def base642file(b64str):
+	filename = getFilenameFromBase64(b64str)
+	if ',' in b64str:
+        header, b64str = b64str.split(',', 1)
+	fs = FileStorage()
+	fpath = fs._name2path(filename, userid='tmp')
+	async with aiofiles.open(fpath, 'wb') as f:
+		binary_data = base64.b64decode(b64str)
+		await f.write(binary_data)
+	return fpath
