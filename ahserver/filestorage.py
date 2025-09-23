@@ -13,6 +13,7 @@ from appPublic.base64_to_file import base64_to_file, getFilenameFromBase64
 from appPublic.jsonConfig import getConfig
 from appPublic.Singleton import SingletonDecorator
 from appPublic.log import info, debug, warning, exception, critical
+from appPublic.streamhttpclient import StreamHttpClient
 
 @SingletonDecorator
 class TmpFileRecord:
@@ -180,3 +181,19 @@ def file_realpath(path):
 	fs = FileStorage()
 	return fs.realPath(path)
 
+async def downloadfile(url, headers=None, params=None, data={}):
+	filename = url.split('/')[-1]
+	fs = FileStorage()
+	fpath = fs._name2path(filename, 'tmp')
+	try:
+		async with aiofiles.open(fpath,'wb') as f:
+			shc = StreamHttpClient()
+			async for chunk in shc('GET', url, 
+					headers=headers, 
+					params=params,
+					data=data):
+				f.write(chunk)
+		return fpath
+	except Exception as e:
+		exception(f'save {url} to {fpath} exception:{e}'
+		raise e
