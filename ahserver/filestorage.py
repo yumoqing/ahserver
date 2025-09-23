@@ -196,7 +196,7 @@ async def downloadfile(url, headers=None, params=None, data={}):
 				f.write(chunk)
 		return fpath
 	except Exception as e:
-		exception(f'save {url} to {fpath} exception:{e}'
+		exception(f'save {url} to {fpath} exception:{e}')
 		raise e
 
 async def base642file(b64str):
