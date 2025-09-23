@@ -187,13 +187,13 @@ async def downloadfile(url, headers=None, params=None, data={}):
 	fs = FileStorage()
 	fpath = fs._name2path(filename, userid='tmp')
 	try:
-		shc = StreamHttpClient()
 		async with aiofiles.open(fpath,'wb') as f:
+			shc = StreamHttpClient()
 			async for chunk in shc('GET', url,
 					headers=headers, 
 					params=params,
 					data=data):
-				f.write(chunk)
+				await f.write(chunk)
 		return fpath
 	except Exception as e:
 		exception(f'save {url} to {fpath} exception:{e}')
