@@ -202,7 +202,7 @@ async def downloadfile(url, headers=None, params=None, data={}):
 async def base642file(b64str):
 	filename = getFilenameFromBase64(b64str)
 	if ',' in b64str:
-        header, b64str = b64str.split(',', 1)
+		header, b64str = b64str.split(',', 1)
 	fs = FileStorage()
 	fpath = fs._name2path(filename, userid='tmp')
 	async with aiofiles.open(fpath, 'wb') as f:
