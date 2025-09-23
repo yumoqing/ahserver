@@ -188,8 +188,8 @@ async def downloadfile(url, headers=None, params=None, data={}):
 	fpath = fs._name2path(filename, userid='tmp')
 	try:
 		shc = StreamHttpClient()
-		async for chunk in shc('GET', url, 
-			async with aiofiles.open(fpath,'wb') as f:
+		async with aiofiles.open(fpath,'wb') as f:
+			async for chunk in shc('GET', url,
 					headers=headers, 
 					params=params,
 					data=data):
