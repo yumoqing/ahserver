@@ -36,6 +36,7 @@ from openpyxl import Workbook
 from tempfile import mktemp
 
 from appPublic.jsonConfig import getConfig
+from appPublic.myTE import string_template_render
 from appPublic.dictObject import DictObject
 from appPublic.Singleton import GlobalEnv
 from appPublic.argsConvert import ArgsConvert
@@ -315,6 +316,7 @@ def initEnv():
 	g.StreamHttpClient = StreamHttpClient
 	g.server_error = server_error
 	g.FileStorage = FileStorage
+	g.str_tmpl_render = string_template_render
 
 def set_builtins():
 	all_builtins = [ i for i in dir(builtins) if not i.startswith('_')]
