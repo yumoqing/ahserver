@@ -48,7 +48,7 @@ class TemplateEngine(Environment):
 	
 	async def renders(self, tmplstr, data):
 		t = self.from_string(tmplstr)
-		return await t.render_async(data
+		return await t.render_async(data)
 
 def setupTemplateEngine():
 	config = getConfig()
