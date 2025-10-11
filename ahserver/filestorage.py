@@ -189,10 +189,13 @@ async def downloadfile(url, headers=None, params=None, data={}, method='GET'):
 	try:
 		async with aiofiles.open(fpath,'wb') as f:
 			shc = StreamHttpClient()
+			"""
 			async for chunk in shc(method, url,
 					headers=headers, 
 					params=params,
 					data=data):
+			"""
+			async for chunk in shc(method, url):
 				await f.write(chunk)
 		return fpath
 	except Exception as e:
