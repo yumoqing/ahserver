@@ -184,6 +184,7 @@ def file_realpath(path):
 
 async def downloadfile(url, headers=None, params=None, data={}, method='GET'):
 	filename = url.split('/')[-1]
+	filename = filename.split('?')[0]
 	fs = FileStorage()
 	fpath = fs._name2path(filename, userid='tmp')
 	try:
