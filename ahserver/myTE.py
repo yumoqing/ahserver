@@ -45,6 +45,10 @@ class TemplateEngine(Environment):
 	async def render(self,___name: str, **globals):
 		t = self.get_template(___name,globals=globals)
 		return await t.render_async(globals)
+	
+	async def renders(self, tmplstr, **globals):
+		t = self.from_string(tmplstr)
+		return await t.render_async(globals)
 
 def setupTemplateEngine():
 	config = getConfig()
