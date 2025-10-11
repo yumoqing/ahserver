@@ -205,7 +205,7 @@ async def downloadfile(url, headers=None, params=None, data={}, method='GET'):
 async def downloadfile2url(request, url, headers=None, params=None, data={}, method='GET'):
 	fpath = await downloadfile(url, headers=headers, params=params, data=data, method=method)
 	fs = FileStorage()
-	webpath = fs.webpath(fs)
+	webpath = fs.webpath(fpath)
 	env = request._run_ns
 	url = env.entire_url('/idfile?path=') + env.quote(webpath)
 	return url
