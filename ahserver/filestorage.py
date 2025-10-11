@@ -182,14 +182,14 @@ def file_realpath(path):
 	fs = FileStorage()
 	return fs.realPath(path)
 
-async def downloadfile(url, headers=None, params=None, data={}):
+async def downloadfile(url, headers=None, params=None, data={}, method='GET'):
 	filename = url.split('/')[-1]
 	fs = FileStorage()
 	fpath = fs._name2path(filename, userid='tmp')
 	try:
 		async with aiofiles.open(fpath,'wb') as f:
 			shc = StreamHttpClient()
-			async for chunk in shc('GET', url,
+			async for chunk in shc(method, url,
 					headers=headers, 
 					params=params,
 					data=data):
@@ -198,6 +198,14 @@ async def downloadfile(url, headers=None, params=None, data={}):
 	except Exception as e:
 		exception(f'save {url} to {fpath} exception:{e}')
 		raise e
+
+async def downloadfile2url(request, url, headers=None, params=None, data={}, method='GET'):
+	fpath = await downloadfile(url, headers=headers, params=params, data=data, method=method)
+	fs = FileStorage()
+	webpath = fs.webpath(fs)
+	env = request._run_ns
+	url = env.entire_url('/idfile?path=') + env.quote(webpath)
+	return url
 
 async def base642file(b64str):
 	filename = getFilenameFromBase64(b64str)

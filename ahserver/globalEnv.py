@@ -63,7 +63,7 @@ from .uriop import URIOp
 from .error import Success, Error, NeedLogin, NoPermission
 from .filetest import current_fileno
 from .filedownload import path_download, file_download
-from .filestorage import FileStorage
+from .filestorage import FileStorage, downloadfile2url
 from .serverenv import ServerEnv
 
 def server_error(errcode):
@@ -317,6 +317,7 @@ def initEnv():
 	g.server_error = server_error
 	g.FileStorage = FileStorage
 	g.str_tmpl_render = string_template_render
+	g.downloadfile2url = downloadfile2url
 
 def set_builtins():
 	all_builtins = [ i for i in dir(builtins) if not i.startswith('_')]
