@@ -29,7 +29,7 @@ class XtermProcessor(PythonScriptProcessor):
 					debug(f'accept client close request, close the ws')
 					self.running = False
 					return
-				if data.type == 'input':
+				if data.type == 'input' and not self.noinput:
 					self.p_obj.stdin.write(data.data)
 				elif data.type == 'heartbeat':
 					await self.ws_send_heartbeat(ws)
@@ -64,10 +64,13 @@ class XtermProcessor(PythonScriptProcessor):
 		# it must return a DictObject with sshnode information
 		# parameters: nodeid
 		#
+		self.noinput = False
 		await self.set_run_env(request, params=params)
 		login_info = await super().path_call(request, params=params)
 		if login_info is None:
 			raise Exception('data error')
+		if login_info.noinput:
+			self.noinput = True
 
 		# debug(f'{login_info=}')
 		ws = web.WebSocketResponse()
