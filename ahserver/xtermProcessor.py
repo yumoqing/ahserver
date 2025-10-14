@@ -81,7 +81,11 @@ class XtermProcessor(PythonScriptProcessor):
 		self.sshnode = SSHServer(login_info)
 		async with self.sshnode.get_connector() as conn:
 			self.running = True
-			self.p_obj = await conn.create_process(term_type='xterm-256color', term_size=(80, 24))
+			if login_info.cmdargs:
+				self.p_obj = await conn.create_process(*login_info.cmdargs, 
+											term_type='xterm-256color', term_size=(80, 24))
+			else:
+				self.p_obj = await conn.create_process(term_type='xterm-256color', term_size=(80, 24))
 			r1 = self.ws_2_process(ws)
 			r2 = self.process_2_ws(ws)
 			await asyncio.gather(r1,r2)
