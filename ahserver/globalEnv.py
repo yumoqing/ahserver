@@ -258,6 +258,9 @@ async def sqlorContext(module):
 	async with db.sqlorContext(dbname) as sor:
 		yield sor
 
+def background_reco(reco, *args, **kw):
+	asyncio.create_task(reco(*args, **kw))
+
 def initEnv():
 	g = ServerEnv()
 	set_builtins()
@@ -318,6 +321,7 @@ def initEnv():
 	g.FileStorage = FileStorage
 	g.str_tmpl_render = string_template_render
 	g.downloadfile2url = downloadfile2url
+	g.background_reco = background_reco
 
 def set_builtins():
 	all_builtins = [ i for i in dir(builtins) if not i.startswith('_')]
