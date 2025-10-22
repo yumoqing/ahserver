@@ -9,6 +9,7 @@ import json
 import time
 import base64
 
+from appPublic.worker import get_event_loop
 from appPublic.folderUtils import _mkdir
 from appPublic.base64_to_file import base64_to_file, getFilenameFromBase64
 from appPublic.jsonConfig import getConfig
@@ -24,7 +25,7 @@ class TmpFileRecord:
 		self.timeout = timeout
 		self.time_period = 10
 		self.filename = self.savefilename()
-		self.loop = asyncio.get_event_loop()
+		self.loop = get_event_loop()
 		self.loop.call_later(0.01, self.load)
 
 	def newtmpfile(self, path:str):
