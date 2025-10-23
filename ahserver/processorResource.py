@@ -56,7 +56,6 @@ from .serverenv import ServerEnv
 from .url2file import Url2File
 from .filestorage import FileStorage, file_realpath
 from .restful import DBCrud
-from .dbadmin import DBAdmin
 from .filedownload import file_download, path_decode
 from .utils import unicode_escape
 from .filetest import current_fileno
@@ -330,37 +329,6 @@ class ProcessorResource(StaticResource,Url2File):
 		path = request.path
 		config = getConfig()
 		request['port'] = config.website.port
-		if config.website.dbadm and path.startswith(config.website.dbadm):
-			pp = path.split('/')[2:]
-			if len(pp)<3:
-				error('%s:not found' % str(request.url))
-				raise HTTPNotFound
-			dbname = pp[0]
-			tablename = pp[1]
-			action = pp[2]
-			adm = DBAdmin(request,dbname,tablename,action)
-			return await adm.render()
-		if config.website.dbrest and path.startswith(config.website.dbrest):
-			pp = path.split('/')[2:]
-			if len(pp)<2:
-				error('%s:not found' % str(request.url))
-				raise HTTPNotFound
-			dbname = pp[0]
-			tablename = pp[1]
-			id = None
-			if len(pp) > 2:
-				id = pp[2]
-			crud = DBCrud(request,dbname,tablename,id=id)
-			return await crud.dispatch()
-		if config.website.download and path.startswith(config.website.download):
-			pp = path.split('/')[2:]
-			if len(pp)<1:
-				error('%s:not found' % str(request.url))
-				raise HTTPNotFound
-			dp = '/'.join(pp)
-			path = path_decode(dp)
-			return await file_download(request, path)
-
 		processor = self.url2processor(request, str(request.url), self.request_filename)
 		if processor:
 			ret = await processor.handle(request)
