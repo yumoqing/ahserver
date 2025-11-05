@@ -21,6 +21,19 @@ class Url2File:
 					break
 		return '/'.join(items)
 
+	def get_ospath_by_webpath(self, path:str) -> str:
+		paths = url.split('/')
+		f = os.path.join(self.rootpath, *paths)
+		if not os.path.exists(f):
+			return None
+		if os.path.isdir(f):
+			for idx in self.indexes:
+				p = os.path.join(real_path,idx)
+				if os.path.isfile(p):
+					return p
+			return None
+		return f
+
 	def url2ospath(self, url: str) -> str:
 		url = url.split('?')[0]
 		if len(url) > 0 and url[-1] == '/':

@@ -7,16 +7,16 @@ from ahserver.configuredServer import ConfiguredServer
 from ahserver.serverenv import ServerEnv
 from appPublic.jsonConfig import getConfig
 		
-def webapp(init_func):
+def webapp(init_func, app=None):
 	parser = argparse.ArgumentParser(prog="Sage")
 	parser.add_argument('-w', '--workdir')
 	parser.add_argument('-p', '--port')
 	args = parser.parse_args()
 	workdir = args.workdir or os.getcwd()
 	port = args.port
-	webserver(init_func, workdir, port)
+	webserver(init_func, workdir, port=port, app=app)
 
-def webserver(init_func, workdir, port=None):
+def webserver(init_func, workdir, port=None, app=None):
 	p = ProgramPath()
 	config = getConfig(workdir, NS={'workdir':workdir, 'ProgramPath':p})
 	if config.logger:
@@ -29,7 +29,7 @@ def webserver(init_func, workdir, port=None):
 	se = ServerEnv()
 	se.workdir = workdir
 	se.port = port
-	server = ConfiguredServer(workdir=workdir)
+	server = ConfiguredServer(workdir=workdir, app=app)
 	port = port or config.website.port or 8080
 	port = int(port)
 	server.run(port=port)

@@ -76,7 +76,7 @@ def i18nDICT(request):
 	return json.dumps(i18n.getLangDict(l)).encode(c.website.coding)
 
 class ProcessorResource(StaticResource,Url2File):
-	def __init__(self, prefix: str, directory: PathLike,
+	def __init__(self, prefix: str, directory: str,
 				 *, name: Optional[str]=None,
 				 expect_handler: Optional[_ExpectHandler]=None,
 				 chunk_size: int=256 * 1024,
@@ -84,14 +84,14 @@ class ProcessorResource(StaticResource,Url2File):
 				 append_version: bool=False,
 				 indexes:list=[],
 				 processors:dict={}) -> None:
-		StaticResource.__init__(self,prefix, directory,
+		StaticResource.__init__(self, prefix, directory,
 				 name=name,
 				 expect_handler=expect_handler,
 				 chunk_size=chunk_size,
 				 show_index=show_index, 
 				 follow_symlinks=follow_symlinks,
 				 append_version=append_version)
-		Url2File.__init__(self,directory,prefix,indexes,inherit=True)
+		Url2File.__init__(self, directory, prefix, indexes, inherit=True)
 		gr = self._routes.get('GET')
 		self._routes.update({'POST':gr})
 		self._routes.update({'PUT':gr})

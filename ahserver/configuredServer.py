@@ -9,7 +9,7 @@ from appPublic.folderUtils import ProgramPath
 from appPublic.dictObject import DictObject
 from appPublic.jsonConfig import getConfig
 from appPublic.log import info, debug, warning, error, critical, exception
-from appPublic.registerfunction import RegisterCoroutine
+from appPublic.registerfunction import RegisterFunction
 
 from sqlor.dbpools import DBPools
 
@@ -24,7 +24,8 @@ from .real_ip import real_ip_middleware
 
 class AHApp(web.Application):
 	def __init__(self, *args, **kw):
-		kw['client_max_size'] = 1024000000
+		if not kw.get('client_max_size'):
+			kw['client_max_size'] = 1024000000
 		super().__init__(*args, **kw)
 		self.user_data = DictObject()
 		self.middlewares.insert(0, real_ip_middleware())
@@ -36,7 +37,7 @@ class AHApp(web.Application):
 		return self.user_data.get(k)
 
 class ConfiguredServer:
-	def __init__(self, auth_klass=AuthAPI, workdir=None):
+	def __init__(self, auth_klass=AuthAPI, workdir=None, app=None):
 		self.auth_klass = auth_klass
 		self.workdir = workdir
 		if self.workdir is not None:
@@ -54,13 +55,16 @@ class ConfiguredServer:
 		if config.website.client_max_size:
 			client_max_size = config.website.client_max_size
 
-		self.app = AHApp(client_max_size=client_max_size)
+		if app:
+			self.app = app
+		else:
+			self.app = AHApp(client_max_size=client_max_size)
 		load_plugins(self.workdir)
 		g = ServerEnv()
 		g.workdir = workdir
 	
 	async def build_app(self):
-		rf = RegisterCoroutine()
+		rf = RegisterFunction()
 		await rf.exe('ahapp_built', self.app)
 		auth = self.auth_klass()
 		await auth.setupAuth(self.app)
@@ -88,7 +92,7 @@ class ConfiguredServer:
 
 	def configPath(self,config):
 		for p,prefix in config.website.paths:
-			res = ProcessorResource(prefix,p,show_index=True,
+			res = ProcessorResource(prefix, p, show_index=True,
 							follow_symlinks=True,
 							indexes=config.website.indexes,
 							processors=config.website.processors)
