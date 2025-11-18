@@ -26,6 +26,7 @@ class AHApp(web.Application):
 	def __init__(self, *args, **kw):
 		if not kw.get('client_max_size'):
 			kw['client_max_size'] = 1024000000
+		debug(f"client_max_size={kw['client_max_size']}")
 		super().__init__(*args, **kw)
 		self.user_data = DictObject()
 		self.middlewares.insert(0, real_ip_middleware())
@@ -51,7 +52,7 @@ class ConfiguredServer:
 		self.config = config
 		initEnv()
 		setupTemplateEngine()
-		client_max_size = 1024 * 10240
+		client_max_size = 1024000000
 		if config.website.client_max_size:
 			client_max_size = config.website.client_max_size
 
