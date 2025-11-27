@@ -28,8 +28,6 @@ async def get_session_userinfo(request):
 	if d is None:
 		return DictObject()
 	ui = d.split(':')
-	session = await get_session(request)
-	session.reset(max_age=3600)
 	return DictObject(**{
 		'userid':ui[0],
 		'username':ui[1],
