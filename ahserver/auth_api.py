@@ -28,6 +28,8 @@ async def get_session_userinfo(request):
 	if d is None:
 		return DictObject()
 	ui = d.split(':')
+	session = await get_session(request)
+	session.reset(max_age=3600)
 	return DictObject(**{
 		'userid':ui[0],
 		'username':ui[1],
@@ -149,10 +151,6 @@ class AuthAPI:
 		path = request.path
 		userinfo = await get_session_userinfo(request)
 		user = userinfo.userid
-		if user:
-			await user_login(request, user, 
-				username=userinfo.username, 
-				userorgid=userinfo.userorgid)
 		is_ok = await self.checkUserPermission(request, user, path)
 		t2 = time.time()
 		ip = get_client_ip(None, request)
