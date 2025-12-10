@@ -63,7 +63,28 @@ class ConfiguredServer:
 		load_plugins(self.workdir)
 		g = ServerEnv()
 		g.workdir = workdir
+		g.cssfiles = self.get_css_files
+		g.jsfiles = self.get_js_files
 	
+	def get_fieltype_files(self, suffix):
+		paths = self.config.website.paths
+		fs = []
+		for p, part in paths:
+			pos = len(p)
+			fs += [f[pos:] for f in listFile(p, suffixs=[suffix])]
+			if part == '':
+				subpaths = listFolder(p)
+				for sp in subpaths:
+					if not sp.endswith('bricks'):
+						fs += [f[pos:] for f in listFile(sp, suffixs=[suffix])]
+		return fs
+
+	def get_css_files(self):
+		return self.get_filetype_files('.css')
+
+	def get_js_files(self):
+		return self.get_filetype_files('.js')
+
 	async def build_app(self):
 		rf = RegisterFunction()
 		await rf.exe('ahapp_built', self.app)
