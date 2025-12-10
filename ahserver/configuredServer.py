@@ -66,7 +66,7 @@ class ConfiguredServer:
 		g.cssfiles = self.get_css_files
 		g.jsfiles = self.get_js_files
 	
-	def get_fieltype_files(self, suffix):
+	def get_filetype_files(self, suffix):
 		paths = self.config.website.paths
 		fs = []
 		for p, part in paths:
