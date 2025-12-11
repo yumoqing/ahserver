@@ -236,12 +236,20 @@ class ProcessorResource(StaticResource,Url2File):
 
 			
 		async def getArgs() -> DictObject:
+			def change_fixvalue(ns):
+				dic = {}
+				for k,v in ns.items():
+					if k in ['_webbricks_', '_is_mobile', '_width', '_height', 'page', 'rows' ]:
+						if isinstance(v, str):
+							v = int(v)
+					dic[k] = v
+				return dic
 			if request.method == 'POST':
-				return await self.getPostData(request)
+				ret = await self.getPostData(request)
+				ret = change_fixvalues(ret)
+				return ret
 			ns = {}
 			for k,v in request.query.items():
-				if k in ['_webbricks_', '_is_mobile', '_width', '_height', 'page', 'rows' ]:
-					v = int(v)
 				ov = ns.get(k,None)
 				if ov is None:
 					ns[k] = v
@@ -250,6 +258,7 @@ class ProcessorResource(StaticResource,Url2File):
 					ns[k] = ov
 				else:
 					ns[k] = [ov,v]
+			ns = change_fixvalue(ns)
 			return ns
 
 			ns = multiDict2Dict(request.query)
