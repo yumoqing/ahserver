@@ -258,7 +258,7 @@ class ProcessorResource(StaticResource,Url2File):
 					ns[k] = ov
 				else:
 					ns[k] = [ov,v]
-			ns = change_fixvalue(ns)
+			ns = change_fixvalues(ns)
 			return ns
 
 			ns = multiDict2Dict(request.query)
