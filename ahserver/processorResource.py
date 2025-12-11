@@ -236,7 +236,7 @@ class ProcessorResource(StaticResource,Url2File):
 
 			
 		async def getArgs() -> DictObject:
-			def change_fixvalue(ns):
+			def change_fixvalues(ns):
 				dic = {}
 				for k,v in ns.items():
 					if k in ['_webbricks_', '_is_mobile', '_width', '_height', 'page', 'rows' ]:
