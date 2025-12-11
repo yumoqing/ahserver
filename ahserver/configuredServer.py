@@ -75,15 +75,14 @@ class ConfiguredServer:
 			if part == '':
 				subpaths = listFolder(p)
 				for sp in subpaths:
-					if not sp.endswith('bricks'):
-						fs += [f[pos:] for f in listFile(sp, suffixs=[suffix])]
+					fs += [f[pos:] for f in listFile(sp, suffixs=[suffix])]
 		return fs
 
 	def get_css_files(self):
-		return self.get_filetype_files('.css')
+		return [ f for f in self.get_filetype_files('.css') if not f.startswith('/bricks') ]
 
 	def get_js_files(self):
-		return self.get_filetype_files('.js')
+		return [ f for f in self.get_filetype_files('.js') if not f.startswith('/bricks') ]
 
 	async def build_app(self):
 		rf = RegisterFunction()
