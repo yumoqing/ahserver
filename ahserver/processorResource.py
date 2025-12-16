@@ -193,7 +193,11 @@ class ProcessorResource(StaticResource,Url2File):
 		if self._prepath != '':
 			self._prepath = '/' + self._prepath
 
-		self._preurl = f'{self._scheme}://{self._host}:{self._port}{self._prepath}'
+		portp = f':{self._port}'
+		if self._port in [ 80, 443 ]:
+			portp = ''
+		self._preurl = f'{self._scheme}://{self._host}{portp}{self._prepath}'
+		request['base_url'] = self._preurl
 		# print(f'{request.path=}, {self._preurl=}')
 
 
