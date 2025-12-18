@@ -355,7 +355,7 @@ class ProcessorResource(StaticResource,Url2File):
 			if not config.website.allowListFolder:
 				error('%s:not found' % str(request.url))
 				raise HTTPNotFound
-		# print(f'{self.request_filename=}, {str(request.url)=} handle as a normal file')
+		debug(f'{self.request_filename=}, {str(request.url)=} handle as a normal file')
 		return await super()._handle(request)
 
 	def gethost(self, request):
