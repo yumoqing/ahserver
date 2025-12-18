@@ -355,8 +355,10 @@ class ProcessorResource(StaticResource,Url2File):
 			if not config.website.allowListFolder:
 				error('%s:not found' % str(request.url))
 				raise HTTPNotFound
-		debug(f'{self.request_filename=}, {str(request.url)=} handle as a normal file')
-		return await super()._handle(request)
+		if os.path.exists(self.request_filename):
+			debug(f'{self.request_filename=}, {str(request.url)=} handle as a normal file')
+			return await super()._handle(request)
+		raise Exception(f'{str(request.url)=} invalid paht')
 
 	def gethost(self, request):
 		host = request.headers.get('X-Forwarded-Host')
