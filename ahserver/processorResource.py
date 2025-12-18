@@ -350,15 +350,16 @@ class ProcessorResource(StaticResource,Url2File):
 		if self.request_filename and await self.isHtml(self.request_filename):
 			return await self.html_handle(request, self.request_filename)
 
-		if self.request_filename and os.path.isdir(self.request_filename):
+		if not self.request_filename:
+			raise Exception(f'{str(request.url)=} invalid path')
+
+		if os.path.isdir(self.request_filename):
 			config = getConfig()
 			if not config.website.allowListFolder:
 				error('%s:not found' % str(request.url))
 				raise HTTPNotFound
-		if os.path.exists(self.request_filename):
-			debug(f'{self.request_filename=}, {str(request.url)=} handle as a normal file')
-			return await super()._handle(request)
-		raise Exception(f'{str(request.url)=} invalid paht')
+		debug(f'{self.request_filename=}, {str(request.url)=} handle as a normal file')
+		return await super()._handle(request)
 
 	def gethost(self, request):
 		host = request.headers.get('X-Forwarded-Host')
