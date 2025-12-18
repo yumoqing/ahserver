@@ -188,7 +188,7 @@ class ProcessorResource(StaticResource,Url2File):
 			port = 443
 	
 		self._host = request.headers.get('X-Forwarded-Host', host)
-		self._port = request.headers.get('X-Forwarded-Port', port)
+		self._port = int(request.headers.get('X-Forwarded-Port', port))
 		self._prepath = request.headers.get('X-Forwarded-Prepath', '')
 		if self._prepath != '':
 			self._prepath = '/' + self._prepath
