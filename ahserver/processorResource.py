@@ -248,7 +248,7 @@ class ProcessorResource(StaticResource,Url2File):
 							try:
 								v = int(v)
 							except Exception as e:
-								exception(f'{int({v}) error, {e}')
+								exception(f'int({v}) error, {e}')
 					dic[k] = v
 				return dic
 			if request.method == 'POST':
