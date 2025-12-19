@@ -346,7 +346,6 @@ class ProcessorResource(StaticResource,Url2File):
 		config = getConfig()
 		request['port'] = config.website.port
 		processor = self.url2processor(request, str(request.url), self.request_filename)
-		client = request['client_ip')
 		if processor:
 			ret = await processor.handle(request)
 			return ret
@@ -355,7 +354,7 @@ class ProcessorResource(StaticResource,Url2File):
 			return await self.html_handle(request, self.request_filename)
 
 		if not self.request_filename:
-			raise Exception(f'{str(request.url)=} invalid path remote({client_ip})')
+			raise Exception(f'{str(request.url)=} invalid path')
 
 		if os.path.isdir(self.request_filename):
 			config = getConfig()
