@@ -245,7 +245,10 @@ class ProcessorResource(StaticResource,Url2File):
 				for k,v in ns.items():
 					if k in ['_webbricks_', '_is_mobile', '_width', '_height', 'page', 'rows' ]:
 						if isinstance(v, str):
-							v = int(v)
+							try:
+								v = int(v)
+							except Exception as e:
+								exception(f'{int({v}) error, {e}')
 					dic[k] = v
 				return dic
 			if request.method == 'POST':
@@ -343,6 +346,7 @@ class ProcessorResource(StaticResource,Url2File):
 		config = getConfig()
 		request['port'] = config.website.port
 		processor = self.url2processor(request, str(request.url), self.request_filename)
+		client = request['client_ip')
 		if processor:
 			ret = await processor.handle(request)
 			return ret
@@ -351,7 +355,7 @@ class ProcessorResource(StaticResource,Url2File):
 			return await self.html_handle(request, self.request_filename)
 
 		if not self.request_filename:
-			raise Exception(f'{str(request.url)=} invalid path')
+			raise Exception(f'{str(request.url)=} invalid path remote({client_ip})')
 
 		if os.path.isdir(self.request_filename):
 			config = getConfig()
