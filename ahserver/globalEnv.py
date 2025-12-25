@@ -24,6 +24,8 @@ from aiohttp.web import (
 	HTTPInternalServerError,
 	HTTPBadGateway,
 	HTTPServiceUnavailable
+	json_response,
+	Response
 	)
 from traceback import format_exc
 from functools import partial
@@ -323,6 +325,8 @@ def initEnv():
 	g.downloadfile2url = downloadfile2url
 	g.background_reco = background_reco
 	g.get_sor_context = get_sor_context
+	g.json_response = json_response
+	g.Response = Response
 
 def set_builtins():
 	all_builtins = [ i for i in dir(builtins) if not i.startswith('_')]
