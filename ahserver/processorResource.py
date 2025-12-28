@@ -188,12 +188,16 @@ class ProcessorResource(StaticResource,Url2File):
 			port = 443
 	
 		self._host = request.headers.get('X-Forwarded-Host', host)
-		self._port = request.headers.get('X-Forwarded-Port', port)
+		self._port = int(request.headers.get('X-Forwarded-Port', port))
 		self._prepath = request.headers.get('X-Forwarded-Prepath', '')
 		if self._prepath != '':
 			self._prepath = '/' + self._prepath
 
-		self._preurl = f'{self._scheme}://{self._host}:{self._port}{self._prepath}'
+		portp = f':{self._port}'
+		if self._port in [ 80, 443 ]:
+			portp = ''
+		self._preurl = f'{self._scheme}://{self._host}{portp}{self._prepath}'
+		request['base_url'] = self._preurl
 		# print(f'{request.path=}, {self._preurl=}')
 
 
@@ -241,7 +245,10 @@ class ProcessorResource(StaticResource,Url2File):
 				for k,v in ns.items():
 					if k in ['_webbricks_', '_is_mobile', '_width', '_height', 'page', 'rows' ]:
 						if isinstance(v, str):
-							v = int(v)
+							try:
+								v = int(v)
+							except Exception as e:
+								exception(f'int({v}) error, {e}')
 					dic[k] = v
 				return dic
 			if request.method == 'POST':
@@ -346,12 +353,15 @@ class ProcessorResource(StaticResource,Url2File):
 		if self.request_filename and await self.isHtml(self.request_filename):
 			return await self.html_handle(request, self.request_filename)
 
-		if self.request_filename and os.path.isdir(self.request_filename):
+		if not self.request_filename:
+			raise Exception(f'{str(request.url)=} invalid path')
+
+		if os.path.isdir(self.request_filename):
 			config = getConfig()
 			if not config.website.allowListFolder:
 				error('%s:not found' % str(request.url))
 				raise HTTPNotFound
-		# print(f'{self.request_filename=}, {str(request.url)=} handle as a normal file')
+		debug(f'{self.request_filename=}, {str(request.url)=} handle as a normal file')
 		return await super()._handle(request)
 
 	def gethost(self, request):

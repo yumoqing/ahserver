@@ -23,7 +23,9 @@ from aiohttp.web import (
 	HTTPTooManyRequests,
 	HTTPInternalServerError,
 	HTTPBadGateway,
-	HTTPServiceUnavailable
+	HTTPServiceUnavailable,
+	json_response,
+	Response
 	)
 from traceback import format_exc
 from functools import partial
@@ -54,7 +56,7 @@ from appPublic.httpclient import HttpClient
 from appPublic.log import debug, exception
 from appPublic.streamhttpclient import StreamHttpClient
 
-from sqlor.dbpools import DBPools
+from sqlor.dbpools import DBPools, get_sor_context
 from sqlor.filter import DBFilter, default_filterjson
 from aiohttp.web import StreamResponse
 
@@ -324,6 +326,9 @@ def initEnv():
 	g.str_tmpl_render = string_template_render
 	g.downloadfile2url = downloadfile2url
 	g.background_reco = background_reco
+	g.get_sor_context = get_sor_context
+	g.json_response = json_response
+	g.Response = Response
 
 def i18n(request, *args, **kw):
 	env = request._rns_ns

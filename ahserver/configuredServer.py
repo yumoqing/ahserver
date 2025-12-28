@@ -22,6 +22,15 @@ from .filestorage import TmpFileRecord
 from .loadplugins import load_plugins
 from .real_ip import real_ip_middleware
 
+startup_coros = []
+cleanup_coros = []
+
+def add_startup(coro):
+	startup_coros.append(coro)
+
+def add_cleanup(coro):
+	cleanup_coros.append(coro)
+
 class AHApp(web.Application):
 	def __init__(self, *args, **kw):
 		if not kw.get('client_max_size'):
@@ -30,7 +39,7 @@ class AHApp(web.Application):
 		super().__init__(*args, **kw)
 		self.user_data = DictObject()
 		self.middlewares.insert(0, real_ip_middleware())
-	
+
 	def set_data(self, k, v):
 		self.user_data[k] = v
 	
@@ -106,6 +115,8 @@ class ConfiguredServer:
 		if platform != 'win32':
 			reuse_port = True
 		print('reuse_port=', reuse_port)
+		[ self.app.on_startup.append(c) for c in startup_coros ]
+		[ self.app.on_cleanup.append(c) for c in cleanup_coros ]
 		web.run_app(self.build_app(),host=config.website.host or '0.0.0.0',
 							port=port,
 							reuse_port=reuse_port,
