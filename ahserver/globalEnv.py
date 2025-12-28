@@ -264,6 +264,8 @@ def background_reco(reco, *args, **kw):
 def initEnv():
 	g = ServerEnv()
 	set_builtins()
+	rf = RegisterFunction()
+	rd.register('i18n', i18n)
 	g.paramify = paramify
 	g.configValue = configValue
 	g.visualcoding = visualcoding
@@ -322,6 +324,17 @@ def initEnv():
 	g.str_tmpl_render = string_template_render
 	g.downloadfile2url = downloadfile2url
 	g.background_reco = background_reco
+
+def i18n(request, *args, **kw):
+	env = request._rns_ns
+	params_kw = env.params_kw
+	fs = FileStorage()
+	lang = params_kw.lang
+	i18n_path = params_kw.i18n or 'i18n'
+	fp = os.path.join(fs.root , i18n_path, lang, 'i18n.json')
+	with codecs.open(fp, 'r', 'utf-8') as f:
+		return f.read()
+	return ""
 
 def set_builtins():
 	all_builtins = [ i for i in dir(builtins) if not i.startswith('_')]
