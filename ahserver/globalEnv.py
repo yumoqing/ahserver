@@ -331,7 +331,7 @@ def initEnv():
 	g.Response = Response
 
 def i18n(request, *args, **kw):
-	env = request._rns_ns
+	env = request._run_ns
 	params_kw = env.params_kw
 	fs = FileStorage()
 	lang = params_kw.lang
