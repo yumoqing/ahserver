@@ -267,7 +267,7 @@ def initEnv():
 	g = ServerEnv()
 	set_builtins()
 	rf = RegisterFunction()
-	rd.register('i18n', i18n)
+	rf.register('i18n', i18n)
 	g.paramify = paramify
 	g.configValue = configValue
 	g.visualcoding = visualcoding
