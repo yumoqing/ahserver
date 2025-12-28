@@ -329,14 +329,22 @@ def initEnv():
 	g.get_sor_context = get_sor_context
 	g.json_response = json_response
 	g.Response = Response
+	g.web_rootpath = web_rootpath
+
+def web_rootpath():
+	config = getConfig()
+	for fp, wp in config.website.paths:
+		if wp == '':
+			return fp
+	return None
 
 def i18n(request, *args, **kw):
 	env = request._run_ns
 	params_kw = env.params_kw
-	fs = FileStorage()
+	root = web_rootpath()
 	lang = params_kw.lang
 	i18n_path = params_kw.i18n or 'i18n'
-	fp = os.path.join(fs.root , i18n_path, lang, 'i18n.json')
+	fp = os.path.join(root , i18n_path, lang, 'i18n.json')
 	with codecs.open(fp, 'r', 'utf-8') as f:
 		return f.read()
 	return ""
