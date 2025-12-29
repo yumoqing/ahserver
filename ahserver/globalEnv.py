@@ -345,9 +345,12 @@ def i18n(request, *args, **kw):
 	lang = params_kw.lang
 	i18n_path = params_kw.i18n or 'i18n'
 	fp = os.path.join(root , i18n_path, lang, 'i18n.json')
-	with codecs.open(fp, 'r', 'utf-8') as f:
-		return f.read()
-	return ""
+	try:
+		with codecs.open(fp, 'r', 'utf-8') as f:
+			return f.read()
+	except Exception as e:
+		exception(f'{params_kw=}, {e}')
+		return {}
 
 def set_builtins():
 	all_builtins = [ i for i in dir(builtins) if not i.startswith('_')]
