@@ -45,15 +45,30 @@ see requirements.txt
 
 [sqlor](https://github.com/yumoqing/sqlor)
 
-## How to use
-see ah.py
+## Usage
 
 ```
-from ahserver.configuredServer import ConfiguredServer
+import asyncio
+from ahserver.webapp import webapp
+from ahserver.configuredServer import add_startup
+
+# task running all the time in background
+async def bgwork(app) -> None:
+	while True:
+		asyncio.sleep(sec)
+		print('hahaha')
+
+def get_module_dbname(modulename):
+	return 'test'
+
+def init():
+	env = ServerEnv()
+	# add background task
+	add_startup(bgwork(10))
+	env.get_module_dbname = get_module_dbname
 
 if __name__ == '__main__':
-	server = ConfiguredServer()
-	server.run()
+	webapp(init)
 ```
 
 ## Folder structure
