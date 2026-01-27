@@ -55,7 +55,7 @@ from ahserver.configuredServer import add_startup
 # task running all the time in background
 async def bgwork(app) -> None:
 	while True:
-		asyncio.sleep(sec)
+		await asyncio.sleep(sec)
 		print('hahaha')
 
 def get_module_dbname(modulename):
