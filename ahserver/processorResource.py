@@ -285,6 +285,14 @@ class ProcessorResource(StaticResource,Url2File):
 		async def getsession():
 			return await get_session(request)
 
+		async def session_getvalue(key, defaultvalue=None):
+			sess = await get_session(request)
+			return sess.get(key, defaultvalue)
+
+		async def session_setvalue(key, value):
+			sess = await get_session(request)
+			sess[key] = value
+
 		async def remember_ticket(ticket):
 			await auth.remember_ticket(request, ticket)
 
@@ -335,6 +343,8 @@ class ProcessorResource(StaticResource,Url2File):
 		self.y_env.abspath = self.abspath
 		self.y_env.request2ns = getArgs
 		self.y_env.aiohttp_client = client
+		self.y_env.session_setvalue = session_setvalue
+		self.y_env.session_getvalue = session_getvalue
 		self.y_env.resource = self
 		self.y_env.gethost = partial(self.gethost, request)
 		self.y_env.path_call = partial(self.path_call,request)
