@@ -54,6 +54,7 @@ from appPublic.registerfunction import RegisterFunction
 from appPublic.httpclient import HttpClient
 from appPublic.log import debug, exception
 from appPublic.streamhttpclient import StreamHttpClient
+from appPublic.zmqapi import zmq_publish
 
 from sqlor.dbpools import DBPools, get_sor_context
 from sqlor.filter import DBFilter, default_filterjson
@@ -268,6 +269,7 @@ def initEnv():
 	rf = RegisterFunction()
 	rf.register('i18n', i18n)
 	g.paramify = paramify
+	g.zmq_publish = zmq_publish
 	g.configValue = configValue
 	g.visualcoding = visualcoding
 	g.uriop = URIOp
