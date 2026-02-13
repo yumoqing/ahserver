@@ -24,12 +24,13 @@ from .real_ip import real_ip_middleware
 
 startup_coros = []
 cleanup_coros = []
+cleanupctx_coros = []
 
 def add_startup(coro):
 	startup_coros.append(coro)
 
-def add_cleanup(coro):
-	cleanup_coros.append(coro)
+def add_cleanupctx(coro):
+	cleanupctx_coros.append(coro)
 
 class AHApp(web.Application):
 	def __init__(self, *args, **kw):
@@ -116,7 +117,7 @@ class ConfiguredServer:
 			reuse_port = True
 		print('reuse_port=', reuse_port)
 		[ self.app.on_startup.append(c) for c in startup_coros ]
-		[ self.app.on_cleanup.append(c) for c in cleanup_coros ]
+		[ self.app.cleanup_ctx.append(c) for c in cleanupctx_coros ]
 		web.run_app(self.build_app(),host=config.website.host or '0.0.0.0',
 							port=port,
 							reuse_port=reuse_port,
