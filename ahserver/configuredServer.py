@@ -23,7 +23,6 @@ from .loadplugins import load_plugins
 from .real_ip import real_ip_middleware
 
 startup_coros = []
-cleanup_coros = []
 cleanupctx_coros = []
 
 def add_startup(coro):
