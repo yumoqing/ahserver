@@ -25,7 +25,7 @@ async def file_upload(request):
 
 async def file_response(request, filepath, download=False):
 	filename = os.path.basename(filepath)
-	filename = urllib.parse.quote(filename)
+	safe_name = urllib.parse.quote(filename)
 	debug(f'{filepath=}, {filename=}, {download=}')
 	headers = {}
 	if download:
