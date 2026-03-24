@@ -1,6 +1,6 @@
 import os
 import asyncio
-
+import urllib
 import aiofiles
 import mimetypes
 from aiohttp.web_exceptions import HTTPNotFound
@@ -23,20 +23,21 @@ def path_decode(dpath):
 async def file_upload(request):
 	pass
 
-async def file_handle(request, filepath, download=False):
+async def file_response(request, filepath, download=False):
 	filename = os.path.basename(filepath)
+	filename = urllib.parse.quote(filename)
 	debug(f'{filepath=}, {filename=}, {download=}')
 	headers = {}
 	if download:
 		headers = {
-		'Content-Disposition': f'attachment; filename="{filename}"'
+		'Content-Disposition': f'attachment; filename="{filename}"; filename*=UTF-8\'\'{safe_name}'
 		}
 	r = web.FileResponse(filepath, chunk_size=8096, headers=headers)
 	r.enable_compression()
 	return r
 
 async def file_download(request, filepath):
-	return await file_handle(request, filepath, download=True)
+	return await file_response(request, filepath, download=True)
 
 async def path_download(request, params_kw, *params, **kw):
 	path = params_kw.get('path')
@@ -46,7 +47,7 @@ async def path_download(request, params_kw, *params, **kw):
 	fs = FileStorage()
 	fp = fs.realPath(path)
 	debug(f'path_download():download filename={fp}')
-	return await file_handle(request, fp, download)
+	return await file_response(request, fp, download)
 
 rf = RegisterFunction()
 rf.register('idfile', path_download)

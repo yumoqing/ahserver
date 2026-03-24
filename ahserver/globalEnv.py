@@ -64,7 +64,7 @@ from .xlsxData import XLSXData
 from .uriop import URIOp
 from .error import Success, Error, NeedLogin, NoPermission
 from .filetest import current_fileno
-from .filedownload import path_download, file_download
+from .filedownload import path_download, file_download, file_response
 from .filestorage import FileStorage, downloadfile2url
 from .serverenv import ServerEnv
 
@@ -220,22 +220,6 @@ def configValue(ks):
 def visualcoding():
 	return configValue('.website.visualcoding');
 
-def file_download(request,path,name,coding='utf8'):
-	f = openfile(path,'rb')
-	b = f.read()
-	f.close()
-	fname = quote(name).encode(coding)
-	hah = b"attachment; filename=" + fname
-	# print('file head=',hah.decode(coding))
-	request.setHeader(b'Content-Disposition',hah)
-	request.setHeader(b'Expires',0)
-	request.setHeader(b'Cache-Control',b'must-revalidate, post-check=0, pre-check=0')
-	request.setHeader(b'Content-Transfer-Encoding',b'binary')
-	request.setHeader(b'Pragma',b'public')
-	request.setHeader(b'Content-Length',len(b))
-	request.write(b)
-	request.finish()
-	
 def paramify(data, ns):
 	ac = ArgsConvert('${', '}$')
 	return ac.convert(data, ns)
@@ -318,6 +302,7 @@ def initEnv():
 	g.rfexe = RegisterFunction().exe
 	g.stream_response = stream_response
 	g.webpath = webpath
+	g.file_response = file_response
 	g.file_download = file_download
 	g.path_download = path_download
 	g.partial = partial
