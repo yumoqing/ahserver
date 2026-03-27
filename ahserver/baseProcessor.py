@@ -65,6 +65,7 @@ class BaseProcessor:
 
 	async def set_run_env(self, request, params={}):
 		if self.env_set:
+			self.run_ns['params_kw'].update(params)
 			return
 		self.real_path = self.resource.url2file(request.path)
 		g = ServerEnv()
@@ -74,9 +75,8 @@ class BaseProcessor:
 		self.run_ns['request'] = request
 		self.run_ns['app'] = request.app
 		kw = await self.run_ns['request2ns']()
-		kw.update(params)
 		self.run_ns['params_kw'] = kw
-		# self.run_ns.update(kw)
+		self.run_ns['params_kw'].update(params)
 		self.run_ns['ref_real_path'] = self.real_path
 		self.run_ns['processor'] = self
 		self.env_set = True
@@ -220,7 +220,7 @@ class PythonScriptProcessor(BaseProcessor):
 		txt = "async def myfunc(request,**ns):\n" + '\n'.join(lines)
 		return txt
 		
-	async def path_call(self, request,params={}):
+	async def path_call(self, request, params={}):
 		await self.set_run_env(request, params=params)
 		lenv = self.run_ns
 		del lenv['request']
