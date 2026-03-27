@@ -2,6 +2,7 @@ import os
 import re
 import json
 import codecs
+import inspect
 import aiofiles
 from aiohttp.web_request import Request
 from aiohttp.web_response import Response, StreamResponse
@@ -99,6 +100,10 @@ class BaseProcessor:
 		if self.retResponse is not None:
 			self.set_response_headers(self.retResponse)
 			return self.retResponse
+		elif inspect.iscoroutinefunction(self.content):
+			e = Exception(f'{self.content} is a coroutine')
+			exception(f'{e}')
+			raise e
 		elif isinstance(self.content, Response):
 			return self.content
 		elif isinstance(self.content, StreamResponse):
