@@ -101,7 +101,7 @@ class BaseProcessor:
 			self.set_response_headers(self.retResponse)
 			return self.retResponse
 		elif inspect.iscoroutine(self.content):
-			e = Exception(f'{self.content} is a coroutine')
+			e = Exception(f'{self.content.__name__} is a coroutine')
 			exception(f'{e}')
 			raise e
 		elif isinstance(self.content, Response):
