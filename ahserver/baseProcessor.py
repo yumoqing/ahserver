@@ -100,7 +100,7 @@ class BaseProcessor:
 		if self.retResponse is not None:
 			self.set_response_headers(self.retResponse)
 			return self.retResponse
-		elif inspect.iscoroutinefunction(self.content):
+		elif inspect.iscoroutine(self.content):
 			e = Exception(f'{self.content} is a coroutine')
 			exception(f'{e}')
 			raise e
