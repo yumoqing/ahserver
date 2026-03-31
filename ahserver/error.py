@@ -25,3 +25,17 @@ def NoPermission(path):
 		"data":path
 	}
 
+def return_error(error_message):
+	return {
+		'status': 'error',
+		'data': {
+			'message': error_message
+		}
+	}
+
+def return_ok(data):
+	return {
+		'status': 'ok',
+		'data': data
+	}
+

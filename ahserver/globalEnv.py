@@ -62,7 +62,8 @@ from aiohttp.web import StreamResponse
 
 from .xlsxData import XLSXData
 from .uriop import URIOp
-from .error import Success, Error, NeedLogin, NoPermission
+from .error import Success, Error, NeedLogin, NoPermission, return_ok, return_error
+
 from .filetest import current_fileno
 from .filedownload import path_download, file_download, file_response
 from .filestorage import FileStorage, downloadfile2url
@@ -315,6 +316,8 @@ def initEnv():
 	g.json_response = json_response
 	g.Response = Response
 	g.web_rootpath = web_rootpath
+	g.return_ok = return_ok
+	g.return_error = return_error
 
 def web_rootpath():
 	config = getConfig()
