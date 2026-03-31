@@ -62,7 +62,17 @@ from aiohttp.web import StreamResponse
 
 from .xlsxData import XLSXData
 from .uriop import URIOp
-from .error import Success, Error, NeedLogin, NoPermission, return_ok, return_error
+from .error import (
+	Success, 
+	Error, 
+	NeedLogin, 
+	NoPermission, 
+	openai_401,
+	openai_403,
+	openai_429,
+	openai_400,
+	return_ok, 
+	return_error
 
 from .filetest import current_fileno
 from .filedownload import path_download, file_download, file_response
@@ -318,6 +328,10 @@ def initEnv():
 	g.web_rootpath = web_rootpath
 	g.return_ok = return_ok
 	g.return_error = return_error
+	g.openai_401 = openai_401
+	g.openai_403 = openai_403
+	g.openai_400 = openai_400
+	g.openai_429 = openai_429
 
 def web_rootpath():
 	config = getConfig()
