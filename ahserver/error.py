@@ -1,3 +1,7 @@
+from aiohttp.web import (
+	json_response
+)
+
 def Error(errno='undefined error',msg='Error'):
 	return {
 		"status":"Error",
@@ -81,4 +85,5 @@ def openai_400():
 			"code": "invalidparameters"
 		}
 	}
+	return json_response(d, status=400)
 	
