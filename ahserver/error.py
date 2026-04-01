@@ -48,7 +48,7 @@ def openai_401():
 		"error": {
 			"message": "Incorrect API key provided: sk-abc...xyz. You can find your API key at https://platform.openai.com/account/api-keys.",
 			"type": "invalid_request_error",
-			"param": null,
+			"param": None,
 			"code": "invalid_api_key"
 		}
 	}
@@ -59,7 +59,7 @@ def openai_403():
 		"error": {
 			"message": "You don't have access to this model.",
 			"type": "invalid_request_error",
-			"param": null,
+			"param": None,
 			"code": "model_not_found"
 		}
 	}
@@ -70,7 +70,7 @@ def openai_429():
 		"error": {
 			"message": "You exceeded your current quota, please check your plan and billing details.",
 			"type": "insufficient_quota",
-			"param": null,
+			"param": None,
 			"code": "insufficient_quota"
 		}
 	}
@@ -81,7 +81,7 @@ def openai_400():
 		"error": {
 			"message": "Parameters error.",
 			"type": "invalidparameters",
-			"param": null,
+			"param": None,
 			"code": "invalidparameters"
 		}
 	}
