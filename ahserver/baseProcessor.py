@@ -101,7 +101,7 @@ class BaseProcessor:
 			self.set_response_headers(self.retResponse)
 			return self.retResponse
 		elif inspect.iscoroutine(self.content):
-			e = Exception(f'{self.content.__name__} is a coroutine')
+			e = Exception(f'{request.path}:{self.content.__name__} is a coroutine')
 			exception(f'{e}')
 			raise e
 		elif isinstance(self.content, Response):
@@ -137,6 +137,10 @@ class BaseProcessor:
 			self.headers['Content-Type'] = "application/json; utf-8"
 
 		self.headers['Access-Control-Expose-Headers'] = 'Set-Cookie'
+		if not isinstance(self.content, str):
+			e = Exception(f'{request.path} return data type error, {type(self.content)}')
+			exception(f'{e}')
+			raise e
 		resp =  Response(text=self.content,headers=self.headers)
 		self.set_response_headers(resp)
 		return resp
