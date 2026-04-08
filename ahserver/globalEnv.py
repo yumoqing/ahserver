@@ -105,6 +105,10 @@ def basic_auth_headers(user, passwd):
 		"Authorization":ba.encode()
 	}
 
+def get_baseurl():
+	baseurl = os.environ.get('BASEURL')
+	return baseurl
+
 async def stream_response(request, async_data_generator, content_type='text/html'):
 	res = StreamResponse()
 	if content_type:
@@ -330,6 +334,7 @@ def initEnv():
 	g.return_ok = return_ok
 	g.return_error = return_error
 	g.openai_401 = openai_401
+	g.get_baseurl = get_baseurl
 	g.openai_403 = openai_403
 	g.openai_400 = openai_400
 	g.openai_429 = openai_429
