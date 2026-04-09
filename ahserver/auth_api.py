@@ -102,12 +102,22 @@ class AuthAPI:
 		b = str(self.conf.website.port).encode('utf-8')
 		cnt = 32 - len(b)
 		secret = b + b'iqwertyuiopasdfghjklzxcvbnm12345'[:cnt]
-		storage = EncryptedCookieStorage(secret)
+		storage = EncryptedCookieStorage(secret,
+			secure=True,          # <--- 核心：生产环境 HTTPS 必须为 True
+			samesite='None',      # <--- 核心：跨域必须为 None
+			httponly=True,        # 安全建议：防止 XSS 攻击
+			max_age=24*60*60  
+		)
 		if self.conf.website.session_redis:
 			url = self.conf.website.session_redis.url
 			# redis = await aioredis.from_url("redis://127.0.0.1:6379")
 			redisdb = await redis.Redis.from_url(url)
-			storage = MyRedisStorage(redisdb)
+			storage = MyRedisStorage(redisdb,
+				secure=True,          # <--- 核心：生产环境 HTTPS 必须为 True
+				samesite='None',      # <--- 核心：跨域必须为 None
+				httponly=True,        # 安全建议：防止 XSS 攻击
+				max_age=24*60*60  
+			)
 		aiohttp_session.setup(app, storage)
 
 		# Create an auth ticket mechanism that expires after 1 minute (60
