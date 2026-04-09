@@ -5,7 +5,10 @@ import sys
 import codecs 
 from urllib.parse import quote
 import json
-import uvloop
+try:
+	import uvloop
+except:
+	pass
 import asyncio
 from contextlib import asynccontextmanager
 
@@ -263,8 +266,9 @@ def background_reco(reco, *args, **kw):
 
 def get_loop_type():
 	loop = asyncio.get_event_loop()
-	if isinstance(loop, uvloop.Loop):
-		return 'uvloop.Loop'
+	if uvloop:
+		if isinstance(loop, uvloop.Loop):
+			return 'uvloop.Loop'
 	return str(type(loop))
 
 def initEnv():

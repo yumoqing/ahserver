@@ -1,8 +1,12 @@
-import uvloop
-uvloop.install()
 import os, sys
-import argparse
+try:
+	import uvloop
+	if sys.platform != 'win32':
+		uvloop.install()
+except Exception as e:
+	pass
 from appPublic.log import MyLogger, info, debug, warning
+import argparse
 from appPublic.folderUtils import ProgramPath
 from appPublic.jsonConfig import getConfig
 from ahserver.configuredServer import ConfiguredServer
