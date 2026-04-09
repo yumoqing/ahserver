@@ -5,6 +5,7 @@ import sys
 import codecs 
 from urllib.parse import quote
 import json
+import uvloop
 import asyncio
 from contextlib import asynccontextmanager
 
@@ -260,9 +261,16 @@ async def sqlorContext(module):
 def background_reco(reco, *args, **kw):
 	asyncio.create_task(reco(*args, **kw))
 
+def get_loop_type():
+	loop = asyncio.get_event_loop()
+	if isinstance(loop, uvloop.Loop):
+		return 'uvloop.Loop'
+	return str(type(loop))
+
 def initEnv():
 	g = ServerEnv()
 	set_builtins()
+	g.get_loop_type = get_loop_type()
 	rf = RegisterFunction()
 	rf.register('i18n', i18n)
 	g.paramify = paramify

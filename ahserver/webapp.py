@@ -1,3 +1,5 @@
+import uvloop
+uvloop.install()
 import os, sys
 import argparse
 from appPublic.log import MyLogger, info, debug, warning
