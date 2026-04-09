@@ -37,7 +37,7 @@ import datetime
 from openpyxl import Workbook
 from tempfile import mktemp
 
-from base64_to_file import hex2base64
+from appPublic.base64_to_file import hex2base64
 from appPublic.jsonConfig import getConfig
 from appPublic.dictObject import DictObject
 from appPublic.Singleton import GlobalEnv
