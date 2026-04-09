@@ -228,8 +228,6 @@ async def base642file(b64str):
 	return fpath
 
 async def b64media2url(request, mediafile):
-	# env = request._run_ns
-	# entire_url = env.entire_url
 	if mediafile.startswith('http://') or mediafile.startswith('https://'):
 		return mediafile
 	webpath = mediafile
@@ -241,6 +239,7 @@ async def b64media2url(request, mediafile):
 		exception(f'{e}')
 		return ''
 	if request:
+		entire_url = request._run_ns.entire_url
 		url = entire_url('/idfile?path=') + quote(webpath)
 		return url
 	baseurl = get_baseurl()
