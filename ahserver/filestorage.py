@@ -8,7 +8,7 @@ import aiofiles
 import json
 import time
 import base64
-
+from urllib.parse import quote
 from appPublic.worker import get_event_loop
 from appPublic.folderUtils import _mkdir
 from appPublic.base64_to_file import base64_to_file, getFilenameFromBase64
@@ -212,6 +212,10 @@ async def downloadfile2url(request, url, headers=None, params=None, data={}, met
 	url = env.entire_url('/idfile?path=') + env.quote(webpath)
 	return url
 
+def get_baseurl():
+	baseurl = os.environ.get('BASEURL')
+	return baseurl
+
 async def base642file(b64str):
 	filename = getFilenameFromBase64(b64str)
 	if ',' in b64str:
@@ -223,4 +227,24 @@ async def base642file(b64str):
 		await f.write(binary_data)
 	return fpath
 
+async def b64media2url(request, mediafile):
+    # env = request._run_ns
+    # entire_url = env.entire_url
+    if mediafile.startswith('http://') or mediafile.startswith('https://'):
+        return mediafile
+	webpath = mediafile
+    if mediafile.startswith('data:'):
+		fpath = await base642file(mediafile)
+		webpath = FileStorage().webpath(fpath)
+    elif len(mediafile) > 8000:
+        e = Exception(f'mediafile is not a media file')
+        exception(f'{e}')
+        return ''
+	if request:
+		url = entire_url('/idfile?path=') + quote(webpath)
+		return url
+	baseurl = get_baseurl()
+	if baseurl:
+		return f'{baseurl}/idfile?path={quote(mediafile)}'
+	return f'/idfile?path={quote(mediafile)}'
 

@@ -37,6 +37,7 @@ import datetime
 from openpyxl import Workbook
 from tempfile import mktemp
 
+from base64_to_file import hex2base64
 from appPublic.jsonConfig import getConfig
 from appPublic.dictObject import DictObject
 from appPublic.Singleton import GlobalEnv
@@ -77,7 +78,7 @@ from .error import (
 
 from .filetest import current_fileno
 from .filedownload import path_download, file_download, file_response
-from .filestorage import FileStorage, downloadfile2url
+from .filestorage import FileStorage, downloadfile2url, get_baseurl, b64media2url
 from .serverenv import ServerEnv
 
 def server_error(errcode):
@@ -104,10 +105,6 @@ def basic_auth_headers(user, passwd):
 	return {
 		"Authorization":ba.encode()
 	}
-
-def get_baseurl():
-	baseurl = os.environ.get('BASEURL')
-	return baseurl
 
 async def stream_response(request, async_data_generator, content_type='text/html'):
 	res = StreamResponse()
@@ -335,6 +332,8 @@ def initEnv():
 	g.return_error = return_error
 	g.openai_401 = openai_401
 	g.get_baseurl = get_baseurl
+	g.hex2base64 = hex2base64
+	g.b64media2url = b64media2url
 	g.openai_403 = openai_403
 	g.openai_400 = openai_400
 	g.openai_429 = openai_429
