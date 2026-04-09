@@ -442,6 +442,9 @@ async with db.sqlorContext('dbname') as sor:
 
 ## Change logs
 
+### 1.2.0
+Use uvloop, httptools to speed up
+
 ### 1.0.8
 #### server_error(errcode)
 add a new global function named "server_error(errcode)", it will raise a HTTPException, errcode should be one of:
