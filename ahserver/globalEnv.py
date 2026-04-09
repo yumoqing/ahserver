@@ -270,7 +270,7 @@ def get_loop_type():
 def initEnv():
 	g = ServerEnv()
 	set_builtins()
-	g.get_loop_type = get_loop_type()
+	g.get_loop_type = get_loop_type
 	rf = RegisterFunction()
 	rf.register('i18n', i18n)
 	g.paramify = paramify
