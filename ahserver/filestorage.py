@@ -228,18 +228,18 @@ async def base642file(b64str):
 	return fpath
 
 async def b64media2url(request, mediafile):
-    # env = request._run_ns
-    # entire_url = env.entire_url
-    if mediafile.startswith('http://') or mediafile.startswith('https://'):
-        return mediafile
+	# env = request._run_ns
+	# entire_url = env.entire_url
+	if mediafile.startswith('http://') or mediafile.startswith('https://'):
+		return mediafile
 	webpath = mediafile
-    if mediafile.startswith('data:'):
+	if mediafile.startswith('data:'):
 		fpath = await base642file(mediafile)
 		webpath = FileStorage().webpath(fpath)
-    elif len(mediafile) > 8000:
-        e = Exception(f'mediafile is not a media file')
-        exception(f'{e}')
-        return ''
+	elif len(mediafile) > 8000:
+		e = Exception(f'mediafile is not a media file')
+		exception(f'{e}')
+		return ''
 	if request:
 		url = entire_url('/idfile?path=') + quote(webpath)
 		return url
