@@ -9,6 +9,7 @@ from appPublic.log import MyLogger, info, debug, warning
 import argparse
 from appPublic.folderUtils import ProgramPath
 from appPublic.jsonConfig import getConfig
+from sqlor.dbpools import DBPools
 from ahserver.configuredServer import ConfiguredServer
 from ahserver.serverenv import ServerEnv
 from appPublic.jsonConfig import getConfig
@@ -31,6 +32,7 @@ def webserver(init_func, workdir, port=None, app=None):
 							logfile=config.logger.logfile or None)
 	else:
 		logger = MyLogger('webapp', levelname='info')
+	DBPools(config.databases)
 	init_func()
 	se = ServerEnv()
 	se.workdir = workdir
