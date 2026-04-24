@@ -166,7 +166,7 @@ class AuthAPI:
 			try:
 				ret = await handler(request)
 				t3 = time.time()
-				info(f'timecost=client({ip}) {user} access {path} cost {t3-t1}, ({t2-t1})')
+				debug(f'timecost=client({ip}) {user} access {path} cost {t3-t1}, ({t2-t1})')
 				return ret
 			except Exception as e:
 				t3 = time.time()
