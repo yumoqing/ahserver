@@ -63,7 +63,7 @@ def openai_403():
 			"code": "model_not_found"
 		}
 	}
-	return json_resposne(d, status=403)
+	return json_response(d, status=403)
 
 def openai_429():
 	d = {
