@@ -230,6 +230,8 @@ async def base642file(b64str):
 async def b64media2url(request, mediafile):
 	if mediafile.startswith('http://') or mediafile.startswith('https://'):
 		return mediafile
+	if mediafile.startswith('asset://'):
+		return mediafile
 	webpath = mediafile
 	if mediafile.startswith('data:'):
 		fpath = await base642file(mediafile)
