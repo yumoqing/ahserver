@@ -53,7 +53,7 @@ class Url2File:
 		ourl = url
 		url = url.split('?')[0]
 		real_path = self.url2ospath(url)
-		if os.path.isdir(real_path):
+		if os.path.isdir(real_path) and self.indexes:
 			for idx in self.indexes:
 				p = os.path.join(real_path,idx)
 				if os.path.isfile(p):
