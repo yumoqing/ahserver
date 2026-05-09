@@ -142,10 +142,11 @@ class WebsocketProcessor(PythonScriptProcessor):
 
 	async def path_call(self, request,params={}):
 		cookie = request.headers.get('Sec-WebSocket-Protocol', None)
+		env = request._run_ns
 		if cookie:
 			# request.headers['Cookies'] = cookie
 			request['WssCookies'] = cookie
-			userid = await get_user()
+			userid = await env.get_user()
 			debug(f'{cookie=}, {userid=}')
 		await self.set_run_env(request)
 		lenv = self.run_ns.copy()
