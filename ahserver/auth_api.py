@@ -41,6 +41,9 @@ class CustomTktAuth(auth.SessionTktAuthentication):
 						client_ip=ip, 
 						user_data=client_uuid)
 
+def get_client_ip(obj, request):
+	return request['client_ip']
+
 async def get_session_userinfo(request):
 	d = await auth.get_auth(request)
 	if d is None:
