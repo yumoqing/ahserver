@@ -141,21 +141,12 @@ class WebsocketProcessor(PythonScriptProcessor):
 		return name=='ws'
 
 	async def path_call(self, request,params={}):
+		await self.set_run_env(request)
 		cookie = request.headers.get('Sec-WebSocket-Protocol', None)
-		env = request._run_ns
 		if cookie:
 			# request.headers['Cookies'] = cookie
 			request['WssCookies'] = cookie
-			userid = await env.get_user()
-			debug(f'{cookie=}, {userid=}')
-		await self.set_run_env(request)
-		lenv = self.run_ns.copy()
-		lenv.update(params)
-		params_kw = lenv.params_kw
-		userid = lenv.params_kw.userid or await lenv.get_user()
-		del lenv['request']
-		txt = await self.loadScript(self.real_path)
-		ws = web.WebSocketResponse()
+		ws = web.WebSocketResponse(protocols=(cookie,) if cookie else ())
 		try:
 			await ws.prepare(request)
 		except Exception as e:
@@ -163,6 +154,17 @@ class WebsocketProcessor(PythonScriptProcessor):
 			print_exc()
 			raise e
 		ws_pool = WsPool(ws, request['client_ip'], request.path, request.app)
+		env = request._run_ns
+		userid = await env.get_user()
+		debug(f'{cookie=}, {userid=}')
+		if userid:
+			ws_pool.register(userid) # 之前漏掉了这一步
+            debug(f'WS Registered: {userid=}')
+		lenv = self.run_ns.copy()
+		lenv.update(params)
+		params_kw = lenv.params_kw
+		del lenv['request']
+		txt = await self.loadScript(self.real_path)
 		debug(f'========== debug ===========')
 		async for msg in ws:
 			if msg.type == aiohttp.WSMsgType.TEXT:
