@@ -20,8 +20,26 @@ from appPublic.dictObject import DictObject
 from appPublic.rsawrap import RSA
 from appPublic.log import info, debug, warning, error, critical, exception
 
-def get_client_ip(obj, request):
-	return request['client_ip']
+class CustomTktAuth(auth.SessionTktAuthentication):
+	async def get_ticket(self, request):
+		# 1. 优先尝试从你手动设置的缓存中取
+		manual_ticket = request.get('WssCookies')
+		if manual_ticket:
+			return manual_ticket
+
+		# 2. 如果没有，再走原有的 Headers/Cookies 逻辑
+		return await super().get_ticket(request)
+	def _get_ip(self, request):
+		return request['client_ip']
+
+	def _new_ticket(self, request, user_id):
+		client_uuid = request.headers.get('client_uuid')
+		ip = self._get_ip(request)
+		valid_until = int(time.time()) + self._max_age
+		return self._ticket.new(user_id, 
+						valid_until=valid_until, 
+						client_ip=ip, 
+						user_data=client_uuid)
 
 async def get_session_userinfo(request):
 	d = await auth.get_auth(request)
@@ -103,9 +121,9 @@ class AuthAPI:
 		cnt = 32 - len(b)
 		secret = b + b'iqwertyuiopasdfghjklzxcvbnm12345'[:cnt]
 		storage = EncryptedCookieStorage(secret,
-			secure=True,          # <--- 核心：生产环境 HTTPS 必须为 True
-			samesite='None',      # <--- 核心：跨域必须为 None
-			httponly=True,        # 安全建议：防止 XSS 攻击
+			secure=True,		  # <--- 核心：生产环境 HTTPS 必须为 True
+			samesite='None',	  # <--- 核心：跨域必须为 None
+			httponly=True,		# 安全建议：防止 XSS 攻击
 			max_age=24*60*60  
 		)
 		if self.conf.website.session_redis:
@@ -113,9 +131,9 @@ class AuthAPI:
 			# redis = await aioredis.from_url("redis://127.0.0.1:6379")
 			redisdb = await redis.Redis.from_url(url)
 			storage = MyRedisStorage(redisdb,
-				secure=True,          # <--- 核心：生产环境 HTTPS 必须为 True
-				samesite='None',      # <--- 核心：跨域必须为 None
-				httponly=True,        # 安全建议：防止 XSS 攻击
+				secure=True,		  # <--- 核心：生产环境 HTTPS 必须为 True
+				samesite='None',	  # <--- 核心：跨域必须为 None
+				httponly=True,		# 安全建议：防止 XSS 攻击
 				max_age=24*60*60  
 			)
 		aiohttp_session.setup(app, storage)
@@ -130,19 +148,7 @@ class AuthAPI:
 		if self.conf.website.session_reissue_time:
 			session_reissue_time = self.conf.website.session_reissue_time
 		
-		def _new_ticket(self, request, user_id):
-			client_uuid = request.headers.get('client_uuid')
-			ip = self._get_ip(request)
-			valid_until = int(time.time()) + self._max_age
-			# print(f'hack: my _new_ticket() called ... remote {ip=}, {client_uuid=}')
-			return self._ticket.new(user_id, 
-							valid_until=valid_until, 
-							client_ip=ip, 
-							user_data=client_uuid)
-
-		TktAuthentication._get_ip = get_client_ip
-		TktAuthentication._new_ticket = _new_ticket
-		policy = auth.SessionTktAuthentication(secret, 
+		policy = CustomTktAuth(secret, 
 										session_max_time,
 										reissue_time=session_reissue_time,
 									   include_ip=True)
