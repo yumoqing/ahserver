@@ -159,7 +159,7 @@ class WebsocketProcessor(PythonScriptProcessor):
 		debug(f'{cookie=}, {userid=}')
 		if userid:
 			ws_pool.register(userid) # 之前漏掉了这一步
-            debug(f'WS Registered: {userid=}')
+			debug(f'WS Registered: {userid=}')
 		lenv = self.run_ns.copy()
 		lenv.update(params)
 		params_kw = lenv.params_kw
