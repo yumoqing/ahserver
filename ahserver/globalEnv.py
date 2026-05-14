@@ -48,7 +48,7 @@ from appPublic.Singleton import GlobalEnv
 from appPublic.argsConvert import ArgsConvert
 from appPublic.timeUtils import str2Date,str2Datetime,curDatetime, \
 			getCurrentTimeStamp,curDateString, curTimeString, \
-			monthfirstday, strdate_add, timestampstr
+			monthfirstday, strdate_add, timestampstr, timestampAdd, timestampSub
 from appPublic.dataencoder import quotedstr
 from appPublic.folderUtils import folderInfo
 from appPublic.uniqueID import setNode,getID
@@ -349,6 +349,8 @@ def initEnv():
 	g.openai_403 = openai_403
 	g.openai_400 = openai_400
 	g.openai_429 = openai_429
+    g.timestampAdd = timestampAdd
+    g.timestampSub = timestampSub
 
 def web_rootpath():
 	config = getConfig()
