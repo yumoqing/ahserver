@@ -88,18 +88,18 @@ from .serverenv import ServerEnv
 def server_error(errcode):
 	exceptions = {
 		400: HTTPBadRequest,
-    	401: HTTPUnauthorized,
-    	403: HTTPForbidden,
-    	404: HTTPNotFound,
-    	405: HTTPMethodNotAllowed,
-    	408: HTTPRequestTimeout,
-    	409: HTTPConflict,
-    	410: HTTPGone,
-    	415: HTTPUnsupportedMediaType,
-    	429: HTTPTooManyRequests,
-    	500: HTTPInternalServerError,
-    	502: HTTPBadGateway,
-    	503: HTTPServiceUnavailable
+		401: HTTPUnauthorized,
+		403: HTTPForbidden,
+		404: HTTPNotFound,
+		405: HTTPMethodNotAllowed,
+		408: HTTPRequestTimeout,
+		409: HTTPConflict,
+		410: HTTPGone,
+		415: HTTPUnsupportedMediaType,
+		429: HTTPTooManyRequests,
+		500: HTTPInternalServerError,
+		502: HTTPBadGateway,
+		503: HTTPServiceUnavailable
 	}
 	E = exceptions.get(errcode, HTTPException)
 	raise E()
@@ -349,8 +349,8 @@ def initEnv():
 	g.openai_403 = openai_403
 	g.openai_400 = openai_400
 	g.openai_429 = openai_429
-    g.timestampAdd = timestampAdd
-    g.timestampSub = timestampSub
+	g.timestampAdd = timestampAdd
+	g.timestampSub = timestampSub
 
 def web_rootpath():
 	config = getConfig()
