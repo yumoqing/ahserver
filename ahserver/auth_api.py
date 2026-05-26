@@ -184,9 +184,9 @@ class AuthAPI:
 				raise e
 				
 		if user is None:
-			info(f'timecost=client({ip}) {user} need login to access {path} ({t2-t1})')
+			exception(f'timecost=client({ip}) {user} need login to access {path} ({t2-t1})')
 			raise web.HTTPUnauthorized
-		info(f'timecost=client({ip}) {user} access {path} forbidden ({t2-t1})')
+		exception(f'timecost=client({ip}) {user} access {path} forbidden ({t2-t1})')
 		raise web.HTTPForbidden()
 
 	async def needAuth(self,path):
