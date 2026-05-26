@@ -397,8 +397,9 @@ class ProcessorResource(StaticResource,Url2File):
 			
 	async def isHtml(self,fn):
 		try:
-			async with aiofiles.open(fn,'r',encoding='utf-8') as f:
-				b = await f.read()
+			async with aiofiles.open(fn,'rb') as f:
+				b = await f.read(512)
+				b = b.decode('utf-8', errors='ignore')
 				while b[0] in ['\n',' ','\t']:
 					b = b[1:]
 				if b.lower().startswith('<html>'):
