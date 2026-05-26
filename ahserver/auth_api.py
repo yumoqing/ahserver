@@ -163,7 +163,6 @@ class AuthAPI:
 
 	@web.middleware
 	async def checkAuth(self,request, handler):
-		info(f'checkAuth() called ... {request.path=}, {request.method}, {type(handler)}')
 		t1 = time.time()
 		path = request.path
 		userinfo = await get_session_userinfo(request)

@@ -202,6 +202,15 @@ class ProcessorResource(StaticResource,Url2File):
 
 
 	async def _handle(self,request:Request) -> StreamResponse:
+		# Fast path for static assets: skip auth closures, i18n, url2processor, isHtml
+		static_exts = ('.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.ico',
+		               '.svg', '.woff', '.woff2', '.ttf', '.eot', '.map',
+		               '.webp', '.bmp', '.mp3', '.mp4', '.webm', '.ogg', '.wav')
+		path_lower = request.path.lower()
+		if any(path_lower.endswith(ext) for ext in static_exts):
+			self.parse_request(request)
+			return await super()._handle(request)
+
 		clientkeys = {
 			"iPhone":"iphone",
 			"iPad":"ipad",
