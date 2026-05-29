@@ -40,7 +40,7 @@ from appPublic.i18n import getI18N
 from appPublic.dictObject import DictObject, multiDict2Dict
 from appPublic.timecost import TimeCost
 from appPublic.timeUtils import timestampstr
-from appPublic.log import clientinfo, info, debug, warning, error, critical, exception
+from appPublic.log import clientinfo, info, debug, debug_params, warning, error, critical, exception
 
 from .baseProcessor import getProcessor, BricksUIProcessor, TemplateProcessor
 from .baseProcessor import PythonScriptProcessor, MarkdownProcessor
@@ -335,6 +335,7 @@ class ProcessorResource(StaticResource,Url2File):
 		self.y_env.info = info
 		self.y_env.error = error
 		self.y_env.debug = debug
+		self.y_env.debug_params = debug_params
 		self.y_env.clientinfo = clientinfo
 		self.y_env.warning = warning
 		self.y_env.critical = critical
