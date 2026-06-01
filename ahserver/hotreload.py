@@ -203,7 +203,11 @@ async def hot_reload_task(app, reloader):
             reloaded = reloader.check_and_reload()
             if reloaded:
                 info(f'[hot_reload] reloaded: {list(reloaded.keys())}')
-                await dispatcher.dispatch('hot_reload', reloaded)
+                # Only dispatch hot_reload event for non-config changes
+                # Config-only reload just refreshes JsonConfig singleton, no cache clearing needed
+                needs_cache_clear = any(k != 'config' for k in reloaded)
+                if needs_cache_clear:
+                    await dispatcher.dispatch('hot_reload', reloaded)
     except asyncio.CancelledError:
         info('[hot_reload] stopped')
         raise
