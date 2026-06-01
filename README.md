@@ -440,6 +440,124 @@ async with db.sqlorContext('dbname') as sor:
 ### classes
 * ArgsConvert
 
+## Hot Reload
+
+ahserver supports automatic hot-reload of cached resources when source files change, without requiring server restart. This is especially useful during development and when deploying configuration changes to production.
+
+### Enable Hot Reload
+
+Add `hot_reload` configuration to `conf/config.json`:
+
+```json
+{
+    "hot_reload": {
+        "enabled": true,
+        "interval": 2
+    }
+}
+```
+
+Or simply:
+```json
+{
+    "hot_reload": true
+}
+```
+
+- `enabled`: whether hot reload is active (default: true when object form is used)
+- `interval`: seconds between file checks (default: 2)
+
+### Trigger Sources
+
+Hot reload is triggered by three sources:
+
+1. **config.json mtime change** — automatically detected by FileWatcher
+   - Clears `JsonConfig` singleton so next `getConfig()` call reloads from disk
+   - **Does NOT dispatch `hot_reload` event** (modules caches are NOT cleared)
+   - This is intentional: config changes rarely affect module cache validity
+
+2. **i18n files mtime change** — automatically detected by FileWatcher
+   - Clears `MiniI18N` singleton and `ServerEnv.myi18n` cache
+   - **Dispatches `hot_reload` event** to all bound listeners
+
+3. **HTTP endpoint** — manual trigger via `GET /__hot_reload__`
+   - Writes to signal file `/tmp/.sage_cache_invalidate`
+   - All workers detect signal file mtime change within their check interval
+   - **Dispatches `hot_reload` event** to all bound listeners in all workers
+   - Returns JSON response with confirmation
+
+### Cross-Process Cache Invalidation
+
+When running with `reuse_port=True` (multiple workers on same port), each process runs its own `HotReloader` instance. Cross-process cache invalidation works via signal file:
+
+- `GET /__hot_reload__` writes timestamp to `/tmp/.sage_cache_invalidate`
+- All workers detect mtime change within their check interval
+- Each worker independently dispatches `hot_reload` event
+
+This ensures all workers clear their caches without requiring IPC or shared memory.
+
+### Event Name
+
+The event dispatched is: **`hot_reload`**
+
+Modules bind to this event to clear their caches. Example from `rbac` module:
+
+```python
+# In load_rbac() or init
+env = ServerEnv()
+if hasattr(env, 'event_dispatcher'):
+    env.event_dispatcher.bind('hot_reload', env.userpermissions.on_hot_reload)
+```
+
+Handler signature:
+```python
+def on_hot_reload(data=None):
+    """Event handler for hot_reload event. Clears all caches."""
+    self.ur_caches.clear()
+    self.invalidate_rp_cache()
+```
+
+The `data` parameter is a dict indicating what was reloaded:
+- `{'config': True}` — config changed (not dispatched, modules won't see this)
+- `{'i18n': True}` — i18n files changed
+- `{'signal': True}` — signal file changed (cross-process)
+- `{'source': 'http_endpoint'}` — HTTP endpoint triggered
+- Multiple keys can be present
+
+### What Gets Cleared
+
+**Automatically cleared by ahserver:**
+- `JsonConfig` singleton (on config.json change)
+- `MiniI18N` singleton (on i18n file change)
+- `ServerEnv.myi18n` cache (on i18n file change)
+
+**Cleared by modules (via `hot_reload` event):**
+- `rbac`: user permissions cache, role-permission cache
+- `uapi`: API data cache, API keys cache, org users cache
+- `pricing`: pricing program data cache
+- `llmage`: UAPI cache
+
+### Debug Logging
+
+Set logger level to `debug` in `conf/config.json` to see hot reload activity:
+
+```json
+{
+    "logger": {
+        "name": "sage",
+        "levelname": "debug",
+        "logfile": "$[workdir]$/logs/sage.log"
+    }
+}
+```
+
+Key log messages:
+- `[hot_reload] changed: {path}` — file mtime changed
+- `[hot_reload] signal file changed, triggering reload` — signal file detected
+- `[hot_reload] dispatching hot_reload event` — event will be dispatched
+- `[hot_reload] config-only change, skipping cache clear dispatch` — config changed, no module cache clear
+- `[module_name] on_hot_reload called, clearing caches` — module handler invoked
+
 ## Change logs
 
 ### 1.2.0
