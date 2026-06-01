@@ -149,7 +149,7 @@ class ConfiguredServer:
 						except asyncio.CancelledError:
 							pass
 				self.app.on_startup.append(_hot_reload_startup)
-				self.app.cleanup_ctx.append(_hot_reload_cleanup)
+				self.app.on_cleanup.append(_hot_reload_cleanup)
 				print(f'hot_reload enabled, interval={interval}s, endpoint=GET /__hot_reload__')
 
 		web.run_app(self.build_app(),host=config.website.host or '0.0.0.0',
