@@ -2,6 +2,7 @@ import os,sys
 from sys import platform
 import time
 import ssl
+import asyncio
 from socket import *
 from aiohttp import web
 
@@ -21,6 +22,7 @@ from .serverenv import ServerEnv
 from .filestorage import TmpFileRecord
 from .loadplugins import load_plugins
 from .real_ip import real_ip_middleware
+from .hotreload import HotReloader, get_i18n_paths, hot_reload_task
 
 startup_coros = []
 cleanupctx_coros = []
@@ -110,17 +112,48 @@ class ConfiguredServer:
 		if config.website.ssl:
 			ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
 			ssl_context.load_cert_chain(config.website.ssl.crtfile,
-						config.website.ssl.keyfile)
+							config.website.ssl.keyfile)
 		reuse_port = None
 		if platform != 'win32':
 			reuse_port = True
 		print('reuse_port=', reuse_port)
 		[ self.app.on_startup.append(c) for c in startup_coros ]
 		[ self.app.cleanup_ctx.append(c) for c in cleanupctx_coros ]
+
+		# Hot reload setup
+		hot_reload_cfg = config.get('hot_reload', False)
+		if hot_reload_cfg:
+			interval = 2
+			if isinstance(hot_reload_cfg, dict):
+				if not hot_reload_cfg.get('enabled', True):
+					hot_reload_cfg = False
+				else:
+					interval = hot_reload_cfg.get('interval', 2)
+			if hot_reload_cfg:
+				workdir = self.workdir or os.getcwd()
+				config_path = os.path.join(workdir, 'conf', 'config.json')
+				i18n_paths = get_i18n_paths(workdir)
+				reloader = HotReloader(config_path, i18n_paths)
+				reloader.set_interval(interval)
+				async def _hot_reload_startup(app):
+					task = asyncio.create_task(hot_reload_task(app, reloader))
+					app['hot_reload_task'] = task
+				async def _hot_reload_cleanup(app):
+					task = app.get('hot_reload_task')
+					if task:
+						task.cancel()
+						try:
+							await task
+						except asyncio.CancelledError:
+							pass
+				self.app.on_startup.append(_hot_reload_startup)
+				self.app.cleanup_ctx.append(_hot_reload_cleanup)
+				print(f'hot_reload enabled, interval={interval}s, pid will check independently')
+
 		web.run_app(self.build_app(),host=config.website.host or '0.0.0.0',
-							port=port,
-							reuse_port=reuse_port,
-							ssl_context=ssl_context)
+						port=port,
+						reuse_port=reuse_port,
+						ssl_context=ssl_context)
 
 	def configPath(self,config):
 		for p,prefix in config.website.paths:
