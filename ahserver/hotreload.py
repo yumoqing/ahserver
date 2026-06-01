@@ -116,7 +116,7 @@ class HotReloader:
                 debug('[hot_reload] signal file changed, triggering reload')
                 return True
         except OSError:
-            debug(f'[hot_reload] signal file not found: {SIGNAL_FILE}')
+            pass
         return False
 
     def check_and_reload(self):
