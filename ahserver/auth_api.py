@@ -174,7 +174,8 @@ class AuthAPI:
 			try:
 				ret = await handler(request)
 				t3 = time.time()
-				debug(f'timecost=client({ip}) {user} access {path} cost {t3-t1}, ({t2-t1})')
+				if t3 - t1 > 1.0:
+					debug(f'timecost=client({ip}) {user} access {path} cost {t3-t1:.3f}, ({t2-t1:.3f})')
 				return ret
 			except Exception as e:
 				t3 = time.time()

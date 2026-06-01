@@ -110,10 +110,9 @@ class HotReloader:
         """Check if cache invalidation signal file was updated."""
         try:
             mtime = os.path.getmtime(SIGNAL_FILE)
-            debug(f'[hot_reload] signal file mtime: {mtime}, last: {self._last_signal_mtime}')
             if mtime > self._last_signal_mtime:
                 self._last_signal_mtime = mtime
-                debug('[hot_reload] signal file changed, triggering reload')
+                debug(f'[hot_reload] signal file changed, mtime: {mtime}')
                 return True
         except OSError:
             pass
