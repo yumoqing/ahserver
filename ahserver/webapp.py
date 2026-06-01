@@ -9,6 +9,7 @@ from appPublic.log import MyLogger, info, debug, warning
 import argparse
 from appPublic.folderUtils import ProgramPath
 from appPublic.jsonConfig import getConfig
+from appPublic.event_dispatcher import EventDispatcher
 from sqlor.dbpools import DBPools
 from ahserver.configuredServer import ConfiguredServer
 from ahserver.serverenv import ServerEnv
@@ -33,8 +34,10 @@ def webserver(init_func, workdir, port=None, app=None):
 	else:
 		logger = MyLogger('webapp', levelname='info')
 	DBPools(config.databases)
-	init_func()
+	# Create EventDispatcher BEFORE init_func() so all load_XXX() can bind
 	se = ServerEnv()
+	se.event_dispatcher = EventDispatcher()
+	init_func()
 	se.workdir = workdir
 	se.port = port
 	server = ConfiguredServer(workdir=workdir, app=app)

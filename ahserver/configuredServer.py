@@ -22,7 +22,7 @@ from .serverenv import ServerEnv
 from .filestorage import TmpFileRecord
 from .loadplugins import load_plugins
 from .real_ip import real_ip_middleware
-from .hotreload import HotReloader, get_i18n_paths, hot_reload_task, hot_reload_handler, invalidate_all_caches
+from .hotreload import HotReloader, get_i18n_paths, hot_reload_task, hot_reload_handler
 
 startup_coros = []
 cleanupctx_coros = []
