@@ -65,9 +65,11 @@ class FileWatcher:
             old_mtime = self._mtimes.get(path)
             if old_mtime is None:
                 self._mtimes[path] = mtime
+                debug(f'[hot_reload] initial mtime for {path}: {mtime}')
             elif mtime > old_mtime:
                 self._mtimes[path] = mtime
                 changed.append(path)
+                debug(f'[hot_reload] changed: {path} (mtime {old_mtime} -> {mtime})')
         return changed
 
 
@@ -108,11 +110,13 @@ class HotReloader:
         """Check if cache invalidation signal file was updated."""
         try:
             mtime = os.path.getmtime(SIGNAL_FILE)
+            debug(f'[hot_reload] signal file mtime: {mtime}, last: {self._last_signal_mtime}')
             if mtime > self._last_signal_mtime:
                 self._last_signal_mtime = mtime
+                debug('[hot_reload] signal file changed, triggering reload')
                 return True
         except OSError:
-            pass
+            debug(f'[hot_reload] signal file not found: {SIGNAL_FILE}')
         return False
 
     def check_and_reload(self):
@@ -130,6 +134,7 @@ class HotReloader:
         # Check config.json
         config_changed = self._watcher.check([self._config_path])
         if config_changed:
+            debug(f'[hot_reload] config changed: {config_changed}')
             self._reload_config()
             reloaded['config'] = True
 
@@ -137,6 +142,7 @@ class HotReloader:
         if self._i18n_paths:
             i18n_changed = self._watcher.check(self._i18n_paths)
             if i18n_changed:
+                debug(f'[hot_reload] i18n changed: {i18n_changed}')
                 self._reload_i18n()
                 reloaded['i18n'] = True
 
@@ -144,12 +150,16 @@ class HotReloader:
         if self._check_signal_file():
             reloaded['signal'] = True
 
+        if reloaded:
+            debug(f'[hot_reload] check_and_reload result: {reloaded}')
+
         return reloaded
 
     def _reload_config(self):
         """Clear JsonConfig singleton so next getConfig() call reloads from disk."""
         try:
             from appPublic.jsonConfig import JsonConfig
+            debug('[hot_reload] clearing JsonConfig singleton')
             # SingletonDecorator stores instance as .instance
             JsonConfig.instance = None
             info('[hot_reload] config.json changed, cache cleared')
@@ -160,6 +170,7 @@ class HotReloader:
         """Clear MiniI18N singleton and ServerEnv cache."""
         try:
             from appPublic.i18n import MiniI18N
+            debug('[hot_reload] clearing MiniI18N singleton')
             MiniI18N.instance = None
             # Clear cached i18n on ServerEnv
             try:
@@ -167,6 +178,7 @@ class HotReloader:
                 g = ServerEnv()
                 if hasattr(g, 'myi18n'):
                     del g.myi18n
+                    debug('[hot_reload] cleared ServerEnv.myi18n')
             except Exception:
                 pass
             info('[hot_reload] i18n files changed, cache cleared')
@@ -197,6 +209,8 @@ async def hot_reload_task(app, reloader):
     from .serverenv import ServerEnv
     dispatcher = ServerEnv().event_dispatcher
     info(f'[hot_reload] started, interval={reloader._interval}s')
+    debug(f'[hot_reload] config_path={reloader._config_path}')
+    debug(f'[hot_reload] watching {len(reloader._i18n_paths)} i18n paths')
     try:
         while True:
             await asyncio.sleep(reloader._interval)
@@ -207,7 +221,10 @@ async def hot_reload_task(app, reloader):
                 # Config-only reload just refreshes JsonConfig singleton, no cache clearing needed
                 needs_cache_clear = any(k != 'config' for k in reloaded)
                 if needs_cache_clear:
+                    debug(f'[hot_reload] dispatching hot_reload event (non-config changes detected)')
                     await dispatcher.dispatch('hot_reload', reloaded)
+                else:
+                    debug(f'[hot_reload] config-only change, skipping cache clear dispatch')
     except asyncio.CancelledError:
         info('[hot_reload] stopped')
         raise
@@ -224,12 +241,14 @@ async def hot_reload_handler(request):
     from aiohttp import web
     from .serverenv import ServerEnv
     
+    debug(f'[hot_reload] HTTP endpoint triggered, writing signal to {SIGNAL_FILE}')
     # Write signal file - other workers will detect this
     with open(SIGNAL_FILE, 'w') as f:
         f.write(str(time.time()))
     
     # Dispatch immediately for current worker
     dispatcher = ServerEnv().event_dispatcher
+    debug('[hot_reload] HTTP endpoint: dispatching hot_reload event')
     await dispatcher.dispatch('hot_reload', {'source': 'http_endpoint'})
     
     return web.json_response({
