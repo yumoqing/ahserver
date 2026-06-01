@@ -22,7 +22,7 @@ from .serverenv import ServerEnv
 from .filestorage import TmpFileRecord
 from .loadplugins import load_plugins
 from .real_ip import real_ip_middleware
-from .hotreload import HotReloader, get_i18n_paths, hot_reload_task
+from .hotreload import HotReloader, get_i18n_paths, hot_reload_task, hot_reload_handler, invalidate_all_caches
 
 startup_coros = []
 cleanupctx_coros = []
@@ -135,6 +135,8 @@ class ConfiguredServer:
 				i18n_paths = get_i18n_paths(workdir)
 				reloader = HotReloader(config_path, i18n_paths)
 				reloader.set_interval(interval)
+				# Register HTTP endpoint for manual cache flush
+				self.app.router.add_get('/__hot_reload__', hot_reload_handler)
 				async def _hot_reload_startup(app):
 					task = asyncio.create_task(hot_reload_task(app, reloader))
 					app['hot_reload_task'] = task
@@ -148,7 +150,7 @@ class ConfiguredServer:
 							pass
 				self.app.on_startup.append(_hot_reload_startup)
 				self.app.cleanup_ctx.append(_hot_reload_cleanup)
-				print(f'hot_reload enabled, interval={interval}s, pid will check independently')
+				print(f'hot_reload enabled, interval={interval}s, endpoint=GET /__hot_reload__')
 
 		web.run_app(self.build_app(),host=config.website.host or '0.0.0.0',
 						port=port,
