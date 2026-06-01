@@ -219,13 +219,19 @@ def invalidate_all_caches():
     """
     cleared = []
     
-    # rbac: UserPermissions singleton with LRU caches
+    # rbac: UserPermissions is NOT a singleton — the actual instance is
+    # stored on ServerEnv by load_rbac(). Must get that instance, not
+    # create a new one (which would have empty caches).
     try:
-        from rbac.userperm import UserPermissions
-        up = UserPermissions()
-        up.ur_caches.clear()
-        up.invalidate_rp_cache()
-        cleared.append('rbac')
+        from ahserver.serverenv import ServerEnv
+        g = ServerEnv()
+        up = getattr(g, 'userpermissions', None)
+        if up is not None:
+            up.ur_caches.clear()
+            up.invalidate_rp_cache()
+            cleared.append('rbac')
+        else:
+            debug('[hot_reload] rbac: userpermissions not found on ServerEnv')
     except Exception as e:
         debug(f'[hot_reload] rbac cache clear skipped: {e}')
     
@@ -237,12 +243,13 @@ def invalidate_all_caches():
     except Exception as e:
         debug(f'[hot_reload] pricing cache clear skipped: {e}')
     
-    # uapi: UAPIData singleton with apidata and org_users dicts
+    # uapi: UAPIData singleton (@SingletonDecorator) with 3 cache dicts
     try:
         from uapi.apidata import UAPIData
         ud = UAPIData()
         ud.apidata.clear()
         ud.org_users.clear()
+        ud.apikeys.clear()
         cleared.append('uapi')
     except Exception as e:
         debug(f'[hot_reload] uapi cache clear skipped: {e}')
