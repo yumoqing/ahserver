@@ -176,6 +176,12 @@ class AuthAPI:
 				t3 = time.time()
 				if t3 - t1 > 1.0:
 					debug(f'timecost=client({ip}) {user} access {path} cost {t3-t1:.3f}, ({t2-t1:.3f})')
+				# Reissue ticket if needed (fix for StreamResponse not triggering process_response)
+				from aiohttp_auth.auth.ticket_auth import _REISSUE_KEY
+				if _REISSUE_KEY in request:
+					policy = request.get('aiohttp_auth.policy')
+					if policy and hasattr(policy, 'remember_ticket'):
+						await policy.remember_ticket(request, request[_REISSUE_KEY])
 				return ret
 			except Exception as e:
 				t3 = time.time()
