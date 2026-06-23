@@ -198,7 +198,9 @@ class ProcessorResource(StaticResource,Url2File):
 			portp = ''
 		self._preurl = f'{self._scheme}://{self._host}{portp}{self._prepath}'
 		request['base_url'] = self._preurl
-		os.environ.setdefault('BASEURL', self._preurl)
+		# 记录最近一次请求的 base URL，供无 request 上下文的代码兜底使用
+		# 多域名部署时应通过 BASEURL 环境变量显式指定主域名
+		os.environ['_LAST_BASEURL'] = self._preurl
 		# print(f'{request.path=}, {self._preurl=}')
 
 

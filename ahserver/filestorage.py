@@ -218,7 +218,8 @@ async def downloadfile2url(request, url, headers=None, params=None, data={}, met
 	return f'/idfile?path={quote(webpath)}'
 
 def get_baseurl():
-	baseurl = os.environ.get('BASEURL')
+	# 优先级：BASEURL（显式配置，多域名部署用） > _LAST_BASEURL（自动推导，单域名场景）
+	baseurl = os.environ.get('BASEURL') or os.environ.get('_LAST_BASEURL')
 	return baseurl
 
 async def base642file(b64str):
