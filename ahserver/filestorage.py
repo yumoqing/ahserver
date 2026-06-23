@@ -208,9 +208,14 @@ async def downloadfile2url(request, url, headers=None, params=None, data={}, met
 	fpath = await downloadfile(url, headers=headers, params=params, data=data, method=method)
 	fs = FileStorage()
 	webpath = fs.webpath(fpath)
-	env = request._run_ns
-	url = env.entire_url('/idfile?path=') + env.quote(webpath)
-	return url
+	if request:
+		env = request._run_ns
+		url = env.entire_url('/idfile?path=') + env.quote(webpath)
+		return url
+	baseurl = get_baseurl()
+	if baseurl:
+		return f'{baseurl}/idfile?path={quote(webpath)}'
+	return f'/idfile?path={quote(webpath)}'
 
 def get_baseurl():
 	baseurl = os.environ.get('BASEURL')

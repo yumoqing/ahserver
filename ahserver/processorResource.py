@@ -198,6 +198,7 @@ class ProcessorResource(StaticResource,Url2File):
 			portp = ''
 		self._preurl = f'{self._scheme}://{self._host}{portp}{self._prepath}'
 		request['base_url'] = self._preurl
+		os.environ.setdefault('BASEURL', self._preurl)
 		# print(f'{request.path=}, {self._preurl=}')
 
 
