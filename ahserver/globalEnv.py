@@ -298,6 +298,7 @@ def initEnv():
 	g.strdate_add = strdate_add
 	g.uObject = uObject
 	g.uuid = getID
+	g.getID = getID
 	g.folderInfo = folderInfo
 	g.abspath = abspath
 	g.data2xlsx = data2xlsx
