@@ -377,6 +377,9 @@ class ProcessorResource(StaticResource,Url2File):
 		request['port'] = config.website.port
 		processor = self.url2processor(request, str(request.url), self.request_filename)
 		if processor:
+			# Fix real_path when fallback added an extension
+			if self.request_filename and (not hasattr(processor, 'real_path') or not processor.real_path):
+				processor.real_path = self.request_filename
 			ret = await processor.handle(request)
 			return ret
 

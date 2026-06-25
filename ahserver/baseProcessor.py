@@ -68,7 +68,9 @@ class BaseProcessor:
 		if self.env_set:
 			self.run_ns['params_kw'].update(params)
 			return
-		self.real_path = self.resource.url2file(request.path)
+		# Only calculate real_path if not already set (e.g., by fallback in _handle)
+		if not hasattr(self, 'real_path') or self.real_path is None:
+			self.real_path = self.resource.url2file(request.path)
 		g = ServerEnv()
 		self.run_ns = DictObject()
 		self.run_ns.update(g)
