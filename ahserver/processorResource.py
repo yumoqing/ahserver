@@ -364,6 +364,13 @@ class ProcessorResource(StaticResource,Url2File):
 		self.user = await auth.get_auth(request)
 		self.y_env.user = self.user
 		self.request_filename = self.url2file(str(request.path))
+		# Fallback: try adding processor extensions for extensionless URLs
+		if not self.request_filename:
+			for ext, _ in self.y_processors:
+				candidate = self.url2file(str(request.path) + ext)
+				if candidate:
+					self.request_filename = candidate
+					break
 		request['request_filename'] = self.request_filename
 		path = request.path
 		config = getConfig()
