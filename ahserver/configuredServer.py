@@ -11,6 +11,7 @@ from appPublic.dictObject import DictObject
 from appPublic.jsonConfig import getConfig
 from appPublic.log import info, debug, warning, error, critical, exception
 from appPublic.registerfunction import RegisterFunction
+from appPublic.streamhttpclient import set_use_socks5
 
 from sqlor.dbpools import DBPools
 
@@ -58,6 +59,8 @@ class ConfiguredServer:
 					{'workdir':self.workdir,'ProgramPath':pp})
 		else:
 			config = getConfig()
+		socks5_use = config.use_socks5 or False
+		set_use_socks5(use_socks5_use)
 		if config.databases:
 			DBPools(config.databases)
 		self.config = config
