@@ -13,6 +13,7 @@ import asyncio
 from contextlib import asynccontextmanager
 
 from aiohttp import BasicAuth
+from aiohttp.client_exceptions import ClientConnectionResetError
 from aiohttp.web import (
 	HTTPException,
 	HTTPBadRequest,
@@ -124,6 +125,9 @@ async def stream_response(request, async_data_generator, content_type='text/html
 			else:
 				d = json.dumps(d, ensure_ascii=False)
 				await res.write(d.encode('utf-8'))
+		except ClientConnectionResetError:
+			# 客户端已断开，静默忽略，不要 re-raise
+			break
 		except Exception as e:
 			e = Exception(f'write error{e=}, {d=}')
 			exception(f'{e}\n{format_exc()}')
