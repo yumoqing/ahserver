@@ -60,7 +60,7 @@ class ConfiguredServer:
 		else:
 			config = getConfig()
 		socks5_use = config.use_socks5 or False
-		set_use_socks5(use_socks5_use)
+		set_use_socks5(socks5_use)
 		if config.databases:
 			DBPools(config.databases)
 		self.config = config
