@@ -41,11 +41,11 @@ async def file_download(request, filepath):
 
 async def path_download(request, params_kw, *params, **kw):
 	path = params_kw.get('path')
-
 	if path is None:
 		if not params:
 			raise Exception(f'not path found')
-		path = params.join('/')
+		debug(f'{params=}')
+		path = '/'.join(params)
 
 	download = False
 	if params_kw.get('download'):
