@@ -10,6 +10,8 @@ import time
 import base64
 from urllib.parse import quote
 from appPublic.worker import get_event_loop
+from appPublic.uniqueID import getID
+from appPublic.qr import gen_qr, gen_qr_withlogo
 from appPublic.folderUtils import _mkdir
 from appPublic.base64_to_file import base64_to_file, getFilenameFromBase64
 from appPublic.jsonConfig import getConfig
@@ -254,4 +256,15 @@ async def b64media2url(request, mediafile):
 	if baseurl:
 		return f'{baseurl}/idfile?path={quote(mediafile)}'
 	return f'/downlaod{quote(mediafile)}'
+
+async def data2qrpath(data, logo=None):
+	fs = FileStorage()
+	qr_name = f'{getID()}.png'
+	path = fs._name2path(qr_name)
+	if logo:
+		gen_qr_withlog(data, path, logo)
+	else:
+		gen_qr(data, path)
+	return fs.webpath(path)
+
 

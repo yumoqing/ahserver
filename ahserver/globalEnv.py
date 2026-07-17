@@ -84,7 +84,7 @@ from .error import (
 
 from .filetest import current_fileno
 from .filedownload import path_download, file_download, file_response
-from .filestorage import FileStorage, downloadfile2url, get_baseurl, b64media2url
+from .filestorage import FileStorage, downloadfile2url, get_baseurl, b64media2url, data2qrpath
 from .serverenv import ServerEnv
 
 def server_error(errcode):
@@ -357,6 +357,7 @@ def initEnv():
 	g.openai_429 = openai_429
 	g.timestampAdd = timestampAdd
 	g.timestampSub = timestampSub
+	g.data2qrpath = data2qrpath
 
 def web_rootpath():
 	config = getConfig()
