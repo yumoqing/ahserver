@@ -238,6 +238,22 @@ def webpath_to_base64(webpath):
 		b64 = base64.b64encode(f.read()).decode('utf-8')
 	return f'data:{mime};base64,{b64}'
 
+def build_kimi_content(prompt='', image_files=None, video_files=None):
+	"""构造 kimi 多模态 content 数组 JSON"""
+	import json
+	parts = []
+	if prompt:
+		parts.append({"type": "text", "text": prompt})
+	for f in (image_files or []):
+		b64 = webpath_to_base64(f)
+		if b64:
+			parts.append({"type": "image_url", "image_url": b64})
+	for f in (video_files or []):
+		b64 = webpath_to_base64(f)
+		if b64:
+			parts.append({"type": "video_url", "video_url": b64})
+	return json.dumps(parts, ensure_ascii=False)
+
 async def base642file(b64str):
 	filename = getFilenameFromBase64(b64str)
 	if ',' in b64str:
@@ -281,7 +297,8 @@ async def data2qrpath(data, logo=None):
 		gen_qr(data, path)
 	return fs.webpath(path)
 
-from appPublic.registerfunction import registerFunction
-registerFunction('webpath_to_base64', webpath_to_base64)
+from .serverenv import ServerEnv
+ServerEnv().webpath_to_base64 = webpath_to_base64
+ServerEnv().build_kimi_content = build_kimi_content
 
 
