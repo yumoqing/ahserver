@@ -224,6 +224,20 @@ def get_baseurl():
 	baseurl = os.environ.get('BASEURL') or os.environ.get('_LAST_BASEURL')
 	return baseurl
 
+def webpath_to_base64(webpath):
+	"""将 webpath 转为 base64 data URI，供 kimi 等多模态 uapi 使用"""
+	import mimetypes
+	fs = FileStorage()
+	fp = fs.realPath(webpath)
+	if not os.path.isfile(fp):
+		return ''
+	mime, _ = mimetypes.guess_type(fp)
+	if not mime:
+		mime = 'application/octet-stream'
+	with open(fp, 'rb') as f:
+		b64 = base64.b64encode(f.read()).decode('utf-8')
+	return f'data:{mime};base64,{b64}'
+
 async def base642file(b64str):
 	filename = getFilenameFromBase64(b64str)
 	if ',' in b64str:
@@ -266,5 +280,8 @@ async def data2qrpath(data, logo=None):
 	else:
 		gen_qr(data, path)
 	return fs.webpath(path)
+
+from appPublic.registerfunction import registerFunction
+registerFunction('webpath_to_base64', webpath_to_base64)
 
 
