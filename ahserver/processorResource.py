@@ -210,10 +210,13 @@ class ProcessorResource(StaticResource,Url2File):
 		               '.svg', '.woff', '.woff2', '.ttf', '.eot', '.map',
 		               '.webp', '.bmp', '.mp3', '.mp4', '.webm', '.ogg', '.wav')
 		path_lower = request.path.lower()
-		# /idfile/ is virtual file storage, not a disk path — skip static fast track
-		if any(path_lower.endswith(ext) for ext in static_exts) and not path_lower.startswith('/idfile/'):
-			self.parse_request(request)
-			return await super()._handle(request)
+		if any(path_lower.endswith(ext) for ext in static_exts):
+			# Skip fast path for virtual path prefixes (startswiths in config)
+			config = getConfig()
+			skip = any(path_lower.startswith(a.leading) for a in (config.website.startswiths or []))
+			if not skip:
+				self.parse_request(request)
+				return await super()._handle(request)
 
 		clientkeys = {
 			"iPhone":"iphone",
