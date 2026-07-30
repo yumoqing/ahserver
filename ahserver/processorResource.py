@@ -206,13 +206,18 @@ class ProcessorResource(StaticResource,Url2File):
 
 	async def _handle(self,request:Request) -> StreamResponse:
 		# Fast path for static assets: skip auth closures, i18n, url2processor, isHtml
-		static_exts = ('.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.ico',
-		               '.svg', '.woff', '.woff2', '.ttf', '.eot', '.map',
-		               '.webp', '.bmp', '.mp3', '.mp4', '.webm', '.ogg', '.wav')
+		config = getConfig()
+		_base = ('.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.ico',
+		         '.svg', '.woff', '.woff2', '.ttf', '.eot', '.map',
+		         '.webp', '.bmp', '.mp3', '.mp4', '.webm', '.ogg', '.wav',
+		         '.pdf', '.json', '.xml', '.txt', '.csv', '.wasm',
+		         '.m4a', '.aac', '.flac', '.mov', '.avi', '.mkv',
+		         '.glb', '.gltf', '.obj', '.zip')
+		cfg_exts = getattr(getattr(config, 'website', None), 'static_exts', None) or []
+		static_exts = tuple(list(_base) + list(cfg_exts))
 		path_lower = request.path.lower()
 		if any(path_lower.endswith(ext) for ext in static_exts):
 			# Skip fast path for virtual path prefixes (startswiths in config)
-			config = getConfig()
 			skip = any(path_lower.startswith(a.leading) for a in (config.website.startswiths or []))
 			if not skip:
 				self.parse_request(request)
