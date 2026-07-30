@@ -41,6 +41,7 @@ import time
 import datetime
 from openpyxl import Workbook
 from tempfile import mktemp
+import base64
 
 from appPublic.qr import gen_qr, gen_qr_withlogo
 from appPublic.base64_to_file import hex2base64
@@ -351,6 +352,7 @@ def initEnv():
 	g.openai_401 = openai_401
 	g.get_baseurl = get_baseurl
 	g.hex2base64 = hex2base64
+	g.base64 = base64
 	g.b64media2url = b64media2url
 	g.openai_403 = openai_403
 	g.openai_400 = openai_400
