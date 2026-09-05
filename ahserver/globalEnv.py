@@ -43,6 +43,7 @@ from openpyxl import Workbook
 from tempfile import mktemp
 
 from appPublic.qr import gen_qr, gen_qr_withlogo
+import base64
 from appPublic.base64_to_file import hex2base64
 from appPublic.jsonConfig import getConfig
 from appPublic.dictObject import DictObject
@@ -350,6 +351,7 @@ def initEnv():
 	g.return_error = return_error
 	g.openai_401 = openai_401
 	g.get_baseurl = get_baseurl
+	g.base64 = base64
 	g.hex2base64 = hex2base64
 	g.b64media2url = b64media2url
 	g.openai_403 = openai_403

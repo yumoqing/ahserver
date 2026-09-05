@@ -212,12 +212,12 @@ async def downloadfile2url(request, url, headers=None, params=None, data={}, met
 	webpath = fs.webpath(fpath)
 	if request:
 		env = request._run_ns
-		url = env.entire_url('/idfile') + '?path=' + env.quote(webpath)
+		url = env.entire_url('/idfile') + env.quote(webpath)
 		return url
 	baseurl = get_baseurl()
 	if baseurl:
-		return f'{baseurl}/idfile?path={quote(webpath)}'
-	return f'/idfile?path={quote(webpath)}'
+		return f'{baseurl}/idfile{quote(webpath)}'
+	return f'/idfile{quote(webpath)}'
 
 def get_baseurl():
 	# 优先级：BASEURL（显式配置，多域名部署用） > _LAST_BASEURL（自动推导，单域名场景）
@@ -264,12 +264,12 @@ async def b64media2url(request, mediafile):
 		return ''
 	if request:
 		entire_url = request._run_ns.entire_url
-		url = entire_url('/idfile?path=') + quote(webpath)
+		url = entire_url('/idfile') + quote(webpath)
 		return url
 	baseurl = get_baseurl()
 	if baseurl:
-		return f'{baseurl}/idfile?path={quote(mediafile)}'
-	return f'/downlaod{quote(mediafile)}'
+		return f'{baseurl}/idfile{quote(mediafile)}'
+	return f'/idfile{quote(mediafile)}'
 
 async def data2qrpath(data, logo=None):
 	fs = FileStorage()
