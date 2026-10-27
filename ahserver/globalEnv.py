@@ -58,7 +58,7 @@ from appPublic.folderUtils import folderInfo
 from appPublic.uniqueID import setNode,getID
 from appPublic.unicoding import unicoding,uDict,uObject
 from appPublic.Singleton import SingletonDecorator
-from appPublic.rc4 import password, unpassword
+from appPublic.aes import aes_encode_b64, aes_decode_b64
 from appPublic.registerfunction import RegisterFunction
 from appPublic.httpclient import HttpClient
 from appPublic.log import debug, exception
@@ -319,11 +319,11 @@ def get_password_key():
 
 def password_encode(s):
 	k = get_password_key()
-	return password(s, key=k)
+	return aes_encode_b64(k, s)
 
 def password_decode(c):
 	k = get_password_key()
-	return unpassword(c, key=k)
+	return aes_decode_b64(k, c)
 
 @asynccontextmanager	
 async def sqlorContext(module):
