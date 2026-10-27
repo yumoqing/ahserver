@@ -130,13 +130,12 @@ class ProcessorResource(StaticResource,Url2File):
 			pd = await request.post()
 			pd = multiDict2Dict(pd)
 			if pd == {}:
-				if request.can_read_body:
+				try:
 					x = await request.read()
-					try:
+					if x:
 						pd = json.loads(x)
-					except:
-						# print('body is not a json')
-						pass
+				except:
+					pass
 			qd.update(pd)
 			return DictObject(**qd)
 		ns = qd
