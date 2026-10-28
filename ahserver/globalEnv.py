@@ -318,10 +318,13 @@ def get_password_key():
 	return config.password_key or 'QRIVSRHrthhwyjy176556332'
 
 def password_encode(s):
-	# 空值保护（2026-10-28）：dspy 端点在无 body / GET 调用时 params_kw.password 为 None，
-	# 旧实现直接进 aes_encode_b64 -> plaintext.encode() 抛 AttributeError，端点返回 500。
-	# 语义上空口令应编码为空串，由调用方（登录/注册校验）返回业务错误码而非 5xx。
-	if s is None or s == '':
+	# 空值保护（2026-10-28，安全修正 v2）：
+	# 只对 None 返回空串——目的是避免 dspy 无 body/GET 调用时 aes_encode_b64(None)
+	# 抛 AttributeError 变 500。**不对显式空串 '' 做短路**：空串必须走真加密
+	# （生成非空密文），否则 SQL `password=''` 会匹配库里的空口令账号，
+	# 形成「任意人用空密码登录」的越权面（2026-10-28 实测 admin 空口令登录成功）。
+	# 调用方（up_login/register/reset_password）另加判空拒绝，双保险。
+	if s is None:
 		return ''
 	k = get_password_key()
 	return aes_encode_b64(k, s)
