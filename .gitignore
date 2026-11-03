@@ -4,3 +4,6 @@ build/
 *.pyc
 *.pyo
 .DS_Store
+init/
+logs/
+*.log
