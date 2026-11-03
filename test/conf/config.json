@@ -1,0 +1,102 @@
+{
+	"password_key":"!@#$%^&*(*&^%$QWERTYUIqwertyui234567",
+	"logger":{
+		"name":"sage",
+		"levelname":"clientinfo",
+		"logfile":"$[workdir]$/logs/sage.log"
+	},
+    "pay":{
+        "alipay":{
+            "public_key_file":"$[workdir]$/conf/alipay/public.txt",
+            "private_key_file":"$[workdir]$/conf/alipay/private.txt",
+            "appid":"2021005111636494",
+            "callback":"https://sage.opencomputing.cn/api/callback/alipay"
+        },  
+        "paypal":{
+            "mode":"sandbox",
+            "client_id":"myid",
+            "client_secret":"mysecret",
+            "return_url":"ret_url",
+            "cancel_url":"cancel_url"
+        }   
+	},
+	"skills_dir": "$[workdir]$/skills",
+	"filesroot":"$[workdir]$/files",
+	"databases":{
+		"sage":{
+			"driver":"mysql",
+			"kwargs":{
+				"user":"test",
+				"db":"sage",
+				"password":"SS+C1MDMJrslBwGzYIv3nQ==",
+				"charset": "utf8mb4",
+				"host":"db"
+			}
+		}
+	},
+	"zmq_url": "tcp://127.0.0.1:5555",
+	"website":{
+		"paths":[
+			["$[workdir]$/wwwroot",""]
+		],
+		"client_max_size":1000000000,
+		"host":"0.0.0.0",
+		"port":9080,
+		"coding":"utf-8",
+		"ssl_gg":{
+			"crtfile":"$[workdir]$/conf/www.bsppo.com.pem",
+			"keyfile":"$[workdir]$/conf/www.bsppo.com.key"
+		},
+		"indexes":[
+			"index.html",
+			"index.tmpl",
+			"index.ui",
+			"index.dspy",
+			"index.md"
+		],
+		"startswiths":[
+			{
+				"leading":"/idfile",
+				"registerfunction":"idfile"
+			},{
+				"leading":"/i18n_getmsgs",
+				"registerfunction":"i18n"
+			}
+		],
+		"processors":[
+			[".ws","ws"],
+			[".xterm","xterm"],
+			[".proxy","proxy"],
+			[".llm", "llm"],
+			[".llms", "llms"],
+			[".llma", "llma"],
+			[".xlsxds","xlsxds"],
+			[".sqlds","sqlds"],
+			[".tmpl.js","tmpl"],
+			[".tmpl.css","tmpl"],
+			[".html.tmpl","tmpl"],
+			[".bcrud", "bricks_crud"],
+			[".tmpl","tmpl"],
+			[".app","app"],
+			[".bui","bui"],
+			[".ui","bui"],
+			[".dspy","dspy"],
+			[".md","md"]
+		],
+		"rsakey":{
+			"privatekey":"$[workdir]$/conf/rsa_private_key.pem",
+			"publickey":"$[workdir]$/conf/rsa_public_key.pem"
+		},
+		"session_max_time":3000,
+		"session_issue_time":2500,
+		"session_redis":{
+			"url":"redis://127.0.0.1:6379"
+		}
+	},
+	"langMapping":{
+		"zh-Hans-CN":"zh-cn",
+		"zh-CN":"zh-cn",
+		"en-us":"en",
+		"en-US":"en"
+	}
+}
