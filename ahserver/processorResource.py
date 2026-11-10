@@ -61,6 +61,23 @@ from .utils import unicode_escape
 from .filetest import current_fileno
 from .auth_api import user_login, user_logout, get_session_user, get_session_userinfo
 
+
+class InvalidPathError(HTTPNotFound):
+	"""请求 URL 无法映射到任何已注册资源（invalid path）。
+
+	语义归属：客户端侧 —— 该 URL 在路由树里不存在，应答 404，响应体为
+	``no such resource: <url>``。
+
+	历史缺陷（R49-c C 根因）：本文件曾以裸 ``raise Exception(...)`` 上抛该语义，
+	aiohttp 对未分类异常一律渲染 500，导致「未注册 .dspy 路径」返回
+	``500 Internal Server Error`` 而非 404。继承 :class:`HTTPNotFound`
+	（``HTTPException`` 子类）后由 aiohttp 按 HTTP 语义渲染，不经任何
+	中间件、不改写业务调用的异常。
+	"""
+	def __init__(self, url=None):
+		text = 'no such resource: %s' % (str(url),) if url else 'no such resource'
+		super().__init__(text=text)
+
 def getHeaderLang(request):
 	al = request.headers.get('Accept-Language')
 	if al is None:
@@ -395,7 +412,9 @@ class ProcessorResource(StaticResource,Url2File):
 			return await self.html_handle(request, self.request_filename)
 
 		if not self.request_filename:
-			raise Exception(f'{str(request.url)=} invalid path')
+			# invalid path 是客户端侧语义 -> 404（HTTPException 由 aiohttp 渲染），
+			# 禁止裸 Exception 上抛：会被 aiohttp 兜成 500（R49-c C 根因）。
+			raise InvalidPathError(str(request.url))
 
 		if os.path.isdir(self.request_filename):
 			config = getConfig()
